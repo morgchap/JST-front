@@ -22,7 +22,7 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    centered: {
+  container: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
