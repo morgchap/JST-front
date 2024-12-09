@@ -1,9 +1,9 @@
 import { Text, View, StyleSheet } from 'react-native';
 
-export default function SearchScreen() {
+export default function ListsScreen() {
   return (
     <View style={styles.centered}>
-    <Text>This is the Search page</Text>
+    <Text>This is the Lists page</Text>
     </View>
   );
 }
