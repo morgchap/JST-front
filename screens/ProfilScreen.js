@@ -1,9 +1,39 @@
 import { Text, View, StyleSheet, Image, ScrollView } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {
+  useFonts,
+  OpenSans_300Light,
+  OpenSans_400Regular,
+  OpenSans_500Medium,
+  OpenSans_600SemiBold,
+  OpenSans_700Bold,
+  OpenSans_800ExtraBold,
+  OpenSans_300Light_Italic,
+  OpenSans_400Regular_Italic,
+  OpenSans_500Medium_Italic,
+  OpenSans_600SemiBold_Italic,
+  OpenSans_700Bold_Italic,
+  OpenSans_800ExtraBold_Italic,
+} from '@expo-google-fonts/open-sans';
 
 
 
 export default function ProfilScreen() {
+
+  let [fontsLoaded] = useFonts({
+    OpenSans_300Light,
+    OpenSans_400Regular,
+    OpenSans_500Medium,
+    OpenSans_600SemiBold,
+    OpenSans_700Bold,
+    OpenSans_800ExtraBold,
+    OpenSans_300Light_Italic,
+    OpenSans_400Regular_Italic,
+    OpenSans_500Medium_Italic,
+    OpenSans_600SemiBold_Italic,
+    OpenSans_700Bold_Italic,
+    OpenSans_800ExtraBold_Italic,
+  });
 
 const stars = [];
 for (let i = 0; i < 5; i++) {
@@ -21,45 +51,53 @@ for (let i = 0; i < 5; i++) {
         <Text style={styles.pseudo}>@TheBestMorg</Text>
       </View>
       <View style={styles.stats}>
-          <Text>7 jeux</Text>
-          <Text>12 amis</Text>
+          <Text style={styles.statsText}>7 jeux</Text>
+          <Text style={styles.statsText}>12 amis</Text>
       </View>
-      <View style={styles.games}>
-          <Text style={styles.secondTitles}>Mes jeux préférés</Text>
-          <View style={styles.listGame}> 
-          <View style={styles.gameContainer}>
-            <Text style={styles.gameTitle}>Mario</Text>
-            <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-            <View style={styles.starsContainer}>
-            {stars}
-            </View>
-          </View>
-          <View style={styles.gameContainer}>
-            <Text style={styles.gameTitle}>Mario</Text>
-            <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-            <View style={styles.starsContainer}>
-            {stars}
-            </View>
-          </View>
-          <View style={styles.gameContainer}>
-            <Text style={styles.gameTitle}>Mario</Text>
-            <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-            <View style={styles.starsContainer}>
-            {stars}
-            </View>
-          </View>
-          <View style={styles.gameContainer}>
-            <Text style={styles.gameTitle}>Mario</Text>
-            <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-            <View style={styles.starsContainer}>
-            {stars}
-            </View>
-          </View>
+      <View style={styles.gameDiv}>
+        <View style={styles.games}>
+            <Text style={styles.secondTitles}>Mes jeux préférés (5)</Text>
+            <ScrollView horizontal={true} style={styles.listGame}> 
+              <View style={styles.gameContainer}>
+                <Text style={styles.gameTitle}>Mario</Text>
+                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
+                <View style={styles.starsContainer}>
+                {stars}
+                </View>
+              </View>
+              <View style={styles.gameContainer}>
+                <Text style={styles.gameTitle}>Mario</Text>
+                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
+                <View style={styles.starsContainer}>
+                {stars}
+                </View>
+              </View>
+              <View style={styles.gameContainer}>
+                <Text style={styles.gameTitle}>Mario</Text>
+                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
+                <View style={styles.starsContainer}>
+                {stars}
+                </View>
+              </View>
+              <View style={styles.gameContainer}>
+                <Text style={styles.gameTitle}>Mario</Text>
+                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
+                <View style={styles.starsContainer}>
+                {stars}
+                </View>
+              </View>
+              <View style={styles.gameContainer}>
+                <Text style={styles.gameTitle}>Mario</Text>
+                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
+                <View style={styles.starsContainer}>
+                {stars}
+                </View>
+              </View>
+            </ScrollView>
         </View>
       </View>
       <View style={styles.myFriendTitleDiv}>
-          <Text style={styles.myFriendsTitle}>Mes amis </Text>
-          <Text>(12)</Text>
+          <Text style={styles.myFriendsTitle}>Mes amis (12)</Text>
         </View>
         <ScrollView style={styles.friendsView}>
         
@@ -67,64 +105,64 @@ for (let i = 0; i < 5; i++) {
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="purple" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="purple" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size="20"/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="purple" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="purple" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size="20"/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="purple" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="purple" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size="20"/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="purple" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="purple" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size="20"/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="purple" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="purple" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size="20"/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="purple" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="purple" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size="20"/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="purple" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="purple" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size="20"/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="purple" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="purple" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size="20"/>
             </View>
         </View>
       </ScrollView>
@@ -157,8 +195,9 @@ const styles = StyleSheet.create({
     pseudo: {
       fontSize: 20,
       paddingTop: 10,
-      color: "purple",
+      color: "#7A28CB",
       paddingBottom: 10,
+      fontWeight: "bold",
 
     },
     stats: {
@@ -168,26 +207,40 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       justifyContent: "space-around",
       alignItems: "center",
-      borderBottomWidth: 1,
+      
 
     },
-    games: {
+    gameDiv: {
       display: "flex",
-      width: "100%",
-      height: "30%",
-      flexDirection: "column",
-      justifyContent: "space-around",
+      justifyContent: "center",
       alignItems: "center",
-      borderBottomWidth: 1,
+      width: "100%",
+      
+    },
+    games: {
+      width: "95%",
+      height: "auto",
+      backgroundColor: "#7A28CB",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      borderBottomWidth: 2,
+      borderBottomColor: '#7A28CB',
       paddingBottom: 10,
+      borderRadius: 10,
+
+    
     },
     secondTitles: {
       fontSize: 16,
+      fontFamily:'OpenSans_600SemiBold',
+      color : 'white',
       fontWeight: "bold",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      paddingTop: 10,
+      paddingTop: 15,
+      paddingBottom: 10,
     },
     gameContainer: {
       display: "flex",
@@ -208,6 +261,7 @@ const styles = StyleSheet.create({
     listGame: {
       display: "flex",
       flexDirection: "row",
+      marginHorizontal: 10,
      
     },
     starsContainer: {
@@ -216,7 +270,9 @@ const styles = StyleSheet.create({
       paddingTop: 5,
     },
     gameTitle: {
-      fontStyle: "italic"
+      fontStyle: "italic",
+      color: "white",
+      
     },
     friendsView: {
       display: "flex",
@@ -242,6 +298,7 @@ const styles = StyleSheet.create({
     friendsPseudo: {
       paddingHorizontal: 10,
       fontSize: 16,
+      color: "#7A28CB",
     },
     myFriendsTitle: {
       fontSize: 16,
@@ -251,6 +308,8 @@ const styles = StyleSheet.create({
       justifyContent: "center",
       alignItems: "center",
       paddingVertical: 10,
+      fontFamily:'OpenSans_600SemiBold',
+      color : '#7A28CB',
     },
     myFriendTitleDiv: {
       display: "flex",
@@ -266,6 +325,9 @@ const styles = StyleSheet.create({
       display: "flex",
       flexDirection: "row",
       
+    },
+    statsText: {
+      color : '#7A28CB',
     }
     
     
