@@ -9,6 +9,8 @@ import SearchScreen from "./screens/SearchScreen";
 import DiscoveryScreen from "./screens/DiscoveryScreen"
 import ProfilScreen from "./screens/ProfilScreen"
 import ListsScreen from "./screens/ListsScreen"
+import SignupScreen from './screens/SignupScreen';
+import SigninScreen from './screens/SigninScreen';
 
 /*import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';*/
@@ -42,10 +44,11 @@ const TabNavigator = () => {
   
           return <FontAwesome name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#ec6e5b',
-        tabBarInactiveTintColor: '#335561',
+        tabBarActiveTintColor: '#33CA7F',
+        tabBarInactiveTintColor: '#C29CE7',
         headerShown: false,
-        tabBarStyle:{backgroundColor: '7A28CB'},
+        tabBarShowLabel:false,
+        tabBarStyle:{backgroundColor: '#7A28CB'},
       })}>
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Search" component={SearchScreen} />
@@ -76,6 +79,8 @@ export default function App() {
               <Stack.Navigator screenOptions={{ headerShown: false }}>
                   <Stack.Screen name="Login" component={LoginScreen} />
                   <Stack.Screen name="TabNavigator" component={TabNavigator} />
+                  <Stack.Screen name="Signup" component={SignupScreen} />
+                  <Stack.Screen name="Signin" component={SigninScreen} />
               </Stack.Navigator>
           </NavigationContainer>
   )
