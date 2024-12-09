@@ -1,10 +1,38 @@
-import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TextInput, ImageBackground, Pressable } from 'react-native';
+import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TextInput, ImageBackground, Pressable, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
+import { updateUsername } from '../reducers/user';
+import { useDispatch, useSelector } from 'react-redux';
 
-export default function SigninScreen() {
+export default function SigninScreen({navigation}) {
 
   const [username, setUsername]= useState('')
   const [password, setpassword]= useState('')
+  //let backend = process.env.BACKEND_URL
+
+  const dispatch = useDispatch();
+  //rconst CurrentUsername = useSelector((state) => state.username.value);
+
+  let errorMessage = <Text></Text>
+const handlesignin = () => {
+  console.log('ok')
+  fetch('http://192.168.100.241:3000/users/signin', {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: username, password: password}),
+}).then(response => response.json())
+.then(data => {
+    console.log(data)
+    if (data.result) {
+        console.log(data);
+        setUsername('')
+        setpassword('')
+        dispatch(updateUsername({username: username, token:data.token}));
+        navigation.navigate('TabNavigator')
+    } else {
+      errorMessage = <Text style={styles.error}>incorrect password, or username</Text>
+    }
+})
+}
   
   return (
     <ImageBackground style={styles.image}
@@ -35,17 +63,17 @@ export default function SigninScreen() {
          value={username} />
           <TextInput style={styles.input} placeholder='password'onChangeText={(value) => setpassword(value)}
           value={password} />
-          <Pressable
-              style={styles.button}
+          {errorMessage}
+          <TouchableOpacity
+             style={styles.button}
             title="steam"
-          // onPress={() => navigation.navigate('Signin')}
-            >
+            onPress={() => handlesignin()}>
+              
               <Text style={styles.buttonText}>Sign in</Text>
-          </Pressable>  
+          </TouchableOpacity>  
           <Pressable
           style={styles.button2}
-        title="sign in"
-        onPress={() => navigation.navigate('TabNavigator')}
+          title="sign in"
         >
           <Text style={styles.buttonText2}>I forgot my password</Text>
       </Pressable>  
@@ -118,5 +146,8 @@ const styles = StyleSheet.create({
       textDecorationLine: 'underline',
       marginTop:'2%'
     }, 
+    error:{
+      color:'red'
+    }
   });
   

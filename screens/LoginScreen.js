@@ -1,4 +1,4 @@
-import { Text, View, Platform, KeyboardAvoidingView, TouchableOpacity, StyleSheet, Link, Image, Style, ImageBackground, Pressable} from 'react-native';
+import { Text, StyleSheet, ImageBackground, Pressable} from 'react-native';
 import AppLoading from 'expo-app-loading';
 import {
   useFonts,
