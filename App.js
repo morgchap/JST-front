@@ -9,6 +9,7 @@ import SearchScreen from "./screens/SearchScreen";
 import DiscoveryScreen from "./screens/DiscoveryScreen"
 import ProfilScreen from "./screens/ProfilScreen"
 import ListsScreen from "./screens/ListsScreen"
+import AddListScreen from "./screens/AddListScreen"
 
 /*import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';*/
@@ -76,6 +77,7 @@ export default function App() {
               <Stack.Navigator screenOptions={{ headerShown: false }}>
                   <Stack.Screen name="Login" component={LoginScreen} />
                   <Stack.Screen name="TabNavigator" component={TabNavigator} />
+                  <Stack.Screen name="AddList" component={AddListScreen} />
               </Stack.Navigator>
           </NavigationContainer>
   )
