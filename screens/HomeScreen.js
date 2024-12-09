@@ -1,15 +1,15 @@
 import { Text, View, StyleSheet } from 'react-native';
 
-export default function SearchScreen() {
+export default function HomeScreen() {
   return (
     <View style={styles.centered}>
-    <Text>This is the Search page</Text>
+    <Text>This is the Home page</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  centered: {
+    centered: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center'

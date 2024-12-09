@@ -14,7 +14,7 @@ export default function LoginScreen({ navigation }) {
         <View>
             <Text>This is the Login page</Text>
             <TouchableOpacity onPress={() => handlePress()} activeOpacity={0.8}>
-                <Text>Go to Discovery</Text>
+                <Text>Go to HomePage</Text>
             </TouchableOpacity>
         </View>
     </KeyboardAvoidingView >

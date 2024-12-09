@@ -4,9 +4,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 //importer les differents ecrans
 import LoginScreen from './screens/LoginScreen';
-import DiscoveryScreen from "./screens/DiscoveryScreen"
+import HomeScreen from "./screens/HomeScreen"
 import SearchScreen from "./screens/SearchScreen";
-import MyProfileScreen from "./screens/MyProfileScreen"
+import DiscoveryScreen from "./screens/DiscoveryScreen"
+import ProfilScreen from "./screens/ProfilScreen"
+import ListsScreen from "./screens/ListsScreen"
 
 /*import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';*/
@@ -26,12 +28,16 @@ const TabNavigator = () => {
         tabBarIcon: ({ color, size }) => {
 
           let iconName = '';
-          if (route.name === 'Discovery') {
-            iconName = 'compass';
+          if (route.name === 'Home') {
+            iconName = 'home';
           } else if (route.name === 'Search') {
+            iconName = 'glass';
+          } else if (route.name === 'Discovery') {
             iconName = 'compass';
-          } else if (route.name = 'Profile'){
+          } else if (route.name === 'Profil') {
             iconName = 'user';
+          } else if (route.name === 'Lists') {
+            iconName = 'gamepad';
           }
   
           return <FontAwesome name={iconName} size={size} color={color} />;
@@ -41,9 +47,11 @@ const TabNavigator = () => {
         headerShown: false,
         tabBarStyle:{backgroundColor: '7A28CB'},
       })}>
-        <Tab.Screen name="Discovery" component={DiscoveryScreen} />
+        <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Search" component={SearchScreen} />
-        <Tab.Screen name="Profile" component={MyProfileScreen}/>
+        <Tab.Screen name="Discovery" component={DiscoveryScreen} />
+        <Tab.Screen name="Profil" component={ProfilScreen} />
+        <Tab.Screen name="Lists" component={ListsScreen} />
       </Tab.Navigator>
     );
   };
