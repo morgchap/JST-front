@@ -29,6 +29,8 @@ const TabNavigator = () => {
             iconName = 'compass';
           } else if (route.name === 'Search') {
             iconName = 'magnifying-glass';
+          } else if (route.name = 'Profile'){
+            iconName = 'user';
           }
   
           return <FontAwesome name={iconName} size={size} color={color} />;
@@ -39,6 +41,7 @@ const TabNavigator = () => {
       })}>
         <Tab.Screen name="Discovery" component={DiscoveryScreen} />
         <Tab.Screen name="Search" component={SearchScreen} />
+        <Tab.Screen name="Profile" component={MyProfileScreen}/>
       </Tab.Navigator>
     );
   };
