@@ -44,7 +44,7 @@ import {
     style={styles.container}
     source={require('../assets/background-blur&logo.png')}>
       <Pressable
-          style={styles.button}
+        style={styles.button}
         title="sign up"
         onPress={() => navigation.navigate('Signup')}
         >
@@ -77,6 +77,7 @@ const styles = StyleSheet.create({
     buttonText:{
       fontFamily:'OpenSans_700Bold',
       color : '#7A28CB',
+      margin: 2,
 
     },
     button:{
