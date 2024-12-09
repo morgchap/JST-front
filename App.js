@@ -6,6 +6,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import LoginScreen from './screens/LoginScreen';
 import DiscoveryScreen from "./screens/DiscoveryScreen"
 import SearchScreen from "./screens/SearchScreen";
+import MyProfileScreen from "./screens/MyProfileScreen"
 
 /*import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';*/
