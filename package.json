@@ -9,11 +9,16 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/open-sans": "^0.2.3",
+    "@react-native-community/blur": "^4.4.1",
     "@react-navigation/bottom-tabs": "6",
     "@react-navigation/native": "6",
     "@react-navigation/native-stack": "6",
     "@reduxjs/toolkit": "^1.8.3",
-    "expo": "^52.0.7",
+    "blur": "^1.0.5",
+    "expo": "^52.0.17",
+    "expo-app-loading": "^2.1.1",
+    "expo-font": "~13.0.1",
     "expo-status-bar": "~2.0.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
