@@ -29,7 +29,7 @@ const TabNavigator = () => {
           if (route.name === 'Discovery') {
             iconName = 'compass';
           } else if (route.name === 'Search') {
-            iconName = 'magnifying-glass';
+            iconName = 'compass';
           } else if (route.name = 'Profile'){
             iconName = 'user';
           }
@@ -39,6 +39,7 @@ const TabNavigator = () => {
         tabBarActiveTintColor: '#ec6e5b',
         tabBarInactiveTintColor: '#335561',
         headerShown: false,
+        tabBarStyle:{backgroundColor: '7A28CB'},
       })}>
         <Tab.Screen name="Discovery" component={DiscoveryScreen} />
         <Tab.Screen name="Search" component={SearchScreen} />
