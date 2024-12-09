@@ -12,9 +12,9 @@ export default function LoginScreen({ navigation }) {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <View>
-            <Text>This is the Login page</Text>
+            <Text>This is MyProfile Screen</Text>
             <TouchableOpacity onPress={() => handlePress()} activeOpacity={0.8}>
-                <Text>Go to HomePage</Text>
+                <Text>Go to Discovery</Text>
             </TouchableOpacity>
         </View>
     </KeyboardAvoidingView >
