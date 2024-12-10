@@ -105,64 +105,64 @@ for (let i = 0; i < 5; i++) {
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
       </ScrollView>
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
-      borderBottomWidth: 2,
+      //borderBottomWidth: 2,
       borderBottomColor: '#7A28CB',
       paddingBottom: 10,
       borderRadius: 10,
