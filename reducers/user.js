@@ -10,8 +10,8 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     updateUsername: (state, action) => {
-      state.value.username = action.payload;
-      state.value.token = action.payload;
+      state.value.username = action.payload.username;
+      state.value.token = action.payload.token;
     },
   },
 });
