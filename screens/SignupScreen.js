@@ -12,6 +12,9 @@ export default function SignupScreen({navigation}) {
   const [email, setEmail]=useState('')
   //let backend = process.env.BACKEND_URL
 
+// Grabbed from emailregex.com
+const EMAIL_REGEX: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
 
   const dispatch = useDispatch();
   const CurrentUsername = useSelector((state) => state.user.value.username);
