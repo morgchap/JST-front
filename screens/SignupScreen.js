@@ -23,7 +23,8 @@ const EMAIL_REGEX: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)
 
   const handlesignup = () => {
     console.log('ok')
-    fetch('http://192.168.100.241:3000/users/signup', {
+    if (EMAIL_REGEX.test(email)){
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: username, password: password, email:email}),
@@ -41,7 +42,9 @@ const EMAIL_REGEX: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)
       } else {
         setError(data.error)
       }
-  })
+  })} else {
+    setError('this email is not valid')
+  }
   }
 
   return (
