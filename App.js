@@ -2,6 +2,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import createWebStorage from "redux-persist/lib/storage/createWebStorage";
+
 //importer les differents ecrans
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from "./screens/HomeScreen"
@@ -16,14 +18,43 @@ import Signup2Screen from './screens/Signup2Screen';
 import SetupScreen from './screens/SetupScreen'
 
 import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import user from './reducers/user'
+
+import { persistStore, persistReducer } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
 
 // importer les differents reducers
 
+const createNoopStorage = () => {
+  return {
+      getItem() {
+          return Promise.resolve(null);
+      },
+      setItem(value) {
+          return Promise.resolve(value);
+      },
+      removeItem() {
+          return Promise.resolve();
+      },
+  };
+};
+
+const storage = typeof window !== "undefined" ? createWebStorage("local") : createNoopStorage();
+
+
+const reducers = combineReducers({ user });
+
+const persistConfig = { key: 'JST', storage }; // pensez a y mettre les different reducer importe
+
 const store = configureStore({
-  reducer: { user }, // pensez a y mettre les different reducer importer
-});
+  reducer: persistReducer(persistConfig, reducers),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false })
+ });
+
+ const persistor= persistStore(store);
+
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -81,17 +112,19 @@ const TabNavigator = () => {
 export default function App() {
   return (
          <Provider store={store}>
-          <NavigationContainer>
-              <Stack.Navigator screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="Login" component={LoginScreen} />
-                  <Stack.Screen name="TabNavigator" component={TabNavigator} />
-                  <Stack.Screen name="AddList" component={AddListScreen} />
-                  <Stack.Screen name="Signup" component={SignupScreen} />
-                  <Stack.Screen name="Signin" component={SigninScreen} />
-                  <Stack.Screen name="Setup" component={SetupScreen} />
-                  <Stack.Screen name="Signup2" component={Signup2Screen} />
-              </Stack.Navigator>
-          </NavigationContainer>
-          </Provider>
+          <PersistGate persistor={persistor}>
+            <NavigationContainer>
+                <Stack.Navigator screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="TabNavigator" component={TabNavigator} />
+                    <Stack.Screen name="AddList" component={AddListScreen} />
+                    <Stack.Screen name="Signup" component={SignupScreen} />
+                    <Stack.Screen name="Signin" component={SigninScreen} />
+                    <Stack.Screen name="Setup" component={SetupScreen} />
+                    <Stack.Screen name="Signup2" component={Signup2Screen} />
+                </Stack.Navigator>
+            </NavigationContainer>
+          </PersistGate>
+        </Provider>
   )
 }
