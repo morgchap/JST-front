@@ -1,6 +1,7 @@
 import { Text, View, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState } from "react";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { useSelector } from 'react-redux';
 
 import {
   useFonts,
@@ -31,9 +32,13 @@ for (let i = 0; i < 5; i++) {
 
 export default function SetupScreen({ navigation }) {
 
+    const user = useSelector((state) => state.user.value)
+
     const [newPseudo, setNewPseudo] = useState("");
     const [newEmail, setNewEmail] = useState("");
     const [newPassword, setNewPassword] = useState("");
+
+    
 
     
 
@@ -60,7 +65,7 @@ export default function SetupScreen({ navigation }) {
     </View>
     <View style={styles.me}>
       <Image style={styles.avatar} source={require("../assets/avatar.png")} />
-      <Text style={styles.pseudo}>@TheBestMorg</Text>
+      <Text style={styles.pseudo}>@{user.username}</Text>
     </View>
     
     <View style={styles.infoDiv}>
