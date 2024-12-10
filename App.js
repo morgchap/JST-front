@@ -12,7 +12,8 @@ import ListsScreen from "./screens/ListsScreen"
 import AddListScreen from "./screens/AddListScreen"
 import SignupScreen from './screens/SignupScreen';
 import SigninScreen from './screens/SigninScreen';
-import SetupScreen from './screens/SetupScreen';
+import Signup2Screen from './screens/Signup2Screen';
+import SetupScreen from './screens/SetupScreen'
 
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
@@ -88,6 +89,7 @@ export default function App() {
                   <Stack.Screen name="Signup" component={SignupScreen} />
                   <Stack.Screen name="Signin" component={SigninScreen} />
                   <Stack.Screen name="Setup" component={SetupScreen} />
+                  <Stack.Screen name="Signup2" component={Signup2Screen} />
               </Stack.Navigator>
           </NavigationContainer>
           </Provider>

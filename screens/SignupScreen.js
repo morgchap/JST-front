@@ -34,7 +34,7 @@ export default function SignupScreen({navigation}) {
           setEmail('')
           dispatch(updateUsername({username: username, token:data.token}));
           console.log(`username:${username} and reducers:${CurrentUsername}`)
-          //navigation.navigate('TabNavigator')
+          navigation.navigate('Signup2')
       } else {
         setError(data.error)
       }
