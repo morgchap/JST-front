@@ -20,7 +20,7 @@ export default function SigninScreen({navigation}) {
 
 const handlesignin = () => {
   console.log('ok')
-  fetch('http://192.168.100.241:3000/users/signin', {
+  fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/signin`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username: username, password: password}),
