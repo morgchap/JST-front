@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState } from "react";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
@@ -32,7 +32,10 @@ for (let i = 0; i < 5; i++) {
 export default function SetupScreen({ navigation }) {
 
     const [newPseudo, setNewPseudo] = useState("");
-    console.log(newPseudo);
+    const [newEmail, setNewEmail] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+
+    
 
 
   let [fontsLoaded] = useFonts({
@@ -63,17 +66,35 @@ export default function SetupScreen({ navigation }) {
     <View style={styles.infoDiv}>
       <View style={styles.myInformations}>
           <Text style={styles.secondTitles}>Mes informations</Text>
-          <View style={styles.infoList}> 
-            <Text style={styles.infoText}>Your pseudo : @TheBestMorg</Text>
-            <TextInput style={styles.inputStyle} placeholder='Type your new pseudo here' onChangeText={text => setNewPseudo(text)} value={newPseudo}/>
-            <Text style={styles.infoText}>Your email : morgane@gmail.com</Text>
-            <TextInput style={styles.inputStyle} placeholder='Type your new email here' onChangeText={text => setNewPseudo(text)} value={newPseudo}/>
-            <Text style={styles.infoText}>You want to change your password?</Text>
-            <TextInput style={styles.inputStyle} placeholder='Type your new password here' onChangeText={text => setNewPseudo(text)} value={newPseudo}/>
-            <TouchableOpacity style={styles.button}>
-                <Text style={styles.textButton}>Save my changes</Text>
-            </TouchableOpacity>
-          </View>
+            <View> 
+                <View style={styles.inputView}>
+                    <Text style={styles.infoText}>Your pseudo : @TheBestMorg</Text>
+                    <View style={styles.inputSaved}>
+                        <TextInput style={styles.inputStyle} placeholder='Type your new pseudo here' onChangeText={text => setNewPseudo(text)} value={newPseudo}/>
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={styles.textButton}>Save</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <View style={styles.inputView}>
+                    <Text style={styles.infoText}>Your email : morgane@gmail.com</Text>
+                    <View style={styles.inputSaved}>
+                        <TextInput style={styles.inputStyle} placeholder='Type your new email here' onChangeText={text => setNewEmail(text)} value={newEmail}/>
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={styles.textButton}>Save</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <View style={styles.inputView}>
+                    <Text style={styles.infoText}>You want to change your password?</Text>
+                    <View style={styles.inputSaved}>
+                        <TextInput style={styles.inputStyle} placeholder='Type your new password here' onChangeText={text => setNewPassword(text)} value={newPassword}/>
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={styles.textButton}>Save</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
       </View>
     </View>
     
@@ -93,7 +114,6 @@ centered: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 70,
-    color: "black",
     marginLeft: 20,
     marginRight: 20,
   },
@@ -146,6 +166,7 @@ centered: {
     alignItems: "center",
     paddingBottom: 10,
     borderRadius: 10,
+    marginBottom: 300,
 
   
   },
@@ -160,23 +181,8 @@ centered: {
     paddingTop: 15,
     paddingBottom: 20,
   },
-  gameContainer: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 7,
-    paddingVertical: 10,
-    
-  },
-  jacket: {
-    borderRadius: 5,
-    height: 100,
-    width: 75,
-    marginTop: 10,
-
-  },
-  infoList: {
+  
+  infoListView: {
     display: "flex",
     flexDirection: "column",
     marginHorizontal: 10,
@@ -185,24 +191,27 @@ centered: {
     width: "100%",
    
   },
+  infoList: {
+    flexGrow: 1,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+
+  },
   inputStyle: {
         height: 40, 
-        width: 250,
-    	borderColor: 'gray', 
+        width: 200,
+    	borderColor: 'green', 
     	borderWidth: 1,
-    	placeholderTextColor: 'gray',
-        borderColor: "black",
+    	placeholderTextColor: 'black',
+        borderColor: "green",
         borderRadius: 5,
         marginVertical: 20,
+        color: "black",
+        backgroundColor: "white",
   },
  
-  friendsView: {
-    display: "flex",
-    width: "100%",
-    height: "auto",
-    flexDirection: "column",
-    
-  },
+
   friendsContainer: {
     display: "flex",
     flexDirection: "row",
@@ -219,26 +228,9 @@ centered: {
   },
   infoText: {
     fontSize: 16,
-    color: "#7A28CB",
+    color: "white",
   },
-  myFriendsTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 10,
-    fontFamily:'OpenSans_600SemiBold',
-    color : '#7A28CB',
-  },
-  myFriendTitleDiv: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
+
   iconStyle: {
     paddingRight: 10,
   },
@@ -247,23 +239,43 @@ centered: {
     flexDirection: "row",
     
   },
-  statsText: {
-    color : '#7A28CB',
-  },
+  
   button: {
     borderRadius: 10,
-    height: 40,
-    width: 150,
-    backgroundColor: '#7A28CB',
+    height: 35,
+    width: 55,
+    backgroundColor: 'white',
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
+    marginLeft: 20,
   },
 
   textButton: {
-    color: "white",
+    color: "black",
     fontWeight: "bold",
+    marginHorizontal: 10,
+    justifyContent: "center",
+    alignItems: "center",
 
+  },
+
+  inputView: {
+        display: "flex",
+        width: "100%",
+        height: "25%",
+        backgroundColor: "#7A28CB",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+      borderRadius: 10,
+      margin: 10,
+  },
+  inputSaved: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   }
   
   
