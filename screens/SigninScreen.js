@@ -2,17 +2,22 @@ import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TextInput, Imag
 import { useState } from 'react';
 import { updateUsername } from '../reducers/user';
 import { useDispatch, useSelector } from 'react-redux';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SigninScreen({navigation}) {
 
   const [username, setUsername]= useState('')
   const [password, setpassword]= useState('')
+  const [error, setError]=useState('')
   //let backend = process.env.BACKEND_URL
 
-  const dispatch = useDispatch();
-  //rconst CurrentUsername = useSelector((state) => state.username.value);
 
-  let errorMessage = <Text></Text>
+  const dispatch = useDispatch();
+  const CurrentUsername = useSelector((state) => state.user.value.username);
+  //console.log(`username:${username} and reducers:${CurrentUsername}`)
+  console.log(CurrentUsername)
+
 const handlesignin = () => {
   console.log('ok')
   fetch('http://192.168.100.241:3000/users/signin', {
@@ -27,19 +32,26 @@ const handlesignin = () => {
         setUsername('')
         setpassword('')
         dispatch(updateUsername({username: username, token:data.token}));
+        console.log(`username:${username} and reducers:${CurrentUsername}`)
         navigation.navigate('TabNavigator')
     } else {
-      errorMessage = <Text style={styles.error}>incorrect password, or username</Text>
+      setError(data.error)
     }
 })
 }
+
   
   return (
     <ImageBackground style={styles.image}
     source={require('../assets/Background-gradient.png')}>
       <KeyboardAvoidingView  
       behavior={Platform.OS === 'ios' ? 'padding' : '40'}
-      style={styles.container}  >
+      style={styles.bigcont}
+      >
+        <SafeAreaView style={styles.backbutton}>
+        <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
+        </SafeAreaView>
+        <View style={styles.container}>
         <Pressable
               style={styles.button}
             title="Google"
@@ -48,7 +60,7 @@ const handlesignin = () => {
               <Text style={styles.buttonText}>Sign in with google</Text>
           </Pressable>  
           <Pressable
-              style={styles.button}
+            style={styles.button}
             title="steam"
           // onPress={() => navigation.navigate('Signin')}
             >
@@ -59,16 +71,20 @@ const handlesignin = () => {
           <Text style={styles.text}>OU</Text>
           <View style={styles.line}></View>
         </View> 
-          <TextInput style={styles.input} placeholder='Username' autoCapitalize='none' onChangeText={(value) => setUsername(value)}
-         value={username} />
-          <TextInput style={styles.input} placeholder='password'onChangeText={(value) => setpassword(value)}
-          value={password} />
-          {errorMessage}
+          <TextInput style={styles.input} 
+          placeholder='Username' 
+          onChangeText={(value) => setUsername(value)}
+          value={username} />
+          <TextInput style={styles.input} 
+          placeholder='password'onChangeText={(value) => setpassword(value)}
+          value={password} 
+          secureTextEntry={true}
+          autoCapitalize='none'/>
+          <Text style={styles.error}>{error}</Text>
           <TouchableOpacity
              style={styles.button}
             title="steam"
             onPress={() => handlesignin()}>
-              
               <Text style={styles.buttonText}>Sign in</Text>
           </TouchableOpacity>  
           <Pressable
@@ -76,7 +92,8 @@ const handlesignin = () => {
           title="sign in"
         >
           <Text style={styles.buttonText2}>I forgot my password</Text>
-      </Pressable>  
+      </Pressable>
+      </View>  
         </KeyboardAvoidingView>
     </ImageBackground>
   );
@@ -84,9 +101,11 @@ const handlesignin = () => {
 
 const styles = StyleSheet.create({
   container: {
-        flex: 1,
+        height:'98%', 
+        width:'100%',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'flex-start',
+
     },
     buttonText:{
       fontFamily:'OpenSans_700Bold',
@@ -126,8 +145,7 @@ const styles = StyleSheet.create({
       marginTop:5,
     }, 
     image:{
-      height:'100%', 
-      width:'100%'
+      flex:1
     }, 
     input:{
       borderBottomColor:'#7A28CB',
@@ -148,6 +166,16 @@ const styles = StyleSheet.create({
     }, 
     error:{
       color:'red'
+    }, 
+    backbutton:{
+      width:'90%',
+    }, 
+    bigcont:{
+      display:'flex', 
+      justifyContent:'space-between', 
+      alignContent:'flex-start',
+      gap:'10%',
+      alignItems:'flex-end'
     }
   });
   
