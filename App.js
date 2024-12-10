@@ -2,7 +2,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 
 //importer les differents ecrans
 import LoginScreen from './screens/LoginScreen';
@@ -23,24 +22,9 @@ import user from './reducers/user'
 
 import { persistStore, persistReducer } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
+import storage from "redux-persist/lib/storage";
 
 // importer les differents reducers
-
-const createNoopStorage = () => {
-  return {
-      getItem() {
-          return Promise.resolve(null);
-      },
-      setItem(value) {
-          return Promise.resolve(value);
-      },
-      removeItem() {
-          return Promise.resolve();
-      },
-  };
-};
-
-const storage = typeof window !== "undefined" ? createWebStorage("local") : createNoopStorage();
 
 
 const reducers = combineReducers({ user });
