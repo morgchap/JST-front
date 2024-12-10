@@ -1,5 +1,6 @@
 import { Text, View, StyleSheet, Image, ScrollView } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
 import {
   useFonts,
   OpenSans_300Light,
@@ -18,7 +19,8 @@ import {
 
 
 
-export default function ProfilScreen() {
+export default function ProfilScreen({ navigation }) {
+
 
   let [fontsLoaded] = useFonts({
     OpenSans_300Light,
@@ -46,6 +48,10 @@ for (let i = 0; i < 5; i++) {
 
   return (
     <View style={styles.centered}>
+      <View style={styles.headIcons}>
+      <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
+      <FontAwesome name="cog" color="#7A28CB" size={25} onPress={() => navigation.navigate("Setup")}/>
+      </View>
       <View style={styles.me}>
         <Image style={styles.avatar} source={require("../assets/avatar.png")} />
         <Text style={styles.pseudo}>@TheBestMorg</Text>
@@ -105,64 +111,64 @@ for (let i = 0; i < 5; i++) {
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20}/>
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20} />
             </View>
         </View>
         <View style={styles.friendsContainer}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
             <Text style={styles.friendsPseudo}>@ami1</Text>
             <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size="20" style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size="20"/>
+              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+              <FontAwesome name="trash" color="#7A28CB" size={20} />
             </View>
         </View>
       </ScrollView>
@@ -176,6 +182,15 @@ const styles = StyleSheet.create({
         alignItems: 'start',
         justifyContent: 'start'
     },
+    headIcons: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginTop: 70,
+      color: "black",
+      marginLeft: 20,
+      marginRight: 20,
+    },
     me: {
       display: "flex",
       width: "100%",
@@ -183,7 +198,7 @@ const styles = StyleSheet.create({
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
-      marginTop: 50,
+      marginTop: 20,
 
     },
     avatar: {
