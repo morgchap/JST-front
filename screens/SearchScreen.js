@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Pressable, KeyboardAvoidingView, Modal, ImageBackground, TextInput, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, StyleSheet, Pressable, KeyboardAvoidingView, FlatList, Modal, ImageBackground, TextInput, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -16,7 +16,45 @@ export default function SearchScreen({navigation}) {
   const [error, setError]= useState('');
   const [consoleGames, setConsoleGames] = useState([]);
   const CurrentUsername = useSelector((state) => state.user.value.username);
+  const [suggestionGame, setSuggestionGame] = useState([]);
+  const [loadingRace, setLoadingRace] = useState(false);
 
+const fetchgames = async (query) => {
+    if (!query) {
+      setSuggestionGame([]);
+      return;
+    }	
+    setLoadingRace(true);
+    
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/fromsearch?search=${query}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log(data);
+      if (data && Array.isArray(data.data)) {
+        setSuggestionGame(data.data);
+      } else {
+        setSuggestionGame([]);
+      }
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+      setError('Failed to fetch suggestions');
+    } finally {
+      setLoadingRace(false);
+    }
+      };
+
+     const handleinput = (value) => {
+      setGameName(value)
+      fetchgames(value)
+     }
+
+     const handleSuggestionGame=() => {
+      console.log('ok')
+      setSuggestionGame([])
+     }
 
   const handlesubmit = ()=> {
     const searchedGame = game.replaceAll(" ", '-');
@@ -25,13 +63,14 @@ export default function SearchScreen({navigation}) {
     .then(data => {
       console.log(`name : ${data.name} img : ${data.background_image} date : ${data.released}, descr : ${data.description}, genres : ${data.genres[0]?.name}`);
       setGame('');
-      setModalVisible(true);
       setGameImg(data.background_image);
       setGameName(data.name);
       setGamedate(data.released);
       setError('');
       setGameDescription(data.description);
       setGameGenre(data.genres.name);
+      setSuggestionGame(suggestionGame => [...suggestionGame, data])
+      console.log(`suggestion ${suggestionGame}`)
     })
     .catch((err) => setError('Game not found'));
   };
@@ -96,15 +135,37 @@ return (
         </View>
 
         <View style={styles.searchContainer}>
-          <TextInput 
+          {/* <TextInput 
             style={styles.input} 
             placeholder='Search for a Game' 
             returnKeyType='search'
             onSubmitEditing={() => handlesubmit()}
             onChangeText={(value) => setGame(value)}
             value={game}
-          />
-          
+          /> */}
+            <TextInput
+              style={styles.input} 
+              onChangeText={(value) => handleinput(value)}
+              value={gameName}
+              placeholder='Search for a Game'
+              returnKeyType='search'
+              onSubmitEditing={(gameName) => handlesubmit(gameName)}
+              placeholderTextColor="black"
+            />
+            {loadingRace && <Text>Chargement...</Text>}
+            {suggestionGame.length > 0 && (
+              <FlatList
+                data={suggestionGame}
+                keyExtractor={(item, index) => `${item._id}-${index}`}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.suggestionItem}
+                    onPress={() => handleSuggestionGame(item.name)}
+                  >
+                    <Text style={styles.suggestionText}>{item.name}</Text>
+                  </TouchableOpacity>
+                )}
+              /> )}         
           <Text style={styles.subtitle}>
             Explore le top des jeux par console
           </Text>

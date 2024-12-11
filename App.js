@@ -16,7 +16,7 @@ import SigninScreen from './screens/SigninScreen';
 import Signup2Screen from './screens/Signup2Screen';
 import SetupScreen from './screens/SetupScreen';
 import Signup3Screen from './screens/Signup3Screen';
-
+//import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Provider } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import user from './reducers/user'
@@ -27,6 +27,10 @@ import storage from "redux-persist/lib/storage";
 
 // importer les differents reducers
 
+// GoogleSignin.configure({
+// 	webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+// 	scopes: ['profile', 'email'],
+// });
 
 const reducers = combineReducers({ user });
 
@@ -96,6 +100,7 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
+        //<GoogleOAuthProvider clientId="40832813030-m32nvk4dn7uh7dkjn86eh9n9innlh0a3.apps.googleusercontent.com">
          <Provider store={store}>
           <PersistGate persistor={persistor}>
             <NavigationContainer>
@@ -112,5 +117,6 @@ export default function App() {
             </NavigationContainer>
           </PersistGate>
         </Provider>
+       // </GoogleOAuthProvider>
   )
 }
