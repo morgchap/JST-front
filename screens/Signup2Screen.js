@@ -1,4 +1,5 @@
 import { Text, View, StyleSheet, Pressable, KeyboardAvoidingView, TouchableOpacity, ImageBackground } from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,6 +9,9 @@ export default function Signup2Screen({navigation}) {
      <ImageBackground style={styles.image}
     source={require('../assets/Background-gradient.png')}>
     <SafeAreaView style={styles.centered}>
+    <SafeAreaView style={styles.backbutton}>
+      <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
+    </SafeAreaView>
     <KeyboardAvoidingView style={styles.buttondiv}>
     <Text style={styles.title}>Welcome to JST, now time to import your games</Text>
             <TouchableOpacity
@@ -56,7 +60,7 @@ const styles = StyleSheet.create({
     centered: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
     },
     buttonText:{
         fontFamily:'OpenSans_700Bold',
@@ -80,7 +84,8 @@ const styles = StyleSheet.create({
         height:'90%',
         width:'100%', 
         alignItems:'center',
-        justifyContent:'center',
+        justifyContent:'flex-start',
+        marginTop:'25%'
     }, 
         buttonText2:{
         fontFamily:'OpenSans_600SemiBold',
@@ -110,6 +115,10 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     gap:10,
     marginTop:5,
+  }, 
+  backbutton:{
+    width:'90%', 
+    marginLeft:'5%'
   }, 
   });
   

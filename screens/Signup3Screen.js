@@ -89,6 +89,7 @@ const handleList = ()=> {
     >
     <View style={styles.modalBackground}>
         <View style={styles.modalContainer}>
+        <FontAwesome name="times" color="#7A28CB" size={25} onPress={() => setModalVisible(false)}/>
              <Image style={styles.jaquette} source={{ uri: gameImg }} />
              <Text style={styles.modalText}>{gameName}</Text>
              <Text style={styles.modalText}>{gameDate}</Text>
