@@ -6,6 +6,7 @@ export default function ListsScreen({ navigation }) {
     const idUser = "426900"
     const [lists, setList] = useState([])
 
+    // receive the list of the user when loading the page
     useEffect(() => {
         fetch(`http://192.168.100.165:3000/lists/${idUser}`)
           .then(response => response.json())
@@ -14,6 +15,7 @@ export default function ListsScreen({ navigation }) {
           });
       }, []);
 
+      
     const games = lists.map((data, i) => {
         let plural = data.gameList.length < 2 ? "jeu" : "jeux" 
         return (

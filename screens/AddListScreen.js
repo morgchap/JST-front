@@ -6,8 +6,6 @@ import { useState } from 'react';
 
 export default function AddListScreen({ navigation }) {
   
-  //const [visibleModal, setVisibleModal] = useState(false)
-  //const [update, setUpdate] = useState(false)
   let [errorInputNameList, setErrorInputNameList] = useState('')
   const [errorFetchNameList, setErrorFetchNameList] = useState('')
   const [listName, setListName] = useState('')
@@ -15,30 +13,27 @@ export default function AddListScreen({ navigation }) {
   //const backendUrl = process.env.BACKEND_URL
   const userId = 426900
   
+  // send userId, listName and ifPublic to the backend to create the list
   const handleAddList = () => {
-//console.log("test")
+  // check if listName field is empty
     if(listName === ''){
-//console.log("2nd test")
-      //setErrorText("Enter a name for your list.")
       setErrorInputNameList(<Text style={styles.errorText}>Enter a name for your list.</Text>)
       return
     }
-//console.log("3e test")
     fetch(`http://192.168.100.165:3000/lists/addList`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ listName, userId, isPublic }),
     }).then(response => response.json())
       .then(data => {
-//console.log("4e test")
         if(data.result){
-//console.log("BdD bien remplit")
+          // the list is correctly send to the database
           setListName("")
           setIsPublic(false)
           setErrorInputNameList("")
           navigation.navigate('Lists')
         } else {
-//console.log("BdB non remplit")
+          // if there is a probleme while sending the ist in the database (in the back), receive the error response
           setErrorFetchNameList(<Text style={styles.errorText}>{data.error}</Text>)
         }
       });

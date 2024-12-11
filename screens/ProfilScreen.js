@@ -132,73 +132,6 @@ for (let i = 0; i < 5; i++) {
           { defaultFriends ? (
             <>
         
-<<<<<<< HEAD
-        <View style={styles.friendsContainer}>
-            <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-            <Text style={styles.friendsPseudo}>@ami1</Text>
-            <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size={20}/>
-            </View>
-        </View>
-        <View style={styles.friendsContainer}>
-            <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-            <Text style={styles.friendsPseudo}>@ami1</Text>
-            <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size={20}/>
-            </View>
-        </View>
-        <View style={styles.friendsContainer}>
-            <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-            <Text style={styles.friendsPseudo}>@ami1</Text>
-            <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size={20}/>
-            </View>
-        </View>
-        <View style={styles.friendsContainer}>
-            <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-            <Text style={styles.friendsPseudo}>@ami1</Text>
-            <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size={20}/>
-            </View>
-        </View>
-        <View style={styles.friendsContainer}>
-            <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-            <Text style={styles.friendsPseudo}>@ami1</Text>
-            <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size={20}/>
-            </View>
-        </View>
-        <View style={styles.friendsContainer}>
-            <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-            <Text style={styles.friendsPseudo}>@ami1</Text>
-            <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size={20}/>
-            </View>
-        </View>
-        <View style={styles.friendsContainer}>
-            <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-            <Text style={styles.friendsPseudo}>@ami1</Text>
-            <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size={20}/>
-            </View>
-        </View>
-        <View style={styles.friendsContainer}>
-            <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-            <Text style={styles.friendsPseudo}>@ami1</Text>
-            <View style={styles.iconContainer}>
-              <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-              <FontAwesome name="trash" color="#7A28CB" size={20}/>
-            </View>
-        </View>
-      </ScrollView>
-=======
               <ScrollView style={styles.friendsView}>
               
               <View style={styles.friendsContainer}>
@@ -331,7 +264,6 @@ for (let i = 0; i < 5; i++) {
             </ScrollView>
             </> 
     )}
->>>>>>> 0ecf6638bc2c29e22521b71e98f141e186143048
     </View>
       
   );
