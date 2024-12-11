@@ -48,7 +48,7 @@ const handleList = ()=> {
   fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/allgames`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ img : gameImg, username : CurrentUsername , summary : gameDescription, release: gameDate,genre:gameGenre }),
+    body: JSON.stringify({ img : gameImg, username : CurrentUsername , summary : gameDescription, release: gameDate, genre:gameGenre, name: gameName }),
 }).then(response => response.json())
 .then(data => {
     console.log(data)
