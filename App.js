@@ -54,7 +54,7 @@ const TabNavigator = () => {
           if (route.name === 'Home') {
             iconName = 'home';
           } else if (route.name === 'Search') {
-            iconName = 'glass';
+            iconName = 'search';
           } else if (route.name === 'Discovery') {
             iconName = 'compass';
           } else if (route.name === 'Profil') {
