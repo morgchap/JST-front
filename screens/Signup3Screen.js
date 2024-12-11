@@ -2,10 +2,8 @@ import { Text, View, StyleSheet, Pressable, KeyboardAvoidingView, Modal, ImageBa
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { Space } from 'antd';
-import {
-    SearchOutlined
-  } from '@ant-design/icons';
+//import { Space } from 'antd';
+//import { SearchOutlined } from '@ant-design/icons';
  import { useSelector } from 'react-redux'; 
 
 export default function Signup3Screen({navigation}) {
