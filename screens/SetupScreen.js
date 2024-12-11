@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useSelector } from 'react-redux';
 
@@ -37,8 +37,32 @@ export default function SetupScreen({ navigation }) {
     const [newPseudo, setNewPseudo] = useState("");
     const [newEmail, setNewEmail] = useState("");
     const [newPassword, setNewPassword] = useState("");
+    const [email, setEmail] = useState("");
 
+
+
+
+    useEffect(() => {
+
+        console.log("ça marche");
     
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${user.username}`)
+        .then(result => result.json())
+        .then(data => {
+          console.log("c'est le front!", data.infos)
+
+          setEmail(data.infos.email)
+
+          console.log("email: ", email);
+    
+        
+      
+    
+          return data
+         
+      })
+    }, [])
+
 
     
 
@@ -73,7 +97,7 @@ export default function SetupScreen({ navigation }) {
           <Text style={styles.secondTitles}>Mes informations</Text>
             <View> 
                 <View style={styles.inputView}>
-                    <Text style={styles.infoText}>Your pseudo : @TheBestMorg</Text>
+                    <Text style={styles.infoText}>Your pseudo : @{user.username}</Text>
                     <View style={styles.inputSaved}>
                         <TextInput style={styles.inputStyle} placeholder='Type your new pseudo here' onChangeText={text => setNewPseudo(text)} value={newPseudo}/>
                         <TouchableOpacity style={styles.button}>
@@ -82,7 +106,7 @@ export default function SetupScreen({ navigation }) {
                     </View>
                 </View>
                 <View style={styles.inputView}>
-                    <Text style={styles.infoText}>Your email : morgane@gmail.com</Text>
+                    <Text style={styles.infoText}>Your email : {email}</Text>
                     <View style={styles.inputSaved}>
                         <TextInput style={styles.inputStyle} placeholder='Type your new email here' onChangeText={text => setNewEmail(text)} value={newEmail}/>
                         <TouchableOpacity style={styles.button}>
