@@ -1,7 +1,8 @@
 import { Text, View, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState, useEffect } from "react";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateUsername } from '../reducers/user';
 
 import {
   useFonts,
@@ -32,15 +33,86 @@ for (let i = 0; i < 5; i++) {
 
 export default function SetupScreen({ navigation }) {
 
+    const dispatch = useDispatch();
+    const updateUser = (newUsername) => {
+        dispatch(updateUsername(newUsername));
+      };
+
+
     const user = useSelector((state) => state.user.value)
 
     const [newPseudo, setNewPseudo] = useState("");
+    const [changedUsername, setChangedUsername] = useState(user.username);
     const [newEmail, setNewEmail] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [email, setEmail] = useState("");
 
+    function updateMyUsername(myNewUsername) {
+
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateUsername`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ currentUsername: user.username, newUsername: myNewUsername}),
+        })
+        .then(result => result.json())
+        .then(data => {
+            console.log(data);
+            if (data.result) {
+                console.log("new username: ", data.updatedProfile.username)
+                setChangedUsername(data.updatedProfile.username)
+                updateUser(data.updatedProfile.username)
+
+            } else {
+                    setError(data.error)
+            }
+        })
+    };
+
+    //
+
+    function updateMyEmail(myNewEmail) {
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateEmail`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ currentEmail: email, newEmail: myNewEmail}),
+        })
+        .then(result => result.json())
+        .then(data => {
+            console.log(data);
+            if (data.result) {
+                console.log("new email: ", data.updatedProfile.email)
+                setEmail(data.updatedProfile.email)
 
 
+            } else {
+                    setError(data.error)
+            }
+        })
+
+    };
+
+    function updateMyPassword(myNewPassword) {
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updatePassword`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: changedUsername, newPassword: myNewPassword}),
+        })
+        .then(result => result.json())
+        .then(data => {
+            console.log(data);
+            if (data.result) {
+                console.log("new passWord updated", data.updatedProfile.password)
+
+
+            } else {
+                    setError(data.error)
+            }
+        })
+
+    };
+
+
+    console.log("reducer", user.username);
 
     useEffect(() => {
 
@@ -89,7 +161,7 @@ export default function SetupScreen({ navigation }) {
     </View>
     <View style={styles.me}>
       <Image style={styles.avatar} source={require("../assets/avatar.png")} />
-      <Text style={styles.pseudo}>@{user.username}</Text>
+      <Text style={styles.pseudo}>@{changedUsername}</Text>
     </View>
     
     <View style={styles.infoDiv}>
@@ -97,10 +169,10 @@ export default function SetupScreen({ navigation }) {
           <Text style={styles.secondTitles}>Mes informations</Text>
             <View> 
                 <View style={styles.inputView}>
-                    <Text style={styles.infoText}>Your pseudo : @{user.username}</Text>
+                    <Text style={styles.infoText}>Your pseudo : @{changedUsername}</Text>
                     <View style={styles.inputSaved}>
                         <TextInput style={styles.inputStyle} placeholder='Type your new pseudo here' onChangeText={text => setNewPseudo(text)} value={newPseudo}/>
-                        <TouchableOpacity style={styles.button}>
+                        <TouchableOpacity style={styles.button} onPress={() => updateMyUsername(newPseudo)}>
                             <Text style={styles.textButton}>Save</Text>
                         </TouchableOpacity>
                     </View>
@@ -109,7 +181,7 @@ export default function SetupScreen({ navigation }) {
                     <Text style={styles.infoText}>Your email : {email}</Text>
                     <View style={styles.inputSaved}>
                         <TextInput style={styles.inputStyle} placeholder='Type your new email here' onChangeText={text => setNewEmail(text)} value={newEmail}/>
-                        <TouchableOpacity style={styles.button}>
+                        <TouchableOpacity style={styles.button} onPress={() => updateMyEmail(newEmail)}>
                             <Text style={styles.textButton}>Save</Text>
                         </TouchableOpacity>
                     </View>
@@ -118,10 +190,19 @@ export default function SetupScreen({ navigation }) {
                     <Text style={styles.infoText}>You want to change your password?</Text>
                     <View style={styles.inputSaved}>
                         <TextInput style={styles.inputStyle} placeholder='Type your new password here' onChangeText={text => setNewPassword(text)} value={newPassword}/>
-                        <TouchableOpacity style={styles.button}>
+                        <TouchableOpacity style={styles.button} onPress={() => updateMyPassword(newPassword)}>
                             <Text style={styles.textButton}>Save</Text>
                         </TouchableOpacity>
                     </View>
+                </View>
+                <View style={styles.logoutView}>
+                    <TouchableOpacity style={styles.logoutButton} onPress={() => {
+                        updateUser("");
+                        navigation.navigate("Login");
+                        
+                        }} >
+                        <Text style={styles.logoutText}>Logout</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
       </View>
@@ -303,6 +384,30 @@ centered: {
   inputSaved: {
     display: "flex",
     flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logoutView: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+
+  },
+
+  logoutButton: {
+    borderRadius: 10,
+    height: 35,
+    width: 70,
+    backgroundColor: '#7A28CB',
+    justifyContent: "center",
+    alignItems: "center",
+
+  },
+
+  logoutText: {
+    color: "white",
+    fontWeight: "bold",
+    marginHorizontal: 10,
     justifyContent: "center",
     alignItems: "center",
   }
