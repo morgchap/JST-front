@@ -57,7 +57,7 @@ const fetchgames = async (query) => {
      }
 
   const handlesubmit = ()=> {
-    const searchedGame = gameName.replaceAll(" ", '-');
+    const searchedGame = game.replaceAll(" ", '-');
     fetch(`https://api.rawg.io/api/games/${searchedGame}?key=${process.env.EXPO_PUBLIC_API_KEY}`)
     .then(response => response.json())
     .then(data => {

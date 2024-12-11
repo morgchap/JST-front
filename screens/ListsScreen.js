@@ -1,28 +1,49 @@
 import { Text, View, Image, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addListGames, deleteGame } from '../reducers/user';
 
 export default function ListsScreen({ navigation }) {
 
-    const idUser = "426900"
-    const [lists, setList] = useState([])
+    //const idUser = "426900"
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user.value)
+    //const [lists, setList] = useState([])
+    const [update, setUpdate] = useState(false)
 
     // receive the list of the user when loading the page
     useEffect(() => {
-        fetch(`http://192.168.100.165:3000/lists/${idUser}`)
+        fetch(`http://192.168.100.165:3000/lists/${user.username}`)
           .then(response => response.json())
           .then(data => {
-            setList(data.lists)
+            dispatch(addListGames(data.lists))
           });
-      }, []);
+      }, [update]);
 
-      
-    const games = lists.map((data, i) => {
-        let plural = data.gameList.length < 2 ? "jeu" : "jeux" 
+    const handleDelete = (listName) => {
+        dispatch(deleteGame(listName))
+        fetch(`http://192.168.100.165:3000/lists/${listName}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+        })
+        .then(response => response.json())
+        .then(data => {
+            setUpdate(!update)
+        })
+    }
+
+    const games = user.lists.map((data, i) => {
+        let trash_bin = i < 1 ? "" : <FontAwesome name="trash" color="#ffffff" size={16} onPress={() => handleDelete(data.listName)}/>
+        let plural = data.gameList.length < 2 ? "jeu" : "jeux"
         return (
             <View key={i} style={styles.gameOfList}>
                 <Image style={styles.jaquetteOfList} source={require("../assets/mario.png")} />
                 <View style={styles.textOfList}>
-                    <Text style={styles.listName}>{data.listName}</Text>
+                    <View style={styles.textOfListTop}>
+                        <Text style={styles.listName}>{data.listName}</Text>
+                        {trash_bin}
+                    </View>
                     <View style={styles.textOfListBottom}>
                         <Text style={styles.listLength}>{data.gameList.length} {plural}</Text>
                         <TouchableOpacity style={styles.buttonOfList} onPress={() => console.log("coucou")} activeOpacity={0.8}>
@@ -36,11 +57,12 @@ export default function ListsScreen({ navigation }) {
 
   return (
     <View style={styles.centered}>
-        <View style={styles.header}>
-
+        <View style={styles.headIcons}>
+            <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
+            <FontAwesome name="cog" color="#7A28CB" size={25} onPress={() => navigation.navigate("Setup")}/>
         </View>
         <View style={styles.body}>
-            <Text style={styles.topText}>To which list do you want to add this game ?</Text>
+            <Text style={styles.topText}>Your lists</Text>
             <View style={styles.lists}>
                 <ScrollView>
                     {games}
@@ -62,10 +84,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    header: {
+    headIcons: {
         width: "100%",
         height: "10%",
-        borderWidth: 1,
+        paddingTop: 35,
+        paddingLeft: 20,
+        paddingRight: 20,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        borderBottomWidth: 1,
         borderColor: "black",
     },
     body: {
@@ -103,6 +130,12 @@ const styles = StyleSheet.create({
         height: 120,
         alignItems: "center",
         justifyContent: "space-around",
+    },
+    textOfListTop: {
+        width: "100%",
+        paddingLeft: 20,
+        flexDirection: "row",
+        justifyContent: "space-between",
     },
     listName: {
         fontSize: 20,

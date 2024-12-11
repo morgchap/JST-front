@@ -1,17 +1,21 @@
 import { View, Text, TextInput, Modal, TouchableOpacity, Switch, StyleSheet } from 'react-native';
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addGame } from '../reducers/user';
 
 
 // a lié a un bouton et avec les text insert !
 
 export default function AddListScreen({ navigation }) {
   
+  const dispatch = useDispatch();
   let [errorInputNameList, setErrorInputNameList] = useState('')
   const [errorFetchNameList, setErrorFetchNameList] = useState('')
   const [listName, setListName] = useState('')
   const [isPublic, setIsPublic] = useState(false)
   //const backendUrl = process.env.BACKEND_URL
-  const userId = 426900
+  //const userId = 426900
+  const user = useSelector((state) => state.user.value)
   
   // send userId, listName and ifPublic to the backend to create the list
   const handleAddList = () => {
@@ -20,14 +24,16 @@ export default function AddListScreen({ navigation }) {
       setErrorInputNameList(<Text style={styles.errorText}>Enter a name for your list.</Text>)
       return
     }
+    const username = user.username
     fetch(`http://192.168.100.165:3000/lists/addList`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listName, userId, isPublic }),
+        body: JSON.stringify({ listName, username, isPublic }),
     }).then(response => response.json())
       .then(data => {
         if(data.result){
           // the list is correctly send to the database
+          dispatch(addGame(data.list))
           setListName("")
           setIsPublic(false)
           setErrorInputNameList("")
