@@ -6,6 +6,7 @@ import { Space } from 'antd';
 import {
     SearchOutlined
   } from '@ant-design/icons';
+ import { useSelector } from 'react-redux'; 
 
 export default function Signup3Screen({navigation}) {
     
@@ -18,6 +19,7 @@ export default function Signup3Screen({navigation}) {
     const [gameGenre, setGameGenre]=useState('')
     const [error, setError]= useState('')
     let searchedGame = game.replaceAll(" ", '-')
+    const CurrentUsername = useSelector((state) => state.user.value.username);
 
     const handlesubmit = ()=> {
         
@@ -39,6 +41,24 @@ export default function Signup3Screen({navigation}) {
              }     
         //}
     )
+}
+
+const handleList = ()=> {
+  console.log('ok')
+  fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/allgames`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ img : gameImg, username : CurrentUsername , summary : gameDescription, release: gameDate,genre:gameGenre }),
+}).then(response => response.json())
+.then(data => {
+    console.log(data)
+    if (data.result) {
+      console.log(`${data} added`)
+      setModalVisible(false)
+    } else {
+      setError(data.error)
+    }
+})
 }
 
   return (
@@ -72,7 +92,7 @@ export default function Signup3Screen({navigation}) {
              <Image style={styles.jaquette} source={{ uri: gameImg }} />
              <Text style={styles.modalText}>{gameName}</Text>
              <Text style={styles.modalText}>{gameDate}</Text>
-             <TouchableOpacity style={styles.button} onPress={()=> setModalVisible(false)}>
+             <TouchableOpacity style={styles.button} onPress={()=> handleList()}>
                 <Text>Add to my list</Text>
              </TouchableOpacity>
          </View>
