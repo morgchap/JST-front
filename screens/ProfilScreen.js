@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import {
@@ -23,8 +23,48 @@ import {
 
 export default function ProfilScreen({ navigation }) {
 
+
   const user = useSelector((state) => state.user.value)
   const [defaultFriends, setDefaultFriends] = useState(true);
+  const [numberOfFriends, setNumberOfFriends] = useState(123);
+  const [numberOfGames, setNumberOfGames] = useState(123);
+
+  useEffect(() => {
+
+    console.log("ça marche");
+
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${user.username}`)
+    .then(result => result.json())
+    .then(data => {
+      console.log("c'est le front!", data.infos)
+
+      setNumberOfFriends(data.infos.friendsList.length)
+
+      console.log("number of friends ", numberOfFriends);
+      console.log("Id de list", data.infos.lists[0])
+
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${user.username}`)
+    .then(result => result.json())
+
+    
+  
+
+      return data
+     
+  })
+  .then(data => {
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`)
+    .then(result => result.json())
+    .then(data => {
+      console.log(data);
+      setNumberOfGames(data.lists.gameList.length)
+      console.log(numberOfGames);
+    })
+  })
+
+
+
+}, []);
 
 
   function sendRequest() {
@@ -65,6 +105,16 @@ for (let i = 0; i < 5; i++) {
   stars.push(<FontAwesome key={i} name={style} color="yellow" />);
 }
 
+let pluralFriends = "";
+if (numberOfFriends >=1) {
+  pluralFriends = "s"
+}
+
+let pluralGames = "";
+if (numberOfGames >=1) {
+  pluralGames = "x"
+}
+
   return (
     <View style={styles.centered}>
       <View style={styles.headIcons}>
@@ -76,8 +126,8 @@ for (let i = 0; i < 5; i++) {
         <Text style={styles.pseudo}>@{user.username}</Text>
       </View>
       <View style={styles.stats}>
-          <Text style={styles.statsText}>7 jeux</Text>
-          <Text style={styles.statsText}>12 amis</Text>
+          <Text style={styles.statsText}>{numberOfGames} jeu{pluralGames}</Text>
+          <Text style={styles.statsText}>{numberOfFriends} ami{pluralFriends}</Text>
       </View>
       <View style={styles.gameDiv}>
         <View style={styles.games}>
