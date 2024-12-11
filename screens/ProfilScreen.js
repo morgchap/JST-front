@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
-      //borderBottomWidth: 2,
+      borderBottomWidth: 2,
       borderBottomColor: '#7A28CB',
       paddingBottom: 10,
       borderRadius: 10,
