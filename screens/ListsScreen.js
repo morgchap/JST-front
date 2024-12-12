@@ -23,7 +23,7 @@ export default function ListsScreen({ navigation }) {
 
     const handleDelete = (listName) => {
         dispatch(deleteGame(listName))
-        fetch(`http://192.168.100.165:3000/lists/${listName}`, {
+        fetch(`http://192.168.100.165:3000/lists/${listName}/${user.username}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
         })

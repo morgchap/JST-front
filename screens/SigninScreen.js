@@ -73,13 +73,16 @@ const handlesignin = () => {
         </View> 
           <TextInput style={styles.input} 
           placeholder='Username' 
+          autoCapitalize='none'
+          placeholderTextColor={'#7A28CB'}
           onChangeText={(value) => setUsername(value)}
           value={username} />
           <TextInput style={styles.input} 
           placeholder='password'onChangeText={(value) => setpassword(value)}
           value={password} 
           secureTextEntry={true}
-          autoCapitalize='none'/>
+          autoCapitalize='none'
+          placeholderTextColor={'#7A28CB'}/>
           <Text style={styles.error}>{error}</Text>
           <TouchableOpacity
              style={styles.button}

@@ -43,23 +43,23 @@ export default function Signup3Screen({ navigation }) {
       )
   }
 
-const handleList = ()=> {
-  console.log('ok')
-  fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/allgames`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ img : gameImg, username : CurrentUsername , summary : gameDescription, release: gameDate, genre:gameGenre, name: gameName }),
-}).then(response => response.json())
-.then(data => {
-    console.log(data)
-    if (data.result) {
-      console.log(`${data} added`)
-      setModalVisible(false)
-    } else {
-      setError(data.error)
-    }
-})
-}
+  const handleList = () => {
+    console.log('ok')
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/allgames`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ img: gameImg, username: CurrentUsername, summary: gameDescription, release: gameDate, genre: gameGenre, name: gameName}),
+    }).then(response => response.json())
+      .then(data => {
+        console.log(data)
+        if (data.result) {
+          console.log(`${data} added`)
+          setModalVisible(false)
+        } else {
+          setError(data.error)
+        }
+      })
+  }
 
   return (
     <ImageBackground style={styles.image}
@@ -90,6 +90,9 @@ const handleList = ()=> {
           >
             <View style={styles.modalBackground}>
               <View style={styles.modalContainer}>
+              <SafeAreaView style={styles.backbutton}>
+                <FontAwesome name="times" color="#7A28CB" size={25} onPress={() => setModalVisible(false)}/>
+              </SafeAreaView>   
                 <Image style={styles.jaquette} source={{ uri: gameImg }} />
                 <Text style={styles.modalText}>{gameName}</Text>
                 <Text style={styles.modalText}>{gameDate}</Text>
