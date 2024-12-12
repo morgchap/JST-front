@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
  import { useSelector } from 'react-redux'; 
+import ModalGames from '../components/ModalGames';
 
 export default function SearchScreen({navigation}) {
   
@@ -18,6 +19,7 @@ export default function SearchScreen({navigation}) {
   const CurrentUsername = useSelector((state) => state.user.value.username);
   const [suggestionGame, setSuggestionGame] = useState([]);
   const [loadingRace, setLoadingRace] = useState(false);
+
 
 const fetchgames = async (query) => {
     if (!query) {
@@ -51,28 +53,47 @@ const fetchgames = async (query) => {
       fetchgames(value)
      }
 
-     const handleSuggestionGame=() => {
-      console.log('ok')
-      setSuggestionGame([])
+     const handleSuggestionGame=(game) => {
+      setModalVisible(true)
+      console.log(game)
+      let searchedgame = suggestionGame.filter((e)=> e.name === game)
+      console.log(searchedgame)
+        setGameImg(searchedgame[0].cover);
+        console.log(gameImg)
+        setGameName(searchedgame[0].name);
+        console.log(gameName)
+        setGamedate(searchedgame[0].releaseDate);
+        console.log(gameDate)
+      //setSuggestionGame([])
      }
 
   const handlesubmit = ()=> {
     //setGame(value)
-    const searchedGame = gameName.replaceAll(" ", '-');
-    fetch(`https://api.rawg.io/api/games/${searchedGame}?key=${process.env.EXPO_PUBLIC_API_KEY}`).then(response => response.json())
-    .then(data => {
-      console.log(`name : ${data.name} img : ${data.background_image} date : ${data.released}, descr : ${data.description}, genres : ${data.genres[0]?.name}`);
-      setGame('');
-      setGameImg(data.background_image);
-      setGameName(data.name);
-      setGamedate(data.released);
-      setError('');
-      setGameDescription(data.description);
-      setGameGenre(data.genres.name);
-      setSuggestionGame(suggestionGame => [...suggestionGame, data])
-      console.log(`suggestion ${suggestionGame}`)
-    })
-    .catch((err) => setError('Game not found'));
+   // console.log(suggestionGame.filter((e) => {e = gameName}))
+   //search if the game is not already in the db 
+   let numberOfSuggestion = suggestionGame.length
+    if(numberOfSuggestion === 0){
+      let searchedGame = gameName.trim()
+      searchedGame = searchedGame.replaceAll(" ", '-');
+      console.log(searchedGame)
+      fetch(`https://api.rawg.io/api/games/${searchedGame}?key=${process.env.EXPO_PUBLIC_API_KEY}`).then(response => response.json())
+      .then(data => {
+        console.log(`name : ${data.name} img : ${data.background_image} date : ${data.released}, descr : ${data.description}, genres : ${data.genres[0]?.name}`);
+        setGame('');
+        setGameImg(data.background_image);
+        setGameName(data.name);
+        setGamedate(data.released);
+        setError('');
+        setGameDescription(data.description);
+        setGameGenre(data.genres.name);
+        console.log('true')
+        setSuggestionGame(suggestionGame => [...suggestionGame, data])
+        //console.log(`suggestion ${suggestionGame}`)
+      })
+      .catch((err) => setError('Game not found'));
+    }else{
+      setSuggestionGame(suggestionGame)
+    }
   };
 
 const handleList = ()=> {
@@ -210,14 +231,25 @@ return (
         >
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
+            <View style={styles.backbutton}>
+          <FontAwesome 
+            name="times"
+            color="#7A28CB" 
+            size={25} 
+            onPress={() => setModalVisible(false)} 
+          />
+        </View>
               <Image style={styles.jaquette} source={{ uri: gameImg }} />
               <Text style={styles.modalText}>{gameName}</Text>
               <Text style={styles.modalText}>{gameDate}</Text>
-              <TouchableOpacity style={styles.button} onPress={()=> handleList()}>
-                  <Text style={styles.buttonText}>Add to my list</Text>
+              <TouchableOpacity style={styles.button} onPress={()=> {
+                navigation.navigate('Games')
+                setModalVisible(false)
+              }}>
+                  <Text style={styles.buttonText}>See more</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </View> 
         </Modal>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -343,5 +375,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  image:{
+    flex:1
+  },
+  backbutton: {
+    width: '90%',
+    marginLeft: '5%'
   },
 });
