@@ -2,6 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { TransitionPresets } from '@react-navigation/bottom-tabs';
 
 //importer les differents ecrans
 import LoginScreen from './screens/LoginScreen';
@@ -16,10 +17,13 @@ import SigninScreen from './screens/SigninScreen';
 import Signup2Screen from './screens/Signup2Screen';
 import SetupScreen from './screens/SetupScreen';
 import Signup3Screen from './screens/Signup3Screen';
+import FriendScreen from './screens/FriendScreen';
+import GamesScreen from './screens/GamesScreen'
 //import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Provider } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import user from './reducers/user'
+import friend from "./reducers/friend"
 
 import { persistStore, persistReducer } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -32,7 +36,7 @@ import storage from "redux-persist/lib/storage";
 // 	scopes: ['profile', 'email'],
 // });
 
-const reducers = combineReducers({ user });
+const reducers = combineReducers({ user, friend });
 
 const persistConfig = { key: 'JST', storage }; // pensez a y mettre les different reducer importe
 
@@ -67,6 +71,7 @@ const TabNavigator = () => {
             iconName = 'gamepad';
           }
   
+  
           return <FontAwesome name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#33CA7F',
@@ -74,6 +79,7 @@ const TabNavigator = () => {
         headerShown: false,
         tabBarShowLabel:false,
         tabBarStyle:{backgroundColor: '#7A28CB'},
+        
       })}>
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Search" component={SearchScreen} />
@@ -113,6 +119,8 @@ export default function App() {
                     <Stack.Screen name="Setup" component={SetupScreen} />
                     <Stack.Screen name="Signup2" component={Signup2Screen} />
                     <Stack.Screen name="Signup3" component={Signup3Screen} />
+                    <Stack.Screen name="Friend" component={FriendScreen} />
+                    <Stack.Screen name="Games" component={GamesScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
           </PersistGate>
