@@ -1,45 +1,25 @@
-import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity } from "react-native";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { clickedFriend } from '../reducers/friend';
-
-import {
-  useFonts,
-  OpenSans_300Light,
-  OpenSans_400Regular,
-  OpenSans_500Medium,
-  OpenSans_600SemiBold,
-  OpenSans_700Bold,
-  OpenSans_800ExtraBold,
-  OpenSans_300Light_Italic,
-  OpenSans_400Regular_Italic,
-  OpenSans_500Medium_Italic,
-  OpenSans_600SemiBold_Italic,
-  OpenSans_700Bold_Italic,
-  OpenSans_800ExtraBold_Italic,
-} from '@expo-google-fonts/open-sans';
 
 
 
-export default function ProfilScreen({ navigation }) {
+export default function FriendScreen({ navigation }) {
+    
+    const user = useSelector((state) => state.user.value)
+    const friend = useSelector((state) => state.friend.value)
+    const [defaultFriends, setDefaultFriends] = useState(true);
+    const [myId, setMyId] = useState("");
+    const [friendId, setFriendId] = useState("");
 
 
-  const user = useSelector((state) => state.user.value)
-  const friend = useSelector((state) => state.friend.value)
-  const [defaultFriends, setDefaultFriends] = useState(true);
-  const [numberOfFriends, setNumberOfFriends] = useState(123);
-  const [numberOfGames, setNumberOfGames] = useState(123);
-  const dispatch = useDispatch();
-  const selectFriend = (friendUsername) => {
-    dispatch(clickedFriend(friendUsername));
-  };
-
+  
   useEffect(() => {
 
     console.log("ça marche");
 
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${user.username}`)
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${friend}`)
     .then(result => result.json())
     .then(data => {
       console.log("c'est le front!", data.infos)
@@ -70,32 +50,6 @@ export default function ProfilScreen({ navigation }) {
 
 }, []);
 
-/*const myFriends = friend.map((data, i) => {
-  return (
-    <View key={i} style={styles.friendsContainer}>
-      <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-      <Text style={styles.friendsPseudo}>@ami1</Text>
-      <View style={styles.iconContainer}>
-        <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-        <FontAwesome name="trash" color="#7A28CB" size={20}/>
-      </View>
-    </View>
-  );
-})
-  */
-
-
-  function sendRequest() {
-    setDefaultFriends(false);
-    console.log(defaultFriends);
-
-  };
-
-  function receivedRequest() {
-    setDefaultFriends(true);
-    console.log(defaultFriends);
-  }
-
 
 
 const stars = [];
@@ -107,33 +61,84 @@ for (let i = 0; i < 5; i++) {
   stars.push(<FontAwesome key={i} name={style} color="yellow" />);
 }
 
-let pluralFriends = "";
-if (numberOfFriends >=1) {
-  pluralFriends = "s"
-}
+function sendRequest() {
+    setDefaultFriends(false);
+    console.log(defaultFriends);
 
-let pluralGames = "";
-if (numberOfGames >=1) {
-  pluralGames = "x"
-}
+  };
+
+  function receivedRequest() {
+    setDefaultFriends(true);
+    console.log(defaultFriends);
+  }
+
+
+  //fonction pour ajouter un ami - pas terminée - je dois générer des vrais demandes d'ami avant (et des vraies page profil d'ami).
+  // je dois donc revenir sur la partie ProfilScreen avant pour mapper la liste des demandes d'amis (envoyées et reçues)
+
+  function addAFriend() {
+
+
+
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${user.username}`)
+    .then(result => result.json())
+    .then(data => {
+        console.log("fetch myId", data.infos._id);
+        setMyId(data.infos._id)
+        
+
+    }).then(() => {
+
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${friend}`)
+    .then(result => result.json())
+    .then(data => {
+        console.log("fetch myFriendId", data.infos._id);
+        setFriendId(data.infos._id)
+        
+
+    })
+}).then(() => {
+
+
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/addFriend`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender: myId, receiver: friendId}),
+    })
+    .then(result => result.json())
+    .then(data => {
+      console.log("data du dernier fetch", data);
+      
+    })
+})
+    
+  }
+
+  console.log("my Id", myId)
+  console.log("friend Id", friendId)
+
 
   return (
     <View style={styles.centered}>
       <View style={styles.headIcons}>
-      <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
-      <FontAwesome name="cog" color="#7A28CB" size={25} onPress={() => navigation.navigate("Setup")}/>
+      <FontAwesome name="chevron-left" color="green" size={25} onPress={() => navigation.goBack()}/>
       </View>
       <View style={styles.me}>
-        <Image style={styles.avatar} source={require("../assets/avatar.png")} />
-        <Text style={styles.pseudo}>@{user.username}</Text>
+        <Image style={styles.avatar} source={require("../assets/nathanael.png")} />
+        <Text style={styles.pseudo}>@{friend}</Text>
       </View>
       <View style={styles.stats}>
-          <Text style={styles.statsText}>{numberOfGames} jeu{pluralGames}</Text>
-          <Text style={styles.statsText}>{numberOfFriends} ami{pluralFriends}</Text>
+          <Text style={styles.statsText}>1 jeu</Text>
+          <Text style={styles.statsText}>1 ami</Text>
+      </View>
+      <View style={styles.logoutView}>
+            <TouchableOpacity style={styles.logoutButton} onPress={() => addAFriend()}>
+                <Text style={styles.logoutText}>Ask as a friend</Text>
+            </TouchableOpacity>
       </View>
       <View style={styles.gameDiv}>
         <View style={styles.games}>
-            <Text style={styles.secondTitles}>Mes jeux préférés (5)</Text>
+            <Text style={styles.secondTitles}>Ses jeux préférés (5)</Text>
             <ScrollView horizontal={true} style={styles.listGame}> 
               <View style={styles.gameContainer}>
                 <Text style={styles.gameTitle}>Mario</Text>
@@ -190,12 +195,7 @@ if (numberOfGames >=1) {
                   <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
                   <Text style={styles.friendsPseudo}>@ami1</Text>
                   <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle} onPress={() => {
-                      navigation.navigate("Friend");
-                      selectFriend("ami1");
-                      console.log(friend);
-                      
-                      }}/>
+                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
                     <FontAwesome name="trash" color="#7A28CB" size={20}/>
                   </View>
               </View>
@@ -207,7 +207,54 @@ if (numberOfGames >=1) {
                     <FontAwesome name="trash" color="#7A28CB" size={20}/>
                   </View>
               </View>
-              
+              <View style={styles.friendsContainer}>
+                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+                  <Text style={styles.friendsPseudo}>@ami1</Text>
+                  <View style={styles.iconContainer}>
+                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+                    <FontAwesome name="trash" color="#7A28CB" size={20}/>
+                  </View>
+              </View>
+              <View style={styles.friendsContainer}>
+                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+                  <Text style={styles.friendsPseudo}>@ami1</Text>
+                  <View style={styles.iconContainer}>
+                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+                    <FontAwesome name="trash" color="#7A28CB" size={20}/>
+                  </View>
+              </View>
+              <View style={styles.friendsContainer}>
+                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+                  <Text style={styles.friendsPseudo}>@ami1</Text>
+                  <View style={styles.iconContainer}>
+                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+                    <FontAwesome name="trash" color="#7A28CB" size={20}/>
+                  </View>
+              </View>
+              <View style={styles.friendsContainer}>
+                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+                  <Text style={styles.friendsPseudo}>@ami1</Text>
+                  <View style={styles.iconContainer}>
+                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+                    <FontAwesome name="trash" color="#7A28CB" size={20}/>
+                  </View>
+              </View>
+              <View style={styles.friendsContainer}>
+                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+                  <Text style={styles.friendsPseudo}>@ami1</Text>
+                  <View style={styles.iconContainer}>
+                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+                    <FontAwesome name="trash" color="#7A28CB" size={20} />
+                  </View>
+              </View>
+              <View style={styles.friendsContainer}>
+                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+                  <Text style={styles.friendsPseudo}>@ami1</Text>
+                  <View style={styles.iconContainer}>
+                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
+                    <FontAwesome name="trash" color="#7A28CB" size={20} />
+                  </View>
+              </View>
             </ScrollView>
             </> 
             ) : (
@@ -223,7 +270,54 @@ if (numberOfGames >=1) {
                     <FontAwesome name="trash" color="white" size={20}/>
                   </View>
               </View>
-             
+              <View style={styles.friendsContainer}>
+                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
+                  <View style={styles.iconContainer}>
+                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
+                    <FontAwesome name="trash" color="white" size={20}/>
+                  </View>
+              </View>
+              <View style={styles.friendsContainer}>
+                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
+                  <View style={styles.iconContainer}>
+                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
+                    <FontAwesome name="trash" color="white" size={20}/>
+                  </View>
+              </View>
+              <View style={styles.friendsContainer}>
+                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
+                  <View style={styles.iconContainer}>
+                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
+                    <FontAwesome name="trash" color="white" size={20}/>
+                  </View>
+              </View>
+              <View style={styles.friendsContainer}>
+                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
+                  <View style={styles.iconContainer}>
+                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
+                    <FontAwesome name="trash" color="white" size={20}/>
+                  </View>
+              </View>
+              <View style={styles.friendsContainer}>
+                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
+                  <View style={styles.iconContainer}>
+                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
+                    <FontAwesome name="trash" color="white" size={20}/>
+                  </View>
+              </View>
+              <View style={styles.friendsContainer}>
+                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
+                  <View style={styles.iconContainer}>
+                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
+                    <FontAwesome name="trash" color="white" size={20} />
+                  </View>
+              </View>
             </ScrollView>
             </> 
     )}
@@ -271,7 +365,7 @@ const styles = StyleSheet.create({
     pseudo: {
       fontSize: 20,
       paddingTop: 10,
-      color: "#7A28CB",
+      color: "green",
       paddingBottom: 10,
       fontWeight: "bold",
 
@@ -299,12 +393,12 @@ const styles = StyleSheet.create({
     games: {
       width: "95%",
       height: "auto",
-      backgroundColor: "#7A28CB",
+      backgroundColor: "green",
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
       borderBottomWidth: 2,
-      borderBottomColor: '#7A28CB',
+      borderBottomColor: 'green',
       paddingBottom: 10,
       borderRadius: 10,
 
@@ -389,7 +483,7 @@ const styles = StyleSheet.create({
     friendsPseudo: {
       paddingHorizontal: 10,
       fontSize: 16,
-      color: "#7A28CB",
+      color: "green",
     },
 
     friendsPseudoBis: {
@@ -407,7 +501,7 @@ const styles = StyleSheet.create({
       alignItems: "center",
       paddingVertical: 10,
       fontFamily:'OpenSans_600SemiBold',
-      color : '#7A28CB',
+      color : 'green',
     },
 
     friendsSent: {
@@ -460,7 +554,7 @@ const styles = StyleSheet.create({
     },
 
     statsText: {
-      color : '#7A28CB',
+      color : 'green',
     },
 
     scrollViewBis: {
@@ -471,8 +565,34 @@ const styles = StyleSheet.create({
       paddingHorizontal: 10,
       marginLeft: 8,
       marginRight: 8,
-    }
-   
+    },
+
+    logoutView: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+        padding: 10,
+    
+      },
+
+    logoutButton: {
+        borderRadius: 10,
+        height: 50,
+        width: 100,
+        backgroundColor: 'green',
+        justifyContent: "center",
+        alignItems: "center",
+    
+      },
+    
+      logoutText: {
+        color: "white",
+        fontWeight: "bold",
+        marginHorizontal: 10,
+        justifyContent: "center",
+        alignItems: "center",
+        textAlign: "center"
+      }
     
     
   });
