@@ -1,18 +1,59 @@
 import { Text, View, StyleSheet, Image, SafeAreaView, KeyboardAvoidingView, TouchableOpacity, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { OpenSans_300Light_Italic, OpenSans_600SemiBold } from '@expo-google-fonts/open-sans';
 import { Collapsible } from 'react-native-fast-collapsible';
+import { useSelector } from 'react-redux';
 
-export default function HomeScreen({navigation}) {
+export default function GamesScreen({navigation, route}) {
 
+    //const gamedata = useSelector((state) => state.game.value);
+    //console.log(`reducer : ${gamedata}`)
+    const {gameName} = route.params
     const [isVisible, setVisibility] = useState(false);
+    const [icon, setIcon]= useState('caret-down')
+    const [isVisible2, setVisibility2] = useState(false);
+    const [icon2, setIcon2]= useState('caret-down')
+    const [gamesinfo, setGamesInfo]=useState([])
+    const [summary, setsummary] = useState('')
+    console.log(`game : ${gameName}`)
 
     const toggleVisibility = () => {
       setVisibility((previous) => !previous);
+      if(isVisible){
+        setIcon('caret-down')
+      }else {
+        setIcon('caret-right')
+      }
     };
-    
+    const toggleVisibility2 = () => {
+        setVisibility2((previous) => !previous);
+        if(isVisible2){
+          setIcon2('caret-down')
+        }else {
+          setIcon2('caret-right')
+        }
+      };
+   
+      
+      useEffect(() => {
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/byname`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              name : gameName, 
+            })
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log(data)
+            setGamesInfo(data.game);
+            if (summary.length > 100){
+            setsummary(summary.slice(100))}
+          })
+      }, []);
+     
     
     const stars = [];
 for (let i = 0; i < 5; i++) {
@@ -21,6 +62,14 @@ for (let i = 0; i < 5; i++) {
     style = "star";
   }
   stars.push(<FontAwesome key={i} name={style} color="#f1c40f" size='20'/>);
+}
+const stars2 = [];
+for (let i = 0; i < 5; i++) {
+  let style = "star-o";
+  if (i < 4 - 1) {
+    style = "star";
+  }
+  stars2.push(<FontAwesome key={i} name={style} color="#f1c40f" size='15'/>);
 }
   return (
     <View style={styles.centered}>
@@ -34,7 +83,7 @@ for (let i = 0; i < 5; i++) {
         <View style={styles.backbutton}>
         <FontAwesome name="chevron-left" color="white" size={25} style={styles.icon} onPress={() => navigation.goBack()} />
         </View>       
-         <Image style={styles.jaquette} source={{uri : 'https://media.rawg.io/media/screenshots/1d7/1d75b9d60cb5884a0b19d21df8557c0c.jpg'}} />
+         <Image style={styles.jaquette} source={{uri : gamesinfo.cover}} />
          <View style={styles.backbutton}>
         <FontAwesome name="ellipsis-h" color="white" style={styles.icon} size={25} 
         // onPress={() => navigation.goBack()} 
@@ -44,9 +93,10 @@ for (let i = 0; i < 5; i++) {
       </LinearGradient>
         </View>
         <View style={styles.general}>
-        <ScrollView>
+        <ScrollView style= {styles.scroll}>
          <View style ={styles.downside}>
-        <Text style={styles.title}>Super Mario</Text>
+        <Text style={styles.title}>{gamesinfo.name}</Text>
+        <Text style={styles.date}>{gamesinfo.releaseDate}</Text>
         <View style={styles.line}></View>
         <View style={styles.starsContainer}>
              {stars}
@@ -63,22 +113,95 @@ for (let i = 0; i < 5; i++) {
          <Text style ={styles.summary}>
                 Summary
         </Text>
-         <View style={styles.resumebox}>
+         <ScrollView style={styles.resumebox}>
             <Text style={styles.resume}>
-            Mario, Super Mario atau SMB adalah suatu permainan platform yang dikembangkan dan diterbitkan oleh Nintendo pada akhir 1985 untuk konsol Nintendo Entertainment System. Permainan ini membawa pengaruh yang besar pada perkembangan dunia hiburan rumahan dan merupakan salah satu permainan terlaris dengan penjualan lebih dari 40 juta salinan hingga saat ini. Dengan latar permainan yang cerah dan alur cerita yang berkembang, Super Mario Bros. berhasil mengubah wajah industri permainan video. Meskipun sering disalah persepsikan sebagai permainan platform bergulir
+            {summary}
             </Text>
-         </View>
+         </ScrollView>
           <SafeAreaView style={styles.container}>
+          <Text style ={styles.summary}>
+                Reviews
+        </Text>   
       <TouchableOpacity onPress={toggleVisibility} style={styles.container2}>
-        <Text>My friend's reviews</Text>
-        <FontAwesome name='caret-down' color="black" size='20'/>
+        <Text style = {styles.collapsedname}>My friend's reviews</Text>
+        <FontAwesome name={icon} color="black" size='20'/>
       </TouchableOpacity>
 
       <Collapsible isVisible={isVisible}>
-        <Text>Lorem ipsum....</Text>
+        <View style = {styles.friendsReviews}>
+        <View style={styles.picanduseandreview}> 
+        <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+        <View style={styles.useandreview}>
+        <Text style={styles.friendsPseudo}>@monami</Text>
+        <View style={styles.starsContainer2}>
+             {stars2}
+            <Text style ={styles.votecount2}>3,5</Text>
+        </View> 
+        </View>
+        </View>   
+        <View style={styles.comment}>
+            <Text>That is my favorite game i would 100% recommend it</Text>
+        </View>
+        </View>
+        <View style = {styles.friendsReviews}>
+        <View style={styles.picanduseandreview}> 
+        <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+        <View style={styles.useandreview}>
+        <Text style={styles.friendsPseudo}>@monami</Text>
+        <View style={styles.starsContainer2}>
+             {stars2}
+            <Text style ={styles.votecount2}>3,5</Text>
+        </View> 
+        </View>
+        </View>   
+        <View style={styles.comment}>
+            <Text>That is my favorite game i would 100% recommend it</Text>
+        </View>
+        </View>
+      </Collapsible>
+
+
+
+      <TouchableOpacity onPress={toggleVisibility2} style={styles.container2}>
+        <Text style = {styles.collapsedname}>Most liked reviews</Text>
+        <FontAwesome name={icon2} color="black" size='20'/>
+      </TouchableOpacity>
+      <Collapsible isVisible={isVisible2}>
+        <View style = {styles.friendsReviews}>
+        <View style={styles.picanduseandreview}> 
+        <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+        <View style={styles.useandreview}>
+        <Text style={styles.friendsPseudo}>@monami</Text>
+        <View style={styles.starsContainer2}>
+             {stars2}
+            <Text style ={styles.votecount2}>3,5</Text>
+        </View> 
+        </View>
+        </View>   
+        <View style={styles.comment}>
+            <Text>That is my favorite game i would 100% recommend it</Text>
+        </View>
+        </View>
+        <View style = {styles.friendsReviews}>
+        <View style={styles.picanduseandreview}> 
+        <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+        <View style={styles.useandreview}>
+        <Text style={styles.friendsPseudo}>@monami</Text>
+        <View style={styles.starsContainer2}>
+             {stars2}
+            <Text style ={styles.votecount2}>3,5</Text>
+        </View> 
+        </View>
+        </View>   
+        <View style={styles.comment}>
+            <Text>That is my favorite game i would 100% recommend it</Text>
+        </View>
+        </View>
       </Collapsible>
     </SafeAreaView>
-         </View>   
+         </View> 
+         <View style ={styles.footer}>
+        </View>  
         </ScrollView>
         </View>
     </View>
@@ -94,7 +217,7 @@ const styles = StyleSheet.create({
     },
     bgpicture:{
         position: 'relative',
-        height:'40%',
+        height:'30%',
         width:'100%', 
     }, 
     gradient:{
@@ -106,7 +229,7 @@ const styles = StyleSheet.create({
     }, 
     jaquette:{
         height:'95%', 
-        width:'40%', 
+        width:'30%', 
         borderRadius:'5%'
     }, 
     Imgview: {
@@ -122,11 +245,13 @@ const styles = StyleSheet.create({
       general:{
         borderColor:'black', 
         // borderWidth:1,
-        height:'60%',
+        height:'70%',
         width:'100%',
         justifyContent:'center', 
         alignItems:'center',
-        zIndex:50,
+        zIndex:100,
+        backgroundColor:'white',
+        
       },
       title:{
         marginTop:'10%',
@@ -150,11 +275,27 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         paddingTop: 5,
       },
+      starsContainer2: {
+        // borderColor:'black', 
+        // borderWidth:1,
+        width:'100%',
+        display: "flex",
+        flexDirection: "row",
+        alignItems:'flex-start',
+        justifyContent:'flex-start',
+        paddingTop: 5,
+        marginLeft:'4%',
+      },
       votecount:{
         marginLeft:'2%',
         fontSize:20, 
         fontFamily:'OpenSans_300Light_Italic'
       }, 
+      votecount2:{
+        marginLeft:'2%',
+        fontSize:12, 
+        fontFamily:'OpenSans_300Light_Italic'
+      },
       greenbutton:{
         borderColor:'#33CA7F', 
         borderWidth:1,
@@ -195,6 +336,8 @@ const styles = StyleSheet.create({
         borderColor:'#33CA7F', 
         borderRadius:10,
         borderWidth:3,
+        minHeight:'30%',
+        maxHeight:'30%'
       }, 
       icon:{
         position:'static'
@@ -213,11 +356,69 @@ const styles = StyleSheet.create({
         height:'20%',
         marginTop:'10%',
         marginBottom:100,
-        borderColor:'black', 
-        borderWidth:1,
+        // borderColor:'black', 
+        // borderWidth:1,
         width:'100%'
       }, 
       container2:{
+        flexDirection:'row',
+        gap:10,
+        backgroundColor:'#EEEEEE',
+        // borderBottomWidth:1, 
+        // borderBottomColor:'#7A28CB',
+        shadowColor: "#000",
+        shadowOffset: {
+	        width: 0,
+	        height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        height:'20%',
+        padding:'2%', 
+        borderRadius:10, 
+        margin:'3%',
+        minHeight:'7%'
+      }, 
+      friendsReviews:{
+        backgroundColor:'#EEEEEE',
+        padding:'2%',
+        margin:'2%', 
+        borderRadius:10
+
+      }, 
+      friendsAvatars: {
+        borderRadius: 50,
+        height: 50,
+        width: 50,
+        paddingBottom: 1
+      },
+  
+      friendsPseudo: {
+        fontSize: 16,
+        color: "#7A28CB",
+      },
+      comment:{
+        marginTop:'2%'
+      }, 
+      picanduseandreview:{
         flexDirection:'row'
+      }, 
+      useandreview:{
+        // borderColor:'black', 
+        // borderWidth:1,
+        alignItems:'flex-start',
+        marginLeft:'2%'
+      }, 
+      collapsedname:{
+        fontSize:15
+      },
+      scroll:{
+        width:'100%',
+        paddingHorizontal:'5%',
+        marginBottom:10
+      }, 
+      footer:{
+        height:300
       }
   });
