@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     buttonText:{
       fontFamily:'OpenSans_700Bold',
       color : '#7A28CB',
-      margin: 2,
+      margin:10,
 
     },
     button:{

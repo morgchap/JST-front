@@ -5,6 +5,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { OpenSans_300Light_Italic, OpenSans_600SemiBold } from '@expo-google-fonts/open-sans';
 import { Collapsible } from 'react-native-fast-collapsible';
 import { useSelector } from 'react-redux';
+import HTMLView from 'react-native-htmlview';
 
 export default function GamesScreen({navigation, route}) {
 
@@ -50,12 +51,11 @@ export default function GamesScreen({navigation, route}) {
           .then(data => {
             console.log(data)
             setGamesInfo(data.game);
-            if (summary.length > 100){
-            setsummary(summary.slice(100))}
-          })
-      }, []);
+      })
+    }, [])
      
-    
+    const summaryToHTML = gamesinfo.summary
+   // console.log(gamesinfo.summary)
     const stars = [];
 for (let i = 0; i < 5; i++) {
   let style = "star-o";
@@ -94,7 +94,9 @@ for (let i = 0; i < 5; i++) {
       </LinearGradient>
         </View>
         <View style={styles.general}>
-        <ScrollView style= {styles.scroll}>
+        <ScrollView style= {styles.scroll} 
+        //</View>onContentSizeChange={(1000, 1000)}
+        >
          <View style ={styles.downside}>
         <Text style={styles.title}>{gamesinfo.name}</Text>
         <Text style={styles.date}>{gamesinfo.releaseDate}</Text>
@@ -116,9 +118,10 @@ for (let i = 0; i < 5; i++) {
                 Summary
         </Text>
          <ScrollView style={styles.resumebox}>
-            <Text style={styles.resume}>
-            {summary}
-            </Text>
+            <HTMLView
+            value={summaryToHTML}
+            stylesheet={styles.resume}
+        />
          </ScrollView>
           <SafeAreaView style={styles.container}>
           <Text style ={styles.summary}>
@@ -274,18 +277,18 @@ const styles = StyleSheet.create({
         marginLeft:'5%',
       },
       general:{
-        borderColor:'black', 
+        // borderColor:'black', 
         // borderWidth:1,
-        height:'70%',
         width:'100%',
         justifyContent:'center', 
         alignItems:'center',
         zIndex:100,
-        backgroundColor:'white',
-        
+        // backgroundColor:'white',
+        height:'80%'
       },
+
       title:{
-        marginTop:'10%',
+        marginTop:10,
         fontFamily:'OpenSans_600SemiBold', 
         fontSize:'20'
       }, 
@@ -351,7 +354,7 @@ const styles = StyleSheet.create({
         // borderColor:'black', 
         // borderWidth:1,
         width:'100%',
-        height:'6%', 
+        maxHeight:50, 
         alignItems:'center',
         justifyContent:'center',
         gap:'10%'
@@ -378,7 +381,7 @@ const styles = StyleSheet.create({
         alignItems:'center'
       }, 
       summary:{
-        marginTop:'5%',
+        marginTop:10,
         fontFamily:'OpenSans_600SemiBold',
         color:'#7A28CB',
         width:'80%'
@@ -393,7 +396,7 @@ const styles = StyleSheet.create({
       }, 
       container2:{
         flexDirection:'row',
-        gap:10,
+        //gap:10,
         backgroundColor:'#EEEEEE',
         // borderBottomWidth:1, 
         // borderBottomColor:'#7A28CB',
@@ -406,7 +409,8 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5,
         height:'20%',
-        padding:'2%', 
+        alignItems:'center', 
+        //justifyContent:'center',
         borderRadius:10, 
         margin:'3%',
         minHeight:'7%'
@@ -447,10 +451,13 @@ const styles = StyleSheet.create({
       scroll:{
         width:'100%',
         paddingHorizontal:'5%',
-        marginBottom:10
+        marginBottom:1,
       }, 
       footer:{
-        height:300
+        position:'absolute',
+        height:400,
+        //backgroundColor:'red', 
+        width:'100%'
       }, 
       modal: {
         backgroundColor: 'red',
@@ -487,4 +494,5 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginBottom: 10,
       },
+
   });
