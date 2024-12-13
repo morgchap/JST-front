@@ -24,7 +24,7 @@ import { Provider } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import user from './reducers/user'
 import friend from "./reducers/friend"
-
+import game from './reducers/game'
 import { persistStore, persistReducer } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import storage from "redux-persist/lib/storage";
@@ -36,7 +36,7 @@ import storage from "redux-persist/lib/storage";
 // 	scopes: ['profile', 'email'],
 // });
 
-const reducers = combineReducers({ user, friend });
+const reducers = combineReducers({ user, friend, game });
 
 const persistConfig = { key: 'JST', storage }; // pensez a y mettre les different reducer importe
 
