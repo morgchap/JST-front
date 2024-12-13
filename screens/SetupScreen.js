@@ -47,7 +47,7 @@ export default function SetupScreen({ navigation }) {
     const [newPassword, setNewPassword] = useState("");
     const [email, setEmail] = useState("");
 
-    function updateMyUsername(myNewUsername) {
+  function updateMyUsername(myNewUsername) {
 
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateUsername`, {
             method: "POST",
@@ -66,11 +66,10 @@ export default function SetupScreen({ navigation }) {
                     setError(data.error)
             }
         })
-    };
+      };
 
-    //
 
-    function updateMyEmail(myNewEmail) {
+  function updateMyEmail(myNewEmail) {
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateEmail`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -89,9 +88,9 @@ export default function SetupScreen({ navigation }) {
             }
         })
 
-    };
+  };
 
-    function updateMyPassword(myNewPassword) {
+  function updateMyPassword(myNewPassword) {
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updatePassword`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -109,12 +108,12 @@ export default function SetupScreen({ navigation }) {
             }
         })
 
-    };
+  };
 
 
-    console.log("reducer", user.username);
+  console.log("reducer", user.username);
 
-    useEffect(() => {
+  useEffect(() => {
 
         console.log("ça marche");
     
@@ -133,26 +132,9 @@ export default function SetupScreen({ navigation }) {
           return data
          
       })
-    }, [])
+  }, [])
 
 
-    
-
-
-  let [fontsLoaded] = useFonts({
-    OpenSans_300Light,
-    OpenSans_400Regular,
-    OpenSans_500Medium,
-    OpenSans_600SemiBold,
-    OpenSans_700Bold,
-    OpenSans_800ExtraBold,
-    OpenSans_300Light_Italic,
-    OpenSans_400Regular_Italic,
-    OpenSans_500Medium_Italic,
-    OpenSans_600SemiBold_Italic,
-    OpenSans_700Bold_Italic,
-    OpenSans_800ExtraBold_Italic,
-  });
 
   return (
     <View style={styles.centered}>
@@ -210,7 +192,7 @@ export default function SetupScreen({ navigation }) {
     
       
   </View>
-);
+  );
 }
 
 const styles = StyleSheet.create({

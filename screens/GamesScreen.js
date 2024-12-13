@@ -4,13 +4,15 @@ import { useEffect, useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { OpenSans_300Light_Italic, OpenSans_600SemiBold } from '@expo-google-fonts/open-sans';
 import { Collapsible } from 'react-native-fast-collapsible';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import HTMLView from 'react-native-htmlview';
+import { addListGames } from '../reducers/user';
 
 export default function GamesScreen({navigation, route}) {
 
     //const gamedata = useSelector((state) => state.game.value);
     //console.log(`reducer : ${gamedata}`)
+    const dispatch = useDispatch();
     const {gameName} = route.params
     const [isVisible, setVisibility] = useState(false);
     const [icon, setIcon]= useState('caret-down')
@@ -19,7 +21,8 @@ export default function GamesScreen({navigation, route}) {
     const [gamesinfo, setGamesInfo]=useState([])
     const [summary, setsummary] = useState('')
     const [modalVisible, setModalVisible] = useState(false);
-    console.log(`game : ${gameName}`)
+    const user = useSelector((state) => state.user.value)
+    //console.log(`game : ${gameName}`)
 
     const toggleVisibility = () => {
       setVisibility((previous) => !previous);
@@ -37,7 +40,24 @@ export default function GamesScreen({navigation, route}) {
           setIcon2('caret-right')
         }
       };
-   
+      
+    const handleAddGameToList = ( listName ) => {
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/addToList`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username: user.username, listName, gameName }),
+          }).then(response => response.json())
+            .then(data => {
+//console.log("test", data)
+              if(!data.result){
+                console.log(data.error)
+              } else {
+                console.log(data.message)
+              }
+              setModalVisible(false)
+              dispatch(updateChange())
+            });
+    }
       
       useEffect(() => {
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/byname`, {
@@ -49,10 +69,12 @@ export default function GamesScreen({navigation, route}) {
         })
           .then(response => response.json())
           .then(data => {
-            console.log(data)
+            //console.log(data)
             setGamesInfo(data.game);
-      })
-    }, [])
+            if (summary.length > 100){
+            setsummary(summary.slice(100))}
+          })
+      }, []);
      
     const summaryToHTML = gamesinfo.summary
    // console.log(gamesinfo.summary)
@@ -62,7 +84,7 @@ for (let i = 0; i < 5; i++) {
   if (i < 4 - 1) {
     style = "star";
   }
-  stars.push(<FontAwesome key={i} name={style} color="#f1c40f" size='20'/>);
+  stars.push(<FontAwesome key={i} name={style} color="#f1c40f" size={20}/>);
 }
 const stars2 = [];
 for (let i = 0; i < 5; i++) {
@@ -70,8 +92,19 @@ for (let i = 0; i < 5; i++) {
   if (i < 4 - 1) {
     style = "star";
   }
-  stars2.push(<FontAwesome key={i} name={style} color="#f1c40f" size='15'/>);
+  stars2.push(<FontAwesome key={i} name={style} color="#f1c40f" size={15}/>);
 }
+
+  const lists = user.lists.map((data, i) => {
+    return (
+      <TouchableOpacity key={i} onPress={() => handleAddGameToList(data.listName)}>
+        <Text style={styles.modalText}>{data.listName}</Text>
+      </TouchableOpacity>
+    )
+    
+  })
+
+
   return (
     <View style={styles.centered}>
         <View style={styles.bgpicture}>
@@ -128,8 +161,8 @@ for (let i = 0; i < 5; i++) {
                 Reviews
         </Text>   
       <TouchableOpacity onPress={toggleVisibility} style={styles.container2}>
-        <Text style = {styles.collapsedname}>My friend's reviews</Text>
-        <FontAwesome name={icon} color="black" size='20'/>
+        <Text>My friend's reviews</Text>
+        <FontAwesome name='caret-down' color="black" size={20}/>
       </TouchableOpacity>
 
       <Collapsible isVisible={isVisible}>
@@ -169,7 +202,7 @@ for (let i = 0; i < 5; i++) {
 
       <TouchableOpacity onPress={toggleVisibility2} style={styles.container2}>
         <Text style = {styles.collapsedname}>Most liked reviews</Text>
-        <FontAwesome name={icon2} color="black" size='20'/>
+        <FontAwesome name={icon2} color="black" size={20}/>
       </TouchableOpacity>
       <Collapsible isVisible={isVisible2}>
         <View style = {styles.friendsReviews}>
@@ -219,23 +252,18 @@ for (let i = 0; i < 5; i++) {
           >
             <View style={styles.modalBackground}>
             <View style={styles.backbutton}>
-          <FontAwesome 
-            name="times"
-            color="#7A28CB" 
-            size={25} 
-            onPress={() => setModalVisible(false)} 
-          />
+              <FontAwesome 
+                name="times"
+                color="#7A28CB" 
+                size={25} 
+                onPress={() => setModalVisible(false)} 
+              />
             </View> 
-            <View style={styles.modalContainer}>
-              <ScrollView style={styles.scroll2}>
-              <TouchableOpacity>
-              <Text style={styles.modalText}>List 1</Text>
-              </TouchableOpacity>  
-              <TouchableOpacity>
-              <Text style={styles.modalText}>List 2</Text>
-              </TouchableOpacity>  
-              </ScrollView>  
-            </View>
+              <View style={styles.modalContainer}>
+                <ScrollView style={styles.scroll2}>
+                  {lists}  
+                </ScrollView>  
+              </View>
           </View> 
           </Modal>
     </View>
@@ -263,8 +291,8 @@ const styles = StyleSheet.create({
     }, 
     jaquette:{
         height:'95%', 
-        width:'30%', 
-        borderRadius:'5%'
+        width:'40%', 
+        borderRadius: 10,
     }, 
     Imgview: {
         width:'100%',
@@ -290,7 +318,7 @@ const styles = StyleSheet.create({
       title:{
         marginTop:10,
         fontFamily:'OpenSans_600SemiBold', 
-        fontSize:'20'
+        fontSize: 20,
       }, 
       line:{
         borderBottomWidth:2, 
@@ -322,7 +350,7 @@ const styles = StyleSheet.create({
       },
       votecount:{
         marginLeft:'2%',
-        fontSize:20, 
+        fontSize: 20, 
         fontFamily:'OpenSans_300Light_Italic'
       }, 
       votecount2:{
