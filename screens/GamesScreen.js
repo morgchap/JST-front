@@ -12,6 +12,10 @@ export default function HomeScreen({navigation}) {
     const toggleVisibility = () => {
       setVisibility((previous) => !previous);
     };
+
+    const handleAddToList = () => {
+      console.log("coucou")
+    }
     
     
     const stars = [];
@@ -20,7 +24,7 @@ for (let i = 0; i < 5; i++) {
   if (i < 4 - 1) {
     style = "star";
   }
-  stars.push(<FontAwesome key={i} name={style} color="#f1c40f" size='20'/>);
+  stars.push(<FontAwesome key={i} name={style} color="#f1c40f" size={20}/>);
 }
   return (
     <View style={styles.centered}>
@@ -53,7 +57,7 @@ for (let i = 0; i < 5; i++) {
              <Text style ={styles.votecount}>3,5</Text>
          </View>
          <View style={styles.topbutton}>
-            <TouchableOpacity style={styles.greenbutton}>
+            <TouchableOpacity style={styles.greenbutton} onPress={() => handleAddToList()}>
                 <Text style={styles.buttontext}>add to list</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.greenbutton}>
@@ -71,7 +75,7 @@ for (let i = 0; i < 5; i++) {
           <SafeAreaView style={styles.container}>
       <TouchableOpacity onPress={toggleVisibility} style={styles.container2}>
         <Text>My friend's reviews</Text>
-        <FontAwesome name='caret-down' color="black" size='20'/>
+        <FontAwesome name='caret-down' color="black" size={20}/>
       </TouchableOpacity>
 
       <Collapsible isVisible={isVisible}>
@@ -107,7 +111,7 @@ const styles = StyleSheet.create({
     jaquette:{
         height:'95%', 
         width:'40%', 
-        borderRadius:'5%'
+        borderRadius: 10,
     }, 
     Imgview: {
         width:'100%',
@@ -131,7 +135,7 @@ const styles = StyleSheet.create({
       title:{
         marginTop:'10%',
         fontFamily:'OpenSans_600SemiBold', 
-        fontSize:'20'
+        fontSize: 20,
       }, 
       line:{
         borderBottomWidth:2, 
@@ -152,7 +156,7 @@ const styles = StyleSheet.create({
       },
       votecount:{
         marginLeft:'2%',
-        fontSize:20, 
+        fontSize: 20, 
         fontFamily:'OpenSans_300Light_Italic'
       }, 
       greenbutton:{

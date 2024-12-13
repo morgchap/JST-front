@@ -47,7 +47,7 @@ export default function ListsScreen({ navigation }) {
                     <View style={styles.textOfListBottom}>
                         <Text style={styles.listLength}>{data.gameList.length} {plural}</Text>
                         <TouchableOpacity style={styles.buttonOfList} onPress={() => console.log("coucou")} activeOpacity={0.8}>
-                            <Text style={styles.textButtonOfList} >Add</Text>
+                            <Text style={styles.textButtonOfList} >See</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
