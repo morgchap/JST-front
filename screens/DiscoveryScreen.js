@@ -6,8 +6,7 @@ import { useSelector } from 'react-redux';
 export default function DiscoveryScreen() {
   const [articles, setArticles] = useState([]);
   const [games, setGames] = useState([]);
-  const [loadingArticles, setLoadingArticles] = useState(true);
-  const [loadingGames, setLoadingGames] = useState(true);
+  const [friends, setFriends] = useState([]);
 
   const newsApiKey = 'da5844b63702429887c8a0b59db638d2';
   const gamesApiKey = process.env.EXPO_PUBLIC_API_KEY;
@@ -26,8 +25,6 @@ export default function DiscoveryScreen() {
         setArticles(data.articles || []);
       } catch (error) {
         console.error('Error fetching articles:', error);
-      } finally {
-        setLoadingArticles(false);
       }
     };
 
@@ -38,11 +35,13 @@ export default function DiscoveryScreen() {
   useEffect(() => {
     const fetchGames = async () => 
     {
-      try {
+      try 
+      {
         const response = await fetch(
           `https://api.rawg.io/api/games?page_size=10&key=${gamesApiKey}`
         );
-        if (!response.ok) {
+        if (!response.ok) 
+        {
           throw new Error('Failed to fetch games');
         }
         const data = await response.json();
@@ -51,19 +50,38 @@ export default function DiscoveryScreen() {
         setGames(shuffledGames);
       } catch (error) {
         console.error('Error fetching games:', error);
-      } finally {
-        setLoadingGames(false);
       }
     };
 
     fetchGames();
   }, []);
 
-  /* Pour I can know them (a commencer)*/
-/*   useEffect(() => {
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${user.username}`)
+  /* Pour I can know them (a continuer)*/
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_BACKEND_URL}/`
+        );
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
+        }
+        const data = await response.json();
+        // Mélange les users et sélectionne les 10 premiers
+        const shuffledUsers = data.results.sort(() => 0.5 - Math.random()).slice(0, 10);
+        setFriends(shuffledUsers);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+  
+    fetchFriends();
+  }, []);
 
-  }, []); */
+  const addFriend = (userId) => {
+    console.log(`Add friend with ID: ${userId}`);
+    // Logique pour ajouter un ami
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -109,12 +127,20 @@ export default function DiscoveryScreen() {
             </View>
           </View>
 
-          {/* Section I can know tham*/}
+          {/* Section I can know them*/}
           <View>
             <Text style={styles.title}>Je pourrais connaitre</Text>
-            <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-            <Text style={styles.friendsPseudo}>Gotaga</Text>
-            <FontAwesome name="plus" color="#7A28CB" size={20} style={styles.iconStyle}/>
+            <View style={styles.encadrer}>
+            {friends.map((friend) => (
+              <View key={friend.id} style={styles.friendItem}>
+                <Image style={styles.friendsAvatars} source={{ uri: friend.avatar }} />
+                <Text style={styles.friendsPseudo}>{friend.username}</Text>
+                <TouchableOpacity onPress={() => addFriend(friend.id)} style={styles.addButton}>
+                  <FontAwesome name="plus" size={20} color="#7A28CB" />
+                </TouchableOpacity>
+              </View>
+            ))}
+            </View>
           </View>
         </ScrollView>
       </ImageBackground>
@@ -217,12 +243,22 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     height: 50,
     width: 50,
-    paddingBottom: 1
+    marginBottom: 5,
   },
   friendsPseudo: {
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#7A28CB',
+  },
+  friendItem: {
+    alignItems: 'center',
+    margin: 10,
+  },
+  addButton: {
+    marginTop: 5,
+    backgroundColor: '#D6CBFD',
+    borderRadius: 25,
+    padding: 5,
   },
 });
