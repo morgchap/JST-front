@@ -30,6 +30,10 @@ export default function ProfilScreen({ navigation }) {
   const [defaultFriends, setDefaultFriends] = useState(true);
   const [numberOfFriends, setNumberOfFriends] = useState(123);
   const [numberOfGames, setNumberOfGames] = useState(123);
+  const [receivedFriendRequestList, setReceivedFriendRequestList] = useState([])
+  const [sentFriendRequestList, setSentFriendRequestList] = useState([])
+  const [gameList, setGameList] = useState([]);
+
   const dispatch = useDispatch();
   const selectFriend = (friendUsername) => {
     dispatch(clickedFriend(friendUsername));
@@ -44,11 +48,27 @@ export default function ProfilScreen({ navigation }) {
     .then(data => {
       console.log("c'est le front!", data.infos)
 
-      setNumberOfFriends(data.infos.friendsList.length)
+      setNumberOfFriends(data.infos.friendsList.length);
 
       console.log("number of friends ", numberOfFriends);
-      console.log("Id de list", data.infos.lists[0])
+      console.log("Id de list", data.infos.lists[0]);
 
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/receivedFriendRequests/${data.infos._id}`)
+      .then(result => result.json())
+      .then(databis => {
+        console.log("fetch de la friendlist received", databis.data)
+        setReceivedFriendRequestList(databis.data);
+      })
+
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/sentFriendRequests/${data.infos._id}`)
+      .then(result => result.json())
+      .then(dataTer => {
+        console.log("fetch de la friend list sent", dataTer.data)
+        setSentFriendRequestList(dataTer.data)
+
+      })
+
+      
     
   
 
@@ -60,29 +80,133 @@ export default function ProfilScreen({ navigation }) {
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`)
     .then(result => result.json())
     .then(data => {
-      console.log("data du fetch", data);
+      console.log("data du fetch des liste de jeux", data);
       setNumberOfGames(data.data.gameList.length)
-      console.log(numberOfGames);
+      console.log("number of Games", numberOfGames);
+      setGameList(data.data.gameList)
+      
     })
+
+
+
   })
 
 
 
 }, []);
 
-/*const myFriends = friend.map((data, i) => {
+console.log(gameList);
+
+
+function acceptFriendRequest(senderId) {
+  //fetch 1 pour changer le statut pending en accepted dans la collection friend
+/*
+  fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/acceptFriendRequest/`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sender: "valeur à remplacer", receiver :"valeur à remplacer" })
+})
+    .then(result => result.json())
+    .then(data => {
+      console.log("data de l'ajout d'ami", data);
+  
+   
+      
+    })
+  */
+
+
+  //fetch 2 pour push l'ID du user dans la FriendList de la collection user 
+
+  fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/addFriend/`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: user.username, id: senderId })
+})
+    .then(result => result.json())
+    .then(data => {
+      console.log("data de l'ajout d'ami", data);
+  
+   
+      
+    })
+}
+  
+
+
+const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
   return (
-    <View key={i} style={styles.friendsContainer}>
+    <View style={styles.headScrollView}>
+    <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
+      navigation.navigate("Friend");
+      selectFriend(data.sender.username);
+      console.log(friend);
+      
+      }}>
       <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-      <Text style={styles.friendsPseudo}>@ami1</Text>
-      <View style={styles.iconContainer}>
-        <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-        <FontAwesome name="trash" color="#7A28CB" size={20}/>
+      <Text style={styles.friendsPseudo}>@{data.sender.username}</Text>
+      
+    </TouchableOpacity>
+    <View style={styles.icons}>
+    <FontAwesome name="plus-circle" color="green" size={25} style={styles.iconStyle} onPress={() => {
+      selectFriend(data.sender.username);
+      console.log(friend);
+      acceptFriendRequest(data.sender._id);
+
+      }}/>
+      <FontAwesome name="ban" color="red" size={25} style={styles.iconStyle} />
       </View>
     </View>
   );
 })
-  */
+
+const mySentFriendRequests = sentFriendRequestList.map((data, i) => {
+  return (
+    <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
+      navigation.navigate("Friend");
+      selectFriend(data.receiver.username);
+      console.log(friend);
+      
+      }}>
+      <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+      <Text style={styles.friendsPseudoBis}>@{data.receiver.username}</Text>
+      <View style={styles.iconContainer}>
+      </View>
+    </TouchableOpacity>
+  );
+})
+
+
+const games = gameList.map((data, i) => {
+
+  const stars = [];
+for (let i = 0; i < 5; i++) {
+  let style = "star-o";
+  if (i < 4 - 1) {
+    style = "star";
+  }
+  stars.push(<FontAwesome key={i} name={style} color="yellow" />);
+}
+
+let name = data.name[0].toUpperCase() + data.name.slice(1);
+
+if (name.length >= 15) {
+  name = name[0].toUpperCase() + name.slice(1, 10) + "..."
+}
+
+  return (
+    <View key={i} style={styles.gameContainer}>
+      <Text style={styles.gameTitle}>{name}</Text>
+      <Image style={styles.jacket} source={{uri: `${data.cover}`, height:100,
+      width: 75 }}/>
+      <View style={styles.starsContainer}>
+        {stars}
+      </View>
+    </View>
+  )
+})
+
+
 
 
   function sendRequest() {
@@ -108,12 +232,12 @@ for (let i = 0; i < 5; i++) {
 }
 
 let pluralFriends = "";
-if (numberOfFriends >=1) {
+if (numberOfFriends >1) {
   pluralFriends = "s"
 }
 
 let pluralGames = "";
-if (numberOfGames >=1) {
+if (numberOfGames >1) {
   pluralGames = "x"
 }
 
@@ -133,52 +257,18 @@ if (numberOfGames >=1) {
       </View>
       <View style={styles.gameDiv}>
         <View style={styles.games}>
-            <Text style={styles.secondTitles}>Mes jeux préférés (5)</Text>
+            <Text style={styles.secondTitles}>Mes jeux préférés ({numberOfGames})</Text>
             <ScrollView horizontal={true} style={styles.listGame}> 
-              <View style={styles.gameContainer}>
-                <Text style={styles.gameTitle}>Mario</Text>
-                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-                <View style={styles.starsContainer}>
-                {stars}
-                </View>
-              </View>
-              <View style={styles.gameContainer}>
-                <Text style={styles.gameTitle}>Mario</Text>
-                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-                <View style={styles.starsContainer}>
-                {stars}
-                </View>
-              </View>
-              <View style={styles.gameContainer}>
-                <Text style={styles.gameTitle}>Mario</Text>
-                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-                <View style={styles.starsContainer}>
-                {stars}
-                </View>
-              </View>
-              <View style={styles.gameContainer}>
-                <Text style={styles.gameTitle}>Mario</Text>
-                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-                <View style={styles.starsContainer}>
-                {stars}
-                </View>
-              </View>
-              <View style={styles.gameContainer}>
-                <Text style={styles.gameTitle}>Mario</Text>
-                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-                <View style={styles.starsContainer}>
-                {stars}
-                </View>
-              </View>
+              {games}
             </ScrollView>
         </View>
       </View>
       <View style={styles.myFriendTitleDiv}>
           <TouchableOpacity style={styles.leftButton} onPress={() => receivedRequest()}>
-            <Text style={styles.friendsReceived}>Demandes reçues (5)</Text>               
+            <Text style={styles.friendsReceived}>Demandes reçues ({receivedFriendRequestList.length})</Text>               
           </TouchableOpacity>
           <TouchableOpacity style={styles.rightButton} onPress={() => sendRequest()}>
-            <Text style={styles.friendsSent}>Demandes envoyées (4)</Text>               
+            <Text style={styles.friendsSent}>Demandes envoyées ({sentFriendRequestList.length})</Text>               
           </TouchableOpacity>
           </View>
           { defaultFriends ? (
@@ -186,27 +276,7 @@ if (numberOfGames >=1) {
         
               <ScrollView style={styles.friendsView}>
               
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudo}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle} onPress={() => {
-                      navigation.navigate("Friend");
-                      selectFriend("ami1");
-                      console.log(friend);
-                      
-                      }}/>
-                    <FontAwesome name="trash" color="#7A28CB" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudo}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="#7A28CB" size={20}/>
-                  </View>
-              </View>
+              {myReceivedFriendRequests}
               
             </ScrollView>
             </> 
@@ -214,16 +284,7 @@ if (numberOfGames >=1) {
               <>
         
               <ScrollView style={styles.scrollViewBis}>
-              
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="white" size={20}/>
-                  </View>
-              </View>
-             
+              {mySentFriendRequests}
             </ScrollView>
             </> 
     )}
@@ -363,11 +424,12 @@ const styles = StyleSheet.create({
     friendsView: {
       display: "flex",
       flex: 1,
-      flexDirection: "column",
+      flexDirection: "row",
       backgroundColor: "white",
       paddingHorizontal: 10,
       marginLeft: 8,
       marginRight: 8,
+
     },
 
     friendsContainer: {
@@ -377,6 +439,7 @@ const styles = StyleSheet.create({
       alignItems: "center",
       paddingVertical: 10,
       paddingLeft: 10,
+
     },
 
     friendsAvatars: {
@@ -466,11 +529,24 @@ const styles = StyleSheet.create({
     scrollViewBis: {
       display: "flex",
       flex: 1,
-      flexDirection: "column",
+      flexDirection: "row",
       backgroundColor: "green",
       paddingHorizontal: 10,
       marginLeft: 8,
       marginRight: 8,
+    },
+    icons: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center"
+    },
+    headScrollView: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      width: "350",
+
     }
    
     
