@@ -28,7 +28,7 @@ export default function Signup3Screen({ navigation }) {
         // if (data.detail = 'not found.'){
         //     setError('game not found') 
         //  } else {
-        console.log(`name : ${data.name} img : ${data.background_image} date : ${data.released}, descr : ${data.description}, genres : ${data.genres[0]?.name}`)
+        //console.log(`name : ${data.name} img : ${data.background_image} date : ${data.released}, descr : ${data.description_raw}, genres : ${data.genres[0]?.name}`)
         setGame('')
         setModalVisible(true)
         setGameImg(data.background_image)

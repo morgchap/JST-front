@@ -26,13 +26,13 @@ const handlesignin = () => {
     body: JSON.stringify({ username: username, password: password}),
 }).then(response => response.json())
 .then(data => {
-    console.log(data)
+    //console.log(data)
     if (data.result) {
-        console.log(data);
+        //console.log(data);
         setUsername('')
         setpassword('')
         dispatch(updateUsername({username: username, token:data.token}));
-        console.log(`username:${username} and reducers:${CurrentUsername}`)
+        //console.log(`username:${username} and reducers:${CurrentUsername}`)
         navigation.navigate('TabNavigator')
     } else {
       setError(data.error)

@@ -3,27 +3,28 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addListGames, deleteGame } from '../reducers/user';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function ListsScreen({ navigation }) {
-
-    //const idUser = "426900"
+    const isFocused = useIsFocused()
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user.value)
-    //const [lists, setList] = useState([])
     const [update, setUpdate] = useState(false)
 
     // receive the list of the user when loading the page
     useEffect(() => {
-        fetch(`http://192.168.100.165:3000/lists/${user.username}`)
-          .then(response => response.json())
-          .then(data => {
-            dispatch(addListGames(data.lists))
-          });
-      }, [update]);
+        // if(user.lists.length === 0){ // because it can also be used in GameScreen
+            fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/${user.username}`)
+              .then(response => response.json())
+              .then(data => {
+                dispatch(addListGames(data.lists))
+              });
+        // }
+      }, [isFocused, update]);
 
     const handleDelete = (listName) => {
         dispatch(deleteGame(listName))
-        fetch(`http://192.168.100.165:3000/lists/${listName}/${user.username}`, {
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/${listName}/${user.username}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
         })
@@ -31,6 +32,10 @@ export default function ListsScreen({ navigation }) {
         .then(data => {
             setUpdate(!update)
         })
+    }
+
+    const handleSeeList = () => {
+        console.log("ne fait rien pour l'instant")
     }
 
     const games = user.lists.map((data, i) => {
@@ -46,8 +51,8 @@ export default function ListsScreen({ navigation }) {
                     </View>
                     <View style={styles.textOfListBottom}>
                         <Text style={styles.listLength}>{data.gameList.length} {plural}</Text>
-                        <TouchableOpacity style={styles.buttonOfList} onPress={() => console.log("coucou")} activeOpacity={0.8}>
-                            <Text style={styles.textButtonOfList} >Add</Text>
+                        <TouchableOpacity style={styles.buttonOfList} onPress={() => handleSeeList()} activeOpacity={0.8}>
+                            <Text style={styles.textButtonOfList} >See</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

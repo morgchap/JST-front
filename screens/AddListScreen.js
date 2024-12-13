@@ -4,8 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addGame } from '../reducers/user';
 
 
-// a lié a un bouton et avec les text insert !
-
 export default function AddListScreen({ navigation }) {
   
   const dispatch = useDispatch();
@@ -13,8 +11,6 @@ export default function AddListScreen({ navigation }) {
   const [errorFetchNameList, setErrorFetchNameList] = useState('')
   const [listName, setListName] = useState('')
   const [isPublic, setIsPublic] = useState(false)
-  //const backendUrl = process.env.BACKEND_URL
-  //const userId = 426900
   const user = useSelector((state) => state.user.value)
   
   // send userId, listName and ifPublic to the backend to create the list
@@ -25,7 +21,7 @@ export default function AddListScreen({ navigation }) {
       return
     }
     const username = user.username
-    fetch(`http://192.168.100.165:3000/lists/addList`, {
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/addList`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ listName, username, isPublic }),
