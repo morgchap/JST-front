@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image, SafeAreaView, KeyboardAvoidingView, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, StyleSheet, Image, SafeAreaView, KeyboardAvoidingView, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -17,6 +17,7 @@ export default function GamesScreen({navigation, route}) {
     const [icon2, setIcon2]= useState('caret-down')
     const [gamesinfo, setGamesInfo]=useState([])
     const [summary, setsummary] = useState('')
+    const [modalVisible, setModalVisible] = useState(false);
     console.log(`game : ${gameName}`)
 
     const toggleVisibility = () => {
@@ -103,7 +104,8 @@ for (let i = 0; i < 5; i++) {
              <Text style ={styles.votecount}>3,5</Text>
          </View>
          <View style={styles.topbutton}>
-            <TouchableOpacity style={styles.greenbutton}>
+            <TouchableOpacity style={styles.greenbutton} 
+            onPress={() => setModalVisible(true)}>
                 <Text style={styles.buttontext}>add to list</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.greenbutton}>
@@ -204,6 +206,35 @@ for (let i = 0; i < 5; i++) {
         </View>  
         </ScrollView>
         </View>
+        <Modal
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              Alert.alert('Modal has been closed.');
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.modalBackground}>
+            <View style={styles.backbutton}>
+          <FontAwesome 
+            name="times"
+            color="#7A28CB" 
+            size={25} 
+            onPress={() => setModalVisible(false)} 
+          />
+            </View> 
+            <View style={styles.modalContainer}>
+              <ScrollView style={styles.scroll2}>
+              <TouchableOpacity>
+              <Text style={styles.modalText}>List 1</Text>
+              </TouchableOpacity>  
+              <TouchableOpacity>
+              <Text style={styles.modalText}>List 2</Text>
+              </TouchableOpacity>  
+              </ScrollView>  
+            </View>
+          </View> 
+          </Modal>
     </View>
   );
 }
@@ -420,5 +451,40 @@ const styles = StyleSheet.create({
       }, 
       footer:{
         height:300
-      }
+      }, 
+      modal: {
+        backgroundColor: 'red',
+        height: '50%',
+        width: '80%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderColor: 'black',
+        borderWidth: 1
+      },
+      modalbox: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      },
+      modalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+      },
+      modalContainer: {
+        width: '80%',
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      scroll2:{
+
+      },
+      modalText: {
+        fontSize: 18,
+        marginBottom: 10,
+      },
   });
