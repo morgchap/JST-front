@@ -3,10 +3,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
  import { useSelector } from 'react-redux'; 
+ import { useDispatch } from 'react-redux';
 import ModalGames from '../components/ModalGames';
+import {searchedgamevalue} from '../reducers/game'
 
 export default function SearchScreen({navigation}) {
-  
+  const dispatch = useDispatch();
+
   const [game, setGame]=useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [gameName, setGameName]=useState('');
@@ -19,7 +22,9 @@ export default function SearchScreen({navigation}) {
   const CurrentUsername = useSelector((state) => state.user.value.username);
   const [suggestionGame, setSuggestionGame] = useState([]);
   const [loadingRace, setLoadingRace] = useState(false);
-
+  
+  const gamedata = useSelector((state) => state.game.value);
+  console.log(`reducer : ${gamedata}`)
 
 const fetchgames = async (query) => {
     if (!query) {
@@ -55,17 +60,56 @@ const fetchgames = async (query) => {
 
      const handleSuggestionGame=(game) => {
       setModalVisible(true)
-      console.log(game)
+      //console.log(game)
       let searchedgame = suggestionGame.filter((e)=> e.name === game)
-      console.log(searchedgame)
+      //console.log(searchedgame)
+      if(searchedgame[0].cover){
         setGameImg(searchedgame[0].cover);
-        console.log(gameImg)
+       //console.log(gameImg)
         setGameName(searchedgame[0].name);
-        console.log(gameName)
+        //console.log(gameName)
         setGamedate(searchedgame[0].releaseDate);
-        console.log(gameDate)
-      //setSuggestionGame([])
+        //console.log(gameDate)
+      }else{
+        setGameImg(searchedgame[0].background_image);
+        //console.log(gameImg)
+        setGameName(searchedgame[0].name);
+        //console.log(gameName)
+        setGamedate(searchedgame[0].released);
+        //console.log(gameDate)
+        setGameDescription(searchedgame[0].description)
+        setGameGenre(searchedgame[0].genres.name)
+      }
      }
+
+// create a new game 
+  const handlenewgame = async ()  => {
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/newgames`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        img : gameImg, 
+        description : gameDescription, 
+        release: gameDate,
+        genre:gameGenre, 
+        name:gameName,
+      }),
+    }).then(response => response.json()).then(data => {
+      if (data){
+        console.log(`result : ${data.gameid}`)
+        
+        dispatch(searchedgamevalue(gameName))
+      } else {
+        dispatch(searchedgamevalue(gameName))
+      }
+    })
+    navigation.navigate('Games',{ gameName: gameName })
+    setModalVisible(false)
+    setGame('')
+    setGameName('')
+    setSuggestionGame([])
+  }
+
 
   const handlesubmit = ()=> {
     //setGame(value)
@@ -75,10 +119,10 @@ const fetchgames = async (query) => {
     if(numberOfSuggestion === 0){
       let searchedGame = gameName.trim()
       searchedGame = searchedGame.replaceAll(" ", '-');
-      console.log(searchedGame)
+      //console.log(searchedGame)
       fetch(`https://api.rawg.io/api/games/${searchedGame}?key=${process.env.EXPO_PUBLIC_API_KEY}`).then(response => response.json())
       .then(data => {
-        console.log(`name : ${data.name} img : ${data.background_image} date : ${data.released}, descr : ${data.description}, genres : ${data.genres[0]?.name}`);
+        //console.log(`name : ${data.name} img : ${data.background_image} date : ${data.released}, descr : ${data.description}, genres : ${data.genres[0]?.name}`);
         setGame('');
         setGameImg(data.background_image);
         setGameName(data.name);
@@ -86,7 +130,7 @@ const fetchgames = async (query) => {
         setError('');
         setGameDescription(data.description);
         setGameGenre(data.genres.name);
-        console.log('true')
+        //console.log('true')
         setSuggestionGame(suggestionGame => [...suggestionGame, data])
         //console.log(`suggestion ${suggestionGame}`)
       })
@@ -106,7 +150,8 @@ const handleList = ()=> {
       username : CurrentUsername, 
       summary : gameDescription, 
       release: gameDate,
-      genre:gameGenre 
+      genre:gameGenre,
+      name:gameName
     }),
   })
   .then(response => response.json())
@@ -243,8 +288,7 @@ return (
               <Text style={styles.modalText}>{gameName}</Text>
               <Text style={styles.modalText}>{gameDate}</Text>
               <TouchableOpacity style={styles.button} onPress={()=> {
-                navigation.navigate('Games')
-                setModalVisible(false)
+                handlenewgame()
               }}>
                   <Text style={styles.buttonText}>See more</Text>
               </TouchableOpacity>

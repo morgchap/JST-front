@@ -77,18 +77,24 @@ const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"
           <Text style={styles.text}>OU</Text>
           <View style={styles.line}></View>
         </View> 
-          <TextInput style={styles.input} placeholder='Username' autoCapitalize='none' onChangeText={(value) => setUsername(value)}
+          <TextInput style={styles.input} 
+          placeholder='Username' 
+          autoCapitalize='none' 
+          placeholderTextColor={'#7A28CB'}
+          onChangeText={(value) => setUsername(value)}
          value={username} />
           <TextInput style={styles.input} 
           autoComplete='email' 
           keyboardType='email-address'
           placeholder='email'
           autoCapitalize='none'
+          placeholderTextColor={'#7A28CB'}
           onChangeText={(value) => setEmail(value)}
           value={email} />
           <TextInput style={styles.input} 
           placeholder='password'
           secureTextEntry={true}
+          placeholderTextColor={'#7A28CB'}
           onChangeText={(value) => setpassword(value)}
           value={password}
           autoCapitalize='none' />
