@@ -21,10 +21,15 @@ export default function SearchScreen({navigation}) {
   const [consoleGames, setConsoleGames] = useState([]);
   const CurrentUsername = useSelector((state) => state.user.value.username);
   const [suggestionGame, setSuggestionGame] = useState([]);
+  const [suggestionUser, setSuggestionUser] = useState([]);
   const [loadingRace, setLoadingRace] = useState(false);
+  const [search, setSearch] = useState('game')
+  const [searchedUser, setSearchedUser] = useState('')
   
   const gamedata = useSelector((state) => state.game.value);
-  console.log(`reducer : ${gamedata}`)
+  //console.log(`reducer : ${gamedata}`)
+
+  console.log(`user : ${suggestionUser}`)
 
 const fetchgames = async (query) => {
     if (!query) {
@@ -53,9 +58,44 @@ const fetchgames = async (query) => {
     }
       };
 
+    const fetchUsers = async (query) => {
+        if (!query) {
+          setSuggestionUser([]);
+          return;
+        }	
+        setLoadingRace(true);
+        
+        try {
+          const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/fromsearch?search=${query}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          const data = await response.json();
+          console.log(data);
+          if (data && Array.isArray(data.data)) {
+            setSuggestionUser(data.data);
+          } else {
+            setSuggestionUser([]);
+          }
+        } catch (error) {
+          console.error("Error fetching suggestions:", error);
+          setError('Failed to fetch suggestions');
+        } finally {
+          setLoadingRace(false);
+        }
+          };
+    
+          //console.log(suggestionUser)
+
      const handleinput = (value) => {
       setGameName(value)
       fetchgames(value)
+     }
+
+
+     const handleinputUser = (value) => {
+      setSearchedUser(value)
+      fetchUsers(value)
      }
 
      const handleSuggestionGame=(game) => {
@@ -81,6 +121,97 @@ const fetchgames = async (query) => {
         setGameGenre(searchedgame[0].genres.name)
       }
      }
+
+     // affichage conditionnel des boutons
+     let searchButton;
+     let searchBar;
+
+     if (search === 'game') {
+       searchButton = (
+         <View style={styles.searchcont}>
+           <TouchableOpacity style={styles.searchOn} onPress={() => setSearch('game')}>
+             <Text>Game</Text>
+           </TouchableOpacity>
+           <TouchableOpacity style={styles.searchOff} onPress={() => setSearch('user')}>
+             <Text>User</Text>
+           </TouchableOpacity>
+         </View>
+       );
+       searchBar = (
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.input} 
+            onChangeText={(value) => handleinput(value)}
+            value={gameName}
+            placeholder='Search for a Game'
+            returnKeyType='search'
+            onSubmitEditing={(gameName) => handlesubmit(gameName)}
+            placeholderTextColor="black"
+          />
+          <View style={styles.suggestiontcontainer}>
+          {loadingRace && <Text>Chargement...</Text>}
+          {suggestionGame.length > 0 && (
+            <FlatList
+              data={suggestionGame}
+              keyExtractor={(item, index) => `${item._id}-${index}`}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.suggestionItem}
+                  onPress={() => handleSuggestionGame(item.name)}
+                >
+                  <Text style={styles.suggestionText}>{item.name}</Text>
+                </TouchableOpacity>
+              )}
+            /> )}   
+            {error && <Text style={styles.errorText}>{error}</Text>}     
+            </View> 
+            </View>
+       )
+
+     } else if (search === 'user') {
+       searchButton = (
+         <View style={styles.searchcont}>
+           <TouchableOpacity style={styles.searchOff} onPress={() => setSearch('game')}>
+             <Text>Game</Text>
+           </TouchableOpacity>
+           <TouchableOpacity style={styles.searchOn} onPress={() => setSearch('user')}>
+             <Text>User</Text>
+           </TouchableOpacity>
+         </View>
+       );
+       searchBar=(
+        <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.input} 
+          onChangeText={(value) => handleinputUser(value)}
+          value={searchedUser}
+          placeholder='Search for a User'
+          returnKeyType='search'
+          // onSubmitEditing={(gameName) => handlesubmit(gameName)}
+          placeholderTextColor="black"
+        />
+        <View style={styles.suggestiontcontainer}>
+        {loadingRace && <Text>Chargement...</Text>}
+        {suggestionUser.length > 0 && (
+          <FlatList
+            data={suggestionUser}
+            keyExtractor={(item, index) => `${item._id}-${index}`}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.suggestionItem}
+                // onPress={() => handleSuggestionGame(item.name)}
+              >
+                <Text style={styles.suggestionText}>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+          /> )}   
+          {error && <Text style={styles.errorText}>{error}</Text>}     
+          </View> 
+          </View>
+       )
+     }
+
+
 
 // create a new game 
   const handlenewgame = async ()  => {
@@ -156,7 +287,7 @@ const handleList = ()=> {
   })
   .then(response => response.json())
   .then(data => {
-    console.log(data)
+    //console.log(data)
     if (data.result) {
       console.log(`${data} added`);
       setModalVisible(false);
@@ -200,43 +331,11 @@ return (
           />
         </View>
 
-        <View style={styles.searchContainer}>
-          {/* <TextInput 
-            style={styles.input} 
-            placeholder='Search for a Game' 
-            returnKeyType='search'
-            onSubmitEditing={() => handlesubmit()}
-            onChangeText={(value) => setGame(value)}
-            value={game}
-          /> */}
-            <TextInput
-              style={styles.input} 
-              onChangeText={(value) => handleinput(value)}
-              value={gameName}
-              placeholder='Search for a Game'
-              returnKeyType='search'
-              onSubmitEditing={(gameName) => handlesubmit(gameName)}
-              placeholderTextColor="black"
-            />
-            {loadingRace && <Text>Chargement...</Text>}
-            {suggestionGame.length > 0 && (
-              <FlatList
-                data={suggestionGame}
-                keyExtractor={(item, index) => `${item._id}-${index}`}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.suggestionItem}
-                    onPress={() => handleSuggestionGame(item.name)}
-                  >
-                    <Text style={styles.suggestionText}>{item.name}</Text>
-                  </TouchableOpacity>
-                )}
-              /> )}         
-          <Text style={styles.subtitle}>
+          {searchBar}
+          {searchButton}
+        <Text style={styles.subtitle}>
             Explore le top des jeux par console
           </Text>
-        </View>
-
         <View style={styles.buttonsContainer}>
           {consoles.map((console, index) => (
             <TouchableOpacity
@@ -252,7 +351,6 @@ return (
         </View>
 
         <ScrollView style={styles.gamesList}>
-            {error && <Text style={styles.errorText}>{error}</Text>}
             {(game || consoleGames.length > 0) && (
               <View>
                 {game && <Text style={styles.gameTitle}>Game Search Results</Text>}
@@ -427,4 +525,44 @@ const styles = StyleSheet.create({
     width: '90%',
     marginLeft: '5%'
   },
+  suggestionItem:{
+    backgroundColor:'white',
+    justifyContent:'flex-start', 
+    alignContent:'flex-start', 
+    marginBottom:'2%', 
+    borderBottomColor:'#7A28CB',
+    borderBottomWidth:1, 
+    width:'100%',
+    padding:'5%', 
+    borderRadius:2
+  },
+  suggestiontcontainer:{
+    width:'90%'
+  },
+  searchOn:{
+    backgroundColor: '#D6CBFD',
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+    width:'40%', 
+    borderWidth:1, 
+    borderColor:'#7A28CB',
+    alignItems:'center',
+  }, 
+  searchOff:{
+    backgroundColor: '#F0F0F0',
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+    width:'40%', 
+    alignItems:'center',
+    borderWidth:1, 
+    borderColor:'grey',
+    opacity:0.5
+  }, 
+  searchcont:{
+    flexDirection:'row',
+    width:'100%',
+    justifyContent:'space-around'
+  }
 });

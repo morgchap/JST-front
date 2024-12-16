@@ -18,7 +18,8 @@ import Signup2Screen from './screens/Signup2Screen';
 import SetupScreen from './screens/SetupScreen';
 import Signup3Screen from './screens/Signup3Screen';
 import FriendScreen from './screens/FriendScreen';
-import GamesScreen from './screens/GamesScreen'
+import GamesScreen from './screens/GamesScreen';
+import ProfilePicture from'./screens/ProfilePicture';
 import FriendListScreen from './screens/FriendListScreen';
 //import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Provider } from 'react-redux';
@@ -124,6 +125,7 @@ export default function App() {
                     <Stack.Screen name="Friend" component={FriendScreen} />
                     <Stack.Screen name="Games" component={GamesScreen} />
                     <Stack.Screen name="FriendList" component={FriendListScreen} />
+                    <Stack.Screen name="ProfilePicture" component={ProfilePicture} />
                 </Stack.Navigator>
             </NavigationContainer>
           </PersistGate>

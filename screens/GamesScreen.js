@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image, SafeAreaView, KeyboardAvoidingView, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import { Text, View, StyleSheet, Image, SafeAreaView, KeyboardAvoidingView, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -14,6 +14,9 @@ export default function GamesScreen({navigation, route}) {
     //console.log(`reducer : ${gamedata}`)
     const dispatch = useDispatch();
     const {gameName} = route.params
+    const user = useSelector((state) => state.user.value)
+    const currentUser = user.username
+
     const [isVisible, setVisibility] = useState(false);
     const [icon, setIcon]= useState('caret-down')
     const [isVisible2, setVisibility2] = useState(false);
@@ -21,7 +24,11 @@ export default function GamesScreen({navigation, route}) {
     const [gamesinfo, setGamesInfo]=useState([])
     const [summary, setsummary] = useState('')
     const [modalVisible, setModalVisible] = useState(false);
-    const user = useSelector((state) => state.user.value)
+    const [message, setmessage] = useState(false);
+    const [review, setReview] = useState(false)
+    const [personalNote, setPersonalNote] = useState(0);
+    const [writtencontent, setWrittentContent]= useState('')
+    const [gamereview, setGameReview] = useState([])
     //console.log(`game : ${gameName}`)
 
     const toggleVisibility = () => {
@@ -57,8 +64,54 @@ export default function GamesScreen({navigation, route}) {
               setModalVisible(false)
               dispatch(updateChange())
             });
+            setmessage(true)
     }
       
+   const  handlesubmit = () => {
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/newreview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        name : gameName, username: user.username, reviewcontent: writtencontent, note: personalNote,
+      })
+  }).then(response => response.json()).then(doc=> {
+    if(doc.result){
+      //console.log(doc.ratings)
+      setGameReview( [... gamereview, doc.ratings] );
+      setReview(false)
+    }
+  }
+  )}
+
+
+   const myreview = gamereview.map((data)=> {
+    const mynotestars = []; 
+for (let i = 0; i < 5; i++) {
+    let style = "star-o";
+    if (i < data.note+1) {
+      style =  style = "star";
+    }
+    mynotestars.push(<FontAwesome key={i} name={style} color="#f1c40f" size={15}/>);
+  }
+    return(
+      <View style = {styles.friendsReviews}>
+      <View style={styles.picanduseandreview}> 
+      <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+      <View style={styles.useandreview}>
+      <Text style={styles.friendsPseudo}>@{user.username}</Text>
+      <View style={styles.starsContainer2}>
+           {mynotestars}
+          <Text style ={styles.votecount2}>{data.note}</Text>
+      </View> 
+      </View>
+      </View>   
+      <View style={styles.comment}>
+          <Text>{data.writtenOpinion}</Text>
+      </View>
+      </View>
+    )
+   })
+
       useEffect(() => {
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/byname`, {
             method: "POST",
@@ -92,17 +145,35 @@ for (let i = 0; i < 5; i++) {
   if (i < 4 - 1) {
     style = "star";
   }
-  stars2.push(<FontAwesome key={i} name={style} color="#f1c40f" size={15}/>);
+  stars2.push(<FontAwesome key={i} name={style} color="#f1c40f" size={15} />);
 }
 
   const lists = user.lists.map((data, i) => {
     return (
-      <TouchableOpacity key={i} onPress={() => handleAddGameToList(data.listName)}>
+      <TouchableOpacity key={i} onPress={() => handleAddGameToList(data.listName)} style={styles.listcont}>
         <Text style={styles.modalText}>{data.listName}</Text>
       </TouchableOpacity>
     )
     
   })
+//handle personnal note
+  const personalStars = [];
+  for (let i = 0; i < 5; i++) {
+    let style = "star-o";
+    if (i < personalNote) {
+      style =  style = "star";
+    }
+    personalStars.push(<FontAwesome key={i} name={style} color="#f1c40f" size={40} onPress={()=> setPersonalNote(i+1)}/>);
+  }
+
+const mynotestars = []; 
+for (let i = 0; i < 5; i++) {
+    let style = "star-o";
+    if (i < personalNote) {
+      style =  style = "star";
+    }
+    mynotestars.push(<FontAwesome key={i} name={style} color="#f1c40f" size={40}/>);
+  }
 
 
   return (
@@ -143,7 +214,9 @@ for (let i = 0; i < 5; i++) {
             onPress={() => setModalVisible(true)}>
                 <Text style={styles.buttontext}>add to list</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.greenbutton}>
+            <TouchableOpacity style={styles.greenbutton}
+            onPress={()=> setReview(true)}
+            >
                 <Text style={styles.buttontext}>Write a review</Text>
             </TouchableOpacity>
          </View>
@@ -159,7 +232,11 @@ for (let i = 0; i < 5; i++) {
           <SafeAreaView style={styles.container}>
           <Text style ={styles.summary}>
                 Reviews
-        </Text>   
+        </Text>
+        <Text style ={styles.summary}>
+               My review
+        </Text>
+            {myreview}
       <TouchableOpacity onPress={toggleVisibility} style={styles.container2}>
         <Text>My friend's reviews</Text>
         <FontAwesome name='caret-down' color="black" size={20}/>
@@ -205,6 +282,7 @@ for (let i = 0; i < 5; i++) {
         <FontAwesome name={icon2} color="black" size={20}/>
       </TouchableOpacity>
       <Collapsible isVisible={isVisible2}>
+
         <View style = {styles.friendsReviews}>
         <View style={styles.picanduseandreview}> 
         <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
@@ -220,6 +298,7 @@ for (let i = 0; i < 5; i++) {
             <Text>That is my favorite game i would 100% recommend it</Text>
         </View>
         </View>
+
         <View style = {styles.friendsReviews}>
         <View style={styles.picanduseandreview}> 
         <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
@@ -235,6 +314,7 @@ for (let i = 0; i < 5; i++) {
             <Text>That is my favorite game i would 100% recommend it</Text>
         </View>
         </View>
+
       </Collapsible>
     </SafeAreaView>
          </View> 
@@ -242,6 +322,8 @@ for (let i = 0; i < 5; i++) {
         </View>  
         </ScrollView>
         </View>
+
+
         <Modal
             transparent={true}
             visible={modalVisible}
@@ -251,7 +333,8 @@ for (let i = 0; i < 5; i++) {
             }}
           >
             <View style={styles.modalBackground}>
-            <View style={styles.backbutton}>
+              <View style={styles.modalContainer}>
+              <View style={styles.backbutton}>
               <FontAwesome 
                 name="times"
                 color="#7A28CB" 
@@ -259,10 +342,72 @@ for (let i = 0; i < 5; i++) {
                 onPress={() => setModalVisible(false)} 
               />
             </View> 
-              <View style={styles.modalContainer}>
                 <ScrollView style={styles.scroll2}>
                   {lists}  
                 </ScrollView>  
+              </View>
+          </View> 
+          </Modal>
+
+          <Modal
+            transparent={true}
+            visible={message}
+          >
+            <View style={styles.modalBackground}>
+              <View style={styles.modalContainer}>
+              <View style={styles.backbutton}>
+              <FontAwesome 
+                name="times"
+                color="#7A28CB" 
+                size={25} 
+                onPress={() => setmessage(false)} 
+              />
+            </View> 
+               <Text>Votre jeux a bien été ajoutéé</Text>
+              </View>
+          </View> 
+          </Modal>
+
+          <Modal
+            transparent={true}
+            visible={review}
+            onRequestClose={() => {
+              Alert.alert('Modal has been closed.');
+              setReview(!review);
+            }}
+          >
+            <View style={styles.modalBackground}>
+              <View style={styles.modalContainer3}>
+              <View style={styles.backbutton}>
+              <FontAwesome 
+                name="times"
+                color="#7A28CB" 
+                size={25} 
+                onPress={() => setReview(false)} 
+              />
+            </View> 
+              <View style ={styles.scrollcont}>
+               <ScrollView style={styles.reviewcont}>
+                 <View style={styles.starsContainer}>
+                   {personalStars}
+                </View>
+                <View style={styles.reviewinputcont}>
+                  <TextInput style={styles.reviewinput}
+                  placeholder='my review'
+                  enterKeyHint='send'
+                  textAlign='left'
+                  textAlignVertical='auto'
+                  onChangeText={(value) => setWrittentContent(value)}
+                  value={writtencontent}
+                  onSubmitEditing={()=> handlesubmit()}   
+                  >
+                  </TextInput>
+                </View>
+               </ScrollView>
+               </View>
+               <View>
+
+               </View>
               </View>
           </View> 
           </Modal>
@@ -512,15 +657,70 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: 'white',
         borderRadius: 10,
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'center',
       },
       scroll2:{
-
+        width:'100%'
       },
       modalText: {
         fontSize: 18,
         marginBottom: 10,
       },
+      listcont:{
+        backgroundColor:'#D4FDC6', 
+        padding:'4%',
+        marginTop: 10,
+        width:'100%',
+        alignContent:'center',
+      }, 
+      reviewcont:{
+        borderColor:'#7A28CB', 
+        borderWidth:1,
+        width:'100%',
+        height:'90%',
+      }, 
+      modalContainer3:{
+        width: '80%',
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        maxHeight:300
 
+      }, 
+      reviewinput:{
+        backgroundColor:'#F0F0F0',
+        height:'80%',
+        marginBottom:'10%',
+        marginTop:'10%',
+        padding:5,
+      }, 
+      reviewinputcont:{
+        marginHorizontal:5,
+      }, 
+      greenbutton2:{
+        borderColor:'#33CA7F', 
+        borderWidth:1,
+        backgroundColor:'white',
+        height:50,
+        alignItems:'center',
+        justifyContent:'center',
+        borderRadius:25, 
+        shadowColor: "#000",
+        shadowOffset: {
+	        width: 0,
+	        height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        width:'60%'
+      }, 
+      scrollcont:{
+        width:'100%', 
+        alignItems:'center', 
+        justifyContent:'center',
+      }
   });
