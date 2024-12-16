@@ -1,8 +1,10 @@
-import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity, RefreshControl, SafeAreaProvider, SafeAreaView } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { clickedFriend } from '../reducers/friend';
+import React from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import {
   useFonts,
@@ -35,6 +37,14 @@ export default function ProfilScreen({ navigation }) {
   const [gameList, setGameList] = useState([]);
   const [myId, setMyId] = useState("");
   const [actionOnFriends, setActionOnFriends] = useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   const dispatch = useDispatch();
   const selectFriend = (friendUsername) => {
@@ -42,61 +52,62 @@ export default function ProfilScreen({ navigation }) {
   };
 
   useEffect(() => {
+    if (!refreshing) {
+      console.log("ça marche");
 
-    console.log("ça marche");
-
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`)
-    .then(result => result.json())
-    .then(data => {
-      console.log("c'est le front!", data.infos)
-
-      setNumberOfFriends(data.infos.friendsList.length);
-      setMyId(data.infos._id)
-
-      console.log("number of friends ", numberOfFriends);
-      console.log("Id de list", data.infos.lists[0]);
-
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/receivedFriendRequests/${data.infos._id}`)
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`)
       .then(result => result.json())
-      .then(databis => {
-        console.log("fetch de la friendlist received", databis.data)
-        setReceivedFriendRequestList(databis.data);
-      })
-
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/sentFriendRequests/${data.infos._id}`)
-      .then(result => result.json())
-      .then(dataTer => {
-        console.log("fetch de la friend list sent", dataTer.data)
-        setSentFriendRequestList(dataTer.data)
-
-      })
-
+      .then(data => {
+  
+        setNumberOfFriends(data.infos.friendsList.length);
+        setMyId(data.infos._id)
+  
+        // console.log("number of friends ", numberOfFriends);
+        // console.log("Id de list", data.infos.lists[0]);
+  
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/receivedFriendRequests/${data.infos._id}`)
+        .then(result => result.json())
+        .then(databis => {
+          // console.log("fetch de la friendlist received", databis.data)
+          setReceivedFriendRequestList(databis.data);
+        })
+  
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/sentFriendRequests/${data.infos._id}`)
+        .then(result => result.json())
+        .then(dataTer => {
+          // console.log("fetch de la friend list sent", dataTer.data)
+          setSentFriendRequestList(dataTer.data)
+  
+        })
+  
+        
       
     
   
+        return data
+       
+      })
+      .then(data => {
+        console.log("deuxième data", data);
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`)
+        .then(result => result.json())
+        .then(data => {
+          console.log("data du fetch des liste de jeux", data);
+          setNumberOfGames(data.data.gameList.length)
+          console.log("number of Games", numberOfGames);
+          setGameList(data.data.gameList)
+          
+        })
+  
+  
+  
+      })
+    }
+    
 
-      return data
-     
-  })
-  .then(data => {
-    console.log("deuxième data", data);
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`)
-    .then(result => result.json())
-    .then(data => {
-      console.log("data du fetch des liste de jeux", data);
-      setNumberOfGames(data.data.gameList.length)
-      console.log("number of Games", numberOfGames);
-      setGameList(data.data.gameList)
-      
-    })
 
 
-
-  })
-
-
-
-}, [actionOnFriends]);
+}, [actionOnFriends, refreshing]);
 
 //fonctionne mais tourne en boucle... -> à voir comment éviter ça
 
@@ -132,8 +143,6 @@ function acceptFriendRequest(senderId, senderUsername) {
     .then(result => result.json())
     .then(data => {
       console.log("data de l'ajout d'ami", data);
-  
-   
       
     })
 
@@ -263,19 +272,29 @@ if (numberOfGames >1) {
   pluralGames = "x"
 }
 
-const isConnected = true;
+// const isConnected = true;
 
-if (!user.token) {
-  isConnected = false;
-};
+// if (!user.token) {
+//   isConnected = false;
+// };
 
 
   return (
-    
+    // <SafeAreaProvider>
     <View style={styles.centered}>
+      <ScrollView
+        Style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
+         <LinearGradient
+        // Background Linear Gradient
+        colors={['74deg, rgba(214,203,253,1) 0%', 'rgba(212,253,198,1) 100%']}
+        style={styles.gradient}
+      >
       <View style={styles.headIcons}>
-      <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
-      <FontAwesome name="cog" color="#7A28CB" size={25} onPress={() => navigation.navigate("Setup")}/>
+      <FontAwesome name="chevron-left" color="white" size={25} onPress={() => navigation.goBack()}/>
+      <FontAwesome name="cog" color="white" size={25} onPress={() => navigation.navigate("Setup")}/>
       </View>
       <View style={styles.me}>
         <Image style={styles.avatar} source={require("../assets/avatar.png")} />
@@ -290,6 +309,7 @@ if (!user.token) {
             <Text style={styles.friendStatsText}>{numberOfFriends} ami{pluralFriends}</Text>
           </TouchableOpacity>
       </View>
+      </LinearGradient>
       <View style={styles.gameDiv}>
         <View style={styles.games}>
             <Text style={styles.secondTitles}>Mes jeux préférés ({numberOfGames})</Text>
@@ -323,7 +343,9 @@ if (!user.token) {
             </ScrollView>
             </> 
     )}
+        </ScrollView>
     </View>
+
       
   );
 }
@@ -331,9 +353,10 @@ if (!user.token) {
 const styles = StyleSheet.create({
 
   centered: {
-        flex: 1,
+        flex:1,
         alignItems: 'start',
-        justifyContent: 'start'
+        justifyContent: 'start',
+        backgroundColor:'#F0F0F0'
     },
 
     headIcons: {
@@ -354,7 +377,7 @@ const styles = StyleSheet.create({
       justifyContent: "center",
       alignItems: "center",
       marginTop: 20,
-
+      marginBottom:30,
     },
 
     avatar: {
@@ -462,8 +485,8 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       backgroundColor: "white",
       paddingHorizontal: 10,
-      marginLeft: 8,
-      marginRight: 8,
+      marginLeft: 13,
+      marginRight: 13,
 
     },
 
@@ -540,7 +563,7 @@ const styles = StyleSheet.create({
     rightButton: {
       borderTopLeftRadius: 10,
       borderTopRightRadius: 10,
-      backgroundColor: 'green',
+      backgroundColor: '#33CA7F',
       justifyContent: "center",
       alignItems: "center",
       paddingHorizontal: 10,
@@ -571,10 +594,10 @@ const styles = StyleSheet.create({
       display: "flex",
       flex: 1,
       flexDirection: "row",
-      backgroundColor: "green",
+      backgroundColor: "#33CA7F",
       paddingHorizontal: 10,
-      marginLeft: 8,
-      marginRight: 8,
+      marginLeft: 13,
+      marginRight: 13,
     },
     icons: {
       display: "flex",
@@ -588,9 +611,19 @@ const styles = StyleSheet.create({
       justifyContent: "space-between",
       width: "350",
 
+    },
+    container: {
+      flex: 1,
+    },
+    scrollView: {
+      flex: 1,
+      backgroundColor: 'pink',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    gradient:{
+      height:'flex 1/4'
     }
-   
-    
     
   });
   

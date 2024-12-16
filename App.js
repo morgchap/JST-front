@@ -30,7 +30,8 @@ import game from './reducers/game'
 import { persistStore, persistReducer } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import storage from "redux-persist/lib/storage";
-
+import { useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
 
 // importer les differents reducers
 
@@ -57,6 +58,27 @@ const Tab = createBottomTabNavigator();
 
 
 const TabNavigator = () => {
+  const username = useSelector((state) => state.user.value)
+
+  const [profileBadgeCount, setProfileBadgeCount] = useState()
+  useEffect(() => {
+  
+    console.log("ça marche");
+  
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${username.username}`)
+    .then(result => result.json())
+    .then(data => {
+      //console.log("c'est le front!", data.infos)
+  
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/receivedFriendRequests/${data.infos._id}`)
+      .then(result => result.json())
+      .then(databis => {
+        //console.log("fetch de la friendlist received", databis.data)
+        setProfileBadgeCount(databis.data.length)
+      })
+  })
+  },[profileBadgeCount])
+
     return (
       <Tab.Navigator screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
@@ -82,12 +104,13 @@ const TabNavigator = () => {
         headerShown: false,
         tabBarShowLabel:false,
         tabBarStyle:{backgroundColor: '#7A28CB'},
+        tabBarBadge: route.name === 'Profil' && profileBadgeCount > 0 ? profileBadgeCount : undefined,
         
       })}>
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Search" component={SearchScreen} />
         <Tab.Screen name="Discovery" component={DiscoveryScreen} />
-        <Tab.Screen name="Profil" component={ProfilScreen} />
+        <Tab.Screen name="Profil" component={ProfilScreen}/>
         <Tab.Screen name="Lists" component={ListsScreen} />
       </Tab.Navigator>
     );

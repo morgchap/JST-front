@@ -49,6 +49,8 @@ export default function GamesScreen({navigation, route}) {
       };
       
     const handleAddGameToList = ( listName ) => {
+      setModalVisible(false)
+      setmessage(true)
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/addToList`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -60,11 +62,9 @@ export default function GamesScreen({navigation, route}) {
                 console.log(data.error)
               } else {
                 console.log(data.message)
+                dispatch(updateChange())
               }
-              setModalVisible(false)
-              dispatch(updateChange())
             });
-            setmessage(true)
     }
       
    const  handlesubmit = () => {
@@ -392,11 +392,9 @@ for (let i = 0; i < 5; i++) {
                    {personalStars}
                 </View>
                 <View style={styles.reviewinputcont}>
-                  <TextInput style={styles.reviewinput}
+                <TextInput style={styles.reviewinput}
                   placeholder='my review'
                   enterKeyHint='send'
-                  textAlign='left'
-                  textAlignVertical='auto'
                   onChangeText={(value) => setWrittentContent(value)}
                   value={writtencontent}
                   onSubmitEditing={()=> handlesubmit()}   
@@ -693,8 +691,6 @@ const styles = StyleSheet.create({
       reviewinput:{
         backgroundColor:'#F0F0F0',
         height:'80%',
-        marginBottom:'10%',
-        marginTop:'10%',
         padding:5,
       }, 
       reviewinputcont:{

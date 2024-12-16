@@ -49,7 +49,7 @@ export default function SnapScreen({navigation}) {
 		  			.then((response) => response.json())
 		  			.then((data) => {
 		  				console.log('data:', data);
-						  
+						navigation.navigate('TabNavigator')  
 		  			})
 		  			.catch((err) => console.error('Error:', err));
 		  	}
@@ -112,39 +112,12 @@ export default function SnapScreen({navigation}) {
 				.then((response) => response.json())
 				.then((data) => {
 					console.log('data:', data);
+					navigation.navigate('TabNavigator')
 				})
 				.catch((err) => console.error('Error:', err));
 		}
 	};
 
-	// const chosePicture = async () => {
-	// 	const formData = new FormData();
-	// 	const photo = 
-	// 	if (photo) {
-	// 		console.log('photo:', photo.uri);
-
-	// 		formData.append('photoFromFront', {
-	// 			uri: photo?.uri,
-	// 			name: 'snapped.jpg',
-	// 			type: 'image/jpeg',
-	// 		});
-	// 		console.log('je rentre dans la route')
-	// 		formData.append('username', user); // Append username separately
-	
-	// 		console.log('formData:', formData);
-	
-	// 		fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateAvatar`, {
-	// 			method: 'POST',
-	// 			body: formData,
-	// 		})
-	// 			.then((response) => response.json())
-	// 			.then((data) => {
-	// 				console.log('data:', data);
-					
-	// 			})
-	// 			.catch((err) => console.error('Error:', err));
-	// 	}
-	// };
 
 	return (
         <View style={styles.container}>
