@@ -1,4 +1,4 @@
-import { Text, View, Image, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { Text, View, Image, TouchableOpacity, ScrollView, Modal, StyleSheet } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +10,8 @@ export default function ListsScreen({ navigation }) {
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user.value)
     const [update, setUpdate] = useState(false)
+    const [modal, setModal] = useState(false)
+    const [game, setGame] = useState("")
 
     // receive the list of the user when loading the page
     useEffect(() => {
@@ -24,7 +26,7 @@ export default function ListsScreen({ navigation }) {
 
     const handleDelete = (listName) => {
         dispatch(deleteGame(listName))
-        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/${listName}/${user.username}`, {
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/getGames/${listName}/${user.username}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
         })
@@ -34,11 +36,38 @@ export default function ListsScreen({ navigation }) {
         })
     }
 
-    const handleSeeList = () => {
-        console.log("ne fait rien pour l'instant")
+    const handleSeeList = (listName) => {
+        listName = listName.replaceAll(" ", "_")
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/getGames/${listName}/${user.username}`)
+            .then(response => response.json())
+            .then(data => {
+                const games = data.list.map((data, i) => {
+                    let titre
+                    if(data[0].length >= 12){
+                        titre = data[0].slice(0, 9) + "..."
+                    } else {
+                        titre = data[0]
+                    }
+                    return (
+                        <View key={i} style={styles.game}>
+                            <TouchableOpacity onPress={() => handleNavigation() }>
+                                <Image style={styles.jaquette} source={{uri: `${data[1]}`}} />
+                            </TouchableOpacity>
+                            <Text>{titre}</Text>
+                        </View>
+                    )
+                })
+                setModal(true)
+                setGame(games)
+        });
     }
 
-    const games = user.lists.map((data, i) => {
+const handleNavigation = () => {
+    console.log("navigation")
+    //navigation.navigate("Games", { gameName: data[0] }) fait bug la page !
+}
+
+    const list = user.lists.map((data, i) => {
         let trash_bin = i < 1 ? "" : <FontAwesome name="trash" color="#ffffff" size={16} onPress={() => handleDelete(data.listName)}/>
         let plural = data.gameList.length < 2 ? "jeu" : "jeux"
         return (
@@ -51,7 +80,7 @@ export default function ListsScreen({ navigation }) {
                     </View>
                     <View style={styles.textOfListBottom}>
                         <Text style={styles.listLength}>{data.gameList.length} {plural}</Text>
-                        <TouchableOpacity style={styles.buttonOfList} onPress={() => handleSeeList()} activeOpacity={0.8}>
+                        <TouchableOpacity style={styles.buttonOfList} onPress={() => handleSeeList(data.listName)} activeOpacity={0.8}>
                             <Text style={styles.textButtonOfList} >See</Text>
                         </TouchableOpacity>
                     </View>
@@ -70,7 +99,7 @@ export default function ListsScreen({ navigation }) {
             <Text style={styles.topText}>Your lists</Text>
             <View style={styles.lists}>
                 <ScrollView>
-                    {games}
+                    {list}
                 </ScrollView>
             </View>
             <View>
@@ -79,6 +108,28 @@ export default function ListsScreen({ navigation }) {
                 </TouchableOpacity>
             </View>
         </View>
+        <Modal
+            transparent={true}
+            visible={modal}
+        >
+            <View style={styles.modalBackground}>
+                <View style={styles.modalContainer}>
+                    <View style={styles.backbutton}>
+                        <FontAwesome 
+                            name="times"
+                            color="#7A28CB" 
+                            size={25} 
+                            onPress={() => setModal(false)} 
+                        />
+                    </View>
+                    <View style={styles.gameContainer}>
+                        <ScrollView horizontal={true}>
+                            {game}
+                        </ScrollView>
+                    </View>
+                </View>
+            </View> 
+        </Modal>
     </View>
   );
 }
@@ -173,4 +224,34 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    gameContainer: {
+        flexDirection: "row",
+    },
+    game: {
+        marginVertical: 10,
+        marginRight: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    jaquette: {
+        height: 160,
+        width: 120,
+    },
+    modalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+      },
+    modalContainer: {
+        width: '80%',
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+      },
+      backbutton: {
+        width: '100%',
+      },
 });
