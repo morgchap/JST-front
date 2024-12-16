@@ -1,8 +1,6 @@
 import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useSelector, useDispatch } from 'react-redux';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
     useFonts,
@@ -23,11 +21,11 @@ import {
 
 
 
-export default function FriendListScreen({ navigation }) {
+export default function FriendListScreen({ navigation, route }) {
 
-    const friend = useSelector((state) => state.friend.value)
+    const { userFriendList } = route.params;
     const [numberOfFriends, setNumberOfFriends] = useState(123);
-    const [numberOfGames, setNumberOfGames] = useState(123);
+    const [friendList, setFriendList] = useState([]);
 
 
 
@@ -35,57 +33,48 @@ export default function FriendListScreen({ navigation }) {
 
         console.log("ça marche");
     
-        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${friend}`)
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${userFriendList}`)
         .then(result => result.json())
         .then(data => {
-          console.log("c'est le front!", data.infos)
+          console.log("c'est le front de FriendListScreen", data.infos)
     
           setNumberOfFriends(data.infos.friendsList.length);
-          setMyId(data.infos._id)
     
           console.log("number of friends ", numberOfFriends);
           console.log("Id de list", data.infos.lists[0]);
+
+          console.log("last data", data);
+
+          setFriendList(data.infos.friendsList);
     
-          fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/receivedFriendRequests/${data.infos._id}`)
-          .then(result => result.json())
-          .then(databis => {
-            console.log("fetch de la friendlist received", databis.data)
-          })
 
           return data
         })
-        .then(data => {
-            console.log("deuxième data", data);
-            fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`)
-            .then(result => result.json())
-            .then(data => {
-              console.log("data du fetch des liste de jeux", data);
-              setNumberOfGames(data.data.gameList.length)
-              console.log("number of Games", numberOfGames);
-              
-            })
-        })
-    }, [])
+      }, [])
 
-    const friendListContent = "test"
+      console.log("state friendlist à exploiter", friendList);
 
-    /*
-    const friendListContent = sentFriendRequestList.map((data, i) => {
+    //const friendListContent = "test";
+
+    
+    const friendListContent = friendList.map((data, i) => {
+
         return (
           <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
-            navigation.navigate("Friend");
-            selectFriend(data.receiver.username);
-            console.log(friend);
+            navigation.navigate("Friend", {friendName : data.username});
+            
+            
             
             }}>
             <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-            <Text style={styles.friendsPseudoBis}>@{data.receiver.username}</Text>
+            <Text style={styles.friendsPseudoBis}>@{data.username}</Text>
             <View style={styles.iconContainer}>
             </View>
           </TouchableOpacity>
         );
       })
-        */
+      
+        
 
     return (
         <View style={styles.centered}>
@@ -94,13 +83,13 @@ export default function FriendListScreen({ navigation }) {
             </View>
             <View style={styles.me}>
                 <Image style={styles.avatar} source={require("../assets/avatar.png")} />
-                <Text style={styles.pseudo}>@{friend}</Text>
+                <Text style={styles.pseudo}>@{userFriendList}</Text>
             </View>
-            <Text>Les amis de @{friend}</Text>
-            
-                <View>
+            <Text style={styles.titleFriendList}>Liste d'amis ({numberOfFriends})</Text>
+            <View style={styles.friendListContainer}>
+                
                 {friendListContent}
-                </View>
+            </View>
         </View>
         
     )
@@ -113,7 +102,7 @@ const styles = StyleSheet.create({
     centered: {
           flex: 1,
           alignItems: 'start',
-          justifyContent: 'start'
+          justifyContent: 'start',
       },
   
       headIcons: {
@@ -151,5 +140,65 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
   
       },
+
+      titleFriendList: {
+        display: "flex",
+        justifyContent: "center",
+        textAlign: "center",
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "#7A28CB",
+        paddingBottom: 20,
+
+      },
+
+      friendListContainer: {
+
+          display: "flex",
+          width: "95%",
+          height: "auto",
+          backgroundColor: "#7A28CB",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "start",
+          borderBottomWidth: 2,
+          borderBottomColor: '#7A28CB',
+          paddingBottom: 10,
+          borderRadius: 10,
+          marginLeft: 10,
+  
+
+        
+        },
+
+        friendsContainer: {
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "start",
+          alignItems: "center",
+          paddingVertical: 10,
+          marginLeft: 20,
+          marginTop: 10,
+          borderBottomColor: "green",
+          borderBottomWidth: 1,
+          marginRight: 20,
+    
+          
+    
+        },
+
+        friendsAvatars: {
+          borderRadius: 50,
+          height: 50,
+          width: 50,
+          paddingBottom: 1
+        },
+
+        friendsPseudoBis: {
+      paddingHorizontal: 10,
+      fontSize: 16,
+      color: "white",
+    },
+      
 
     })

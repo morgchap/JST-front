@@ -66,7 +66,7 @@ const fetchgames = async (query) => {
         setLoadingRace(true);
         
         try {
-          const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/fromsearch?search=${query}`);
+          const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/search?search=${query}`);
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
@@ -199,9 +199,9 @@ const fetchgames = async (query) => {
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.suggestionItem}
-                // onPress={() => handleSuggestionGame(item.name)}
+                onPress={() => navigation.navigate('Friend', { friendName : item.username})}
               >
-                <Text style={styles.suggestionText}>{item.name}</Text>
+                <Text style={styles.suggestionText}>@{item.username}</Text>
               </TouchableOpacity>
             )}
           /> )}   
@@ -564,5 +564,16 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     width:'100%',
     justifyContent:'space-around'
-  }
+  }, 
+  suggestionItem2:{
+    backgroundColor:'black',
+    justifyContent:'flex-start', 
+    alignContent:'flex-start', 
+    marginBottom:'2%', 
+    borderBottomColor:'#7A28CB',
+    borderBottomWidth:1, 
+    width:'100%',
+    padding:'5%', 
+    borderRadius:2
+  },
 });

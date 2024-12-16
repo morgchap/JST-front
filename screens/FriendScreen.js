@@ -6,16 +6,13 @@ import { clickedFriend } from '../reducers/friend';
 
 
 
-export default function FriendScreen({ navigation }) {
+export default function FriendScreen({ navigation, route }) {
     
     const user = useSelector((state) => state.user.value)
-    const friend = useSelector((state) => state.friend.value)
-    const [defaultFriends, setDefaultFriends] = useState(true);
     const [numberOfFriends, setNumberOfFriends] = useState(123);
     const [numberOfGames, setNumberOfGames] = useState(123);
-    const [myId, setMyId] = useState("");
-    const [friendId, setFriendId] = useState("");
     const [gameList, setGameList] = useState([]);
+    const { friendName } = route.params
 
 
     const dispatch = useDispatch();
@@ -29,7 +26,7 @@ export default function FriendScreen({ navigation }) {
 
     console.log("ça marche");
 
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${friend}`)
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`)
     .then(result => result.json())
     .then(data => {
       console.log("c'est le front!", data.infos)
@@ -77,46 +74,33 @@ for (let i = 0; i < 5; i++) {
   //fonction pour ajouter un ami - pas terminée - je dois générer des vrais demandes d'ami avant (et des vraies page profil d'ami).
   // je dois donc revenir sur la partie ProfilScreen avant pour mapper la liste des demandes d'amis (envoyées et reçues)
 
-  function addAFriend() {
+  async function addAFriend() {
+    try {
+        // Récupérer l'ID de l'utilisateur courant
+        const userResponse = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`);
+        const userData = await userResponse.json();
+        console.log("fetch myId", userData.infos._id);
 
 
+        // Récupérer l'ID de l'ami
+        const friendResponse = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`);
+        const friendData = await friendResponse.json();
+        console.log("fetch myFriendId", friendData.infos._id);
 
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${user.username}`)
-    .then(result => result.json())
-    .then(data => {
-        console.log("fetch myId", data.infos._id);
-        setMyId(data.infos._id)
-        
+        // Ajouter un nouvel ami
+        const addFriendResponse = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/addFriend`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sender: userData.infos._id, receiver: friendData.infos._id }),
+        });
+        const addFriendData = await addFriendResponse.json();
+        console.log("data du dernier fetch", addFriendData);
 
-    }).then(() => {
+    } catch (error) {
+        console.error("Erreur dans addAFriend:", error.message);
+    }
+}
 
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${friend}`)
-    .then(result => result.json())
-    .then(data => {
-        console.log("fetch myFriendId", data.infos._id);
-        setFriendId(data.infos._id)
-        
-
-    })
-}).then(() => {
-
-
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/addFriend`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sender: myId, receiver: friendId}),
-    })
-    .then(result => result.json())
-    .then(data => {
-      console.log("data du dernier fetch", data);
-      
-    })
-})
-    
-  }
-
-  console.log("my Id", myId)
-  console.log("friend Id", friendId)
 
   let pluralFriends = "";
 if (numberOfFriends >1) {
@@ -170,7 +154,7 @@ if (name.length >= 15) {
       </View>
       <View style={styles.me}>
         <Image style={styles.avatar} source={require("../assets/nathanael.png")} />
-        <Text style={styles.pseudo}>@{friend}</Text>
+        <Text style={styles.pseudo}>@{friendName}</Text>
       </View>
       <View style={styles.stats}>
           <Text style={styles.statsText}>{numberOfGames} jeu{pluralGames}</Text>

@@ -27,6 +27,32 @@ export default function SnapScreen({navigation}) {
     
         if (!result.canceled) {
           console.log(result);
+		  const formData = new FormData();
+			const photo = result.assets[0]
+		  	if (photo) {
+		  		console.log('photo:', photo.uri);
+	  
+		  		formData.append('photoFromFront', {
+		  			uri: photo?.uri,
+		  			name: 'snapped.jpg',
+		  			type: 'image/jpeg',
+		  		});
+		  		console.log('je rentre dans la route')
+		  		formData.append('username', user); // Append username separately
+		  
+		  		console.log('formData:', formData);
+		  
+		  		fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateAvatar`, {
+		  			method: 'POST',
+		  			body: formData,
+		  		})
+		  			.then((response) => response.json())
+		  			.then((data) => {
+		  				console.log('data:', data);
+						  
+		  			})
+		  			.catch((err) => console.error('Error:', err));
+		  	}
         } else {
           alert('You did not select any image.');
         }
@@ -66,25 +92,59 @@ export default function SnapScreen({navigation}) {
 	const takePicture = async () => {
 		const formData = new FormData();
 		const photo = await cameraRef?.current?.takePictureAsync({ quality: 0.3 });
-		console.log('photo:', photo.uri)
-		if(photo){
+		if (photo) {
+			console.log('photo:', photo.uri);
+
 			formData.append('photoFromFront', {
-				uri: photo.uri,
+				uri: photo?.uri,
 				name: 'snapped.jpg',
 				type: 'image/jpeg',
-                username: user,
-			   });
-
-			   fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateAvatar`, {
+			});
+			console.log('je rentre dans la route')
+			formData.append('username', user); // Append username separately
+	
+			console.log('formData:', formData);
+	
+			fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateAvatar`, {
 				method: 'POST',
 				body: formData,
-			   }).then((response) => response.json())
+			})
+				.then((response) => response.json())
 				.then((data) => {
-					console.log('data:', data)
-					//dispatch(addPhoto(data.url));
-			   });   
+					console.log('data:', data);
+				})
+				.catch((err) => console.error('Error:', err));
 		}
 	};
+
+	// const chosePicture = async () => {
+	// 	const formData = new FormData();
+	// 	const photo = 
+	// 	if (photo) {
+	// 		console.log('photo:', photo.uri);
+
+	// 		formData.append('photoFromFront', {
+	// 			uri: photo?.uri,
+	// 			name: 'snapped.jpg',
+	// 			type: 'image/jpeg',
+	// 		});
+	// 		console.log('je rentre dans la route')
+	// 		formData.append('username', user); // Append username separately
+	
+	// 		console.log('formData:', formData);
+	
+	// 		fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateAvatar`, {
+	// 			method: 'POST',
+	// 			body: formData,
+	// 		})
+	// 			.then((response) => response.json())
+	// 			.then((data) => {
+	// 				console.log('data:', data);
+					
+	// 			})
+	// 			.catch((err) => console.error('Error:', err));
+	// 	}
+	// };
 
 	return (
         <View style={styles.container}>
@@ -116,8 +176,7 @@ export default function SnapScreen({navigation}) {
 
         <View style={styles.container2}>
             <View style={styles.footerContainer}>
-                <Button theme="primary" label="Choose a photo" onPress={pickImageAsync} />
-                <Button label="Use this photo" />
+                <Button theme='primary' label="Choose a photo" onPress={pickImageAsync} />
             </View>
         </View>
         <View>
