@@ -45,7 +45,7 @@ export default function ProfilScreen({ navigation }) {
 
     console.log("ça marche");
 
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${user.username}`)
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`)
     .then(result => result.json())
     .then(data => {
       console.log("c'est le front!", data.infos)
@@ -103,7 +103,7 @@ export default function ProfilScreen({ navigation }) {
 console.log(gameList);
 
 
-function acceptFriendRequest(senderId) {
+function acceptFriendRequest(senderId, senderUsername) {
   //fetch 1 pour changer le statut pending en accepted dans la collection friend
 
   fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/acceptFriendRequest/`, {
@@ -122,7 +122,7 @@ function acceptFriendRequest(senderId) {
   
 
 
-  //fetch 2 pour push l'ID du user dans la FriendList de la collection user 
+  //fetch 2 pour push l'ID du friend dans la FriendList de la collection de myUser 
 
   fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/addFriend/`, {
     method: "PUT",
@@ -136,6 +136,21 @@ function acceptFriendRequest(senderId) {
    
       
     })
+
+    //fetch 3 pour push mon ID dans la friendList du friend
+
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/addFriend/`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: senderUsername, id: myId })
+  })
+      .then(result => result.json())
+      .then(data => {
+        console.log("data de l'ajout d'ami2", data);
+    
+     
+        
+      })
 }
   
 
@@ -144,7 +159,8 @@ const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
   return (
     <View style={styles.headScrollView}>
     <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
-      navigation.navigate("Friend");
+      navigation.navigate("Friend", {friendName: data.sender.username});
+      //{ gameName: gameName }('Games',{ gameName: gameName })
       selectFriend(data.sender.username);
       console.log(friend);
       
@@ -157,7 +173,7 @@ const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
     <FontAwesome name="plus-circle" color="green" size={25} style={styles.iconStyle} onPress={() => {
       selectFriend(data.sender.username);
       console.log(friend);
-      acceptFriendRequest(data.sender._id);
+      acceptFriendRequest(data.sender._id, data.sender.username);
 
       }}/>
       <FontAwesome name="ban" color="red" size={25} style={styles.iconStyle} />
@@ -247,7 +263,15 @@ if (numberOfGames >1) {
   pluralGames = "x"
 }
 
+const isConnected = true;
+
+if (!user.token) {
+  isConnected = false;
+};
+
+
   return (
+    
     <View style={styles.centered}>
       <View style={styles.headIcons}>
       <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
@@ -260,7 +284,7 @@ if (numberOfGames >1) {
       <View style={styles.stats}>
           <Text style={styles.gameStatsText}>{numberOfGames} jeu{pluralGames}</Text>
           <TouchableOpacity onPress={() => {
-            navigation.navigate("FriendList")
+            navigation.navigate("FriendList", {userFriendList: user.username})
             selectFriend(user.username)
           }}>
             <Text style={styles.friendStatsText}>{numberOfFriends} ami{pluralFriends}</Text>
