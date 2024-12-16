@@ -374,14 +374,14 @@ return (
         >
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-            <View style={styles.backbutton}>
-          <FontAwesome 
-            name="times"
-            color="#7A28CB" 
-            size={25} 
-            onPress={() => setModalVisible(false)} 
-          />
-        </View>
+              <View style={styles.backbutton}>
+                <FontAwesome 
+                  name="times"
+                  color="#7A28CB" 
+                  size={25} 
+                  onPress={() => setModalVisible(false)} 
+                />
+              </View>
               <Image style={styles.jaquette} source={{ uri: gameImg }} />
               <Text style={styles.modalText}>{gameName}</Text>
               <Text style={styles.modalText}>{gameDate}</Text>

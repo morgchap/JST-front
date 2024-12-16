@@ -22,7 +22,7 @@ export default function DiscoveryScreen() {
           throw new Error('Failed to fetch articles');
         }
         const data = await response.json();
-        setArticles(data.articles || []);
+        setArticles(data.articles?.map(article => ({ ...article, title: article.title.slice(0, 15) + (article.title.length > 15 ? "..." : "") })));
       } catch (error) {
         console.error('Error fetching articles:', error);
       }
@@ -47,7 +47,7 @@ export default function DiscoveryScreen() {
         const data = await response.json();
         // Mélange les jeux et sélectionne les 10 premiers
         const shuffledGames = data.results.sort(() => 0.5 - Math.random()).slice(0, 10);
-        setGames(shuffledGames);
+        setGames(shuffledGames.map(game => ({ ...game, name: game.name.slice(0, 15) + (game.name.length > 15 ? "..." : "") })));
       } catch (error) {
         console.error('Error fetching games:', error);
       }

@@ -1,94 +1,160 @@
-import { View, Text, TextInput, Modal, TouchableOpacity, Switch, StyleSheet } from 'react-native';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  Switch, 
+  StyleSheet, 
+  ImageBackground 
+} from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { addGame } from '../reducers/user';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-
-export default function AddListScreen({ navigation }) {
-  
+const AddListScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-  let [errorInputNameList, setErrorInputNameList] = useState('')
-  const [errorFetchNameList, setErrorFetchNameList] = useState('')
-  const [listName, setListName] = useState('')
-  const [isPublic, setIsPublic] = useState(false)
-  const user = useSelector((state) => state.user.value)
-  
-  // send userId, listName and ifPublic to the backend to create the list
-  const handleAddList = () => {
-  // check if listName field is empty
-    if(listName === ''){
-      setErrorInputNameList(<Text style={styles.errorText}>Enter a name for your list.</Text>)
-      return
-    }
-    const username = user.username
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/addList`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listName, username, isPublic }),
-    }).then(response => response.json())
-      .then(data => {
-        if(data.result){
-          // the list is correctly send to the database
-          dispatch(addGame(data.list))
-          setListName("")
-          setIsPublic(false)
-          setErrorInputNameList("")
-          navigation.navigate('Lists')
-        } else {
-          // if there is a probleme while sending the ist in the database (in the back), receive the error response
-          setErrorFetchNameList(<Text style={styles.errorText}>{data.error}</Text>)
-        }
-      });
-  }
+  const [listName, setListName] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
+  const [error, setError] = useState('');
+  const user = useSelector((state) => state.user.value);
 
+  const handleAddList = async () => {
+    if (!listName.trim()) {
+      setError('Please enter a name for your list.');
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/addList`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ listName, username: user.username, isPublic }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.result) {
+        dispatch(addGame(data.list));
+        setListName('');
+        setIsPublic(false);
+        setError('');
+        navigation.navigate('Lists');
+      } else {
+        setError(data.error || 'An error occurred while creating the list.');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again later.');
+    }
+  };
 
   return (
-    <View style={styles.centered}>
-        <TextInput
-          placeholder="List name"
-          autoCapitalize="none"
-          onChangeText={(value) => setListName(value)}
-          value={listName}
-          style={styles.input}
-        />
-        {errorInputNameList}
-        <View style={styles.publicSwitch}>
-          <Text>public list ?   false</Text>
-          <Switch
-            trackColor={{false: '#0000ff', true: '#ff0000'}}
-            thumbColor={isPublic ? '#ffffff' : '#ffffff'}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={(value) => {setIsPublic(value)}}
-            value={isPublic}
-          />
-            <Text>true</Text>
+    <View style={styles.container}>
+      <ImageBackground 
+        source={require('../assets/background-blur.png')} 
+        style={styles.backgroundImage}
+      >
+        <View style={styles.headIcons}>
+            <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
+            <Text style={styles.title}>Create New List</Text>
+            <FontAwesome name="cog" color="#7A28CB" size={25} onPress={() => navigation.navigate("Setup")}/>
         </View>
-        <TouchableOpacity onPress={() => handleAddList()} activeOpacity={0.8}>
-            <Text style={styles.button} >Add list</Text>
-        </TouchableOpacity>
-        {errorFetchNameList}
+        <View style={styles.contentContainer}>
+          <TextInput 
+            placeholder="List Name" 
+            placeholderTextColor="#7A28CB" 
+            autoCapitalize="none" 
+            onChangeText={setListName} 
+            value={listName} 
+            style={styles.input} 
+          />
+          {error && <Text style={styles.errorText}>{error}</Text>}
+          <View style={styles.switchContainer}>
+            <Text style={styles.switchLabel}>Private</Text>
+            <Switch 
+              trackColor={{ false: '#7A28CB', true: '#33CA7F' }}
+              thumbColor={isPublic ? '#ffffff' : '#ffffff'} 
+              ios_backgroundColor="#3e3e3e" 
+              onValueChange={setIsPublic} 
+              value={isPublic} 
+            />
+            <Text style={styles.switchLabel}>Public</Text>
+          </View>
+          <TouchableOpacity style={styles.button} onPress={handleAddList}>
+            <Text style={styles.buttonText}>Add List</Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  centered: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center'
-    },
-    input: {
-      backgroundColor: "#e0e0e0"
-    },
-    publicSwitch: {
-      flexDirection: "row",
-      alignItems: 'center',
-    },
-    button:  {
-      backgroundColor: "#e0a0e0"
-    },
-    errorText: {
-      color: "red",
-    },
-  });
-  
+  container: {
+    flex: 1,
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover', 
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#7A28CB',
+  },
+  headIcons: {
+    width: "100%",
+    height: "10%",
+    paddingTop: 35,
+    paddingLeft: 20,
+    paddingRight: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderBottomWidth: 2,
+    borderColor: "#7A28CB",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#7A28CB',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+    color: '#000',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+  },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  switchLabel: {
+    marginRight: 10,
+    color: '#7A28CB',
+    fontWeight: 'bold',
+  },
+  button: {
+    backgroundColor: '#7A28CB',
+    padding: 15,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+});
+
+export default AddListScreen;
