@@ -1,7 +1,8 @@
 import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity } from "react-native";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
+import { clickedFriend } from '../reducers/friend';
 
 
 
@@ -10,8 +11,17 @@ export default function FriendScreen({ navigation }) {
     const user = useSelector((state) => state.user.value)
     const friend = useSelector((state) => state.friend.value)
     const [defaultFriends, setDefaultFriends] = useState(true);
+    const [numberOfFriends, setNumberOfFriends] = useState(123);
+    const [numberOfGames, setNumberOfGames] = useState(123);
     const [myId, setMyId] = useState("");
     const [friendId, setFriendId] = useState("");
+    const [gameList, setGameList] = useState([]);
+
+
+    const dispatch = useDispatch();
+    const selectFriend = (friendUsername) => {
+      dispatch(clickedFriend(friendUsername));
+    };
 
 
   
@@ -40,9 +50,10 @@ export default function FriendScreen({ navigation }) {
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`)
     .then(result => result.json())
     .then(data => {
-      console.log("data du fetch", data);
+      console.log("data du fetch des listes de jeux", data);
       setNumberOfGames(data.data.gameList.length)
-      console.log(numberOfGames);
+      console.log("number of games", numberOfGames);
+      setGameList(data.data.gameList)
     })
   })
 
@@ -61,16 +72,6 @@ for (let i = 0; i < 5; i++) {
   stars.push(<FontAwesome key={i} name={style} color="yellow" />);
 }
 
-function sendRequest() {
-    setDefaultFriends(false);
-    console.log(defaultFriends);
-
-  };
-
-  function receivedRequest() {
-    setDefaultFriends(true);
-    console.log(defaultFriends);
-  }
 
 
   //fonction pour ajouter un ami - pas terminée - je dois générer des vrais demandes d'ami avant (et des vraies page profil d'ami).
@@ -117,19 +118,63 @@ function sendRequest() {
   console.log("my Id", myId)
   console.log("friend Id", friendId)
 
+  let pluralFriends = "";
+if (numberOfFriends >1) {
+  pluralFriends = "s"
+}
+
+let pluralGames = "";
+if (numberOfGames >1) {
+  pluralGames = "x"
+}
+
+const games = gameList.map((data, i) => {
+
+  const stars = [];
+for (let i = 0; i < 5; i++) {
+  let style = "star-o";
+  if (i < 4 - 1) {
+    style = "star";
+  }
+  stars.push(<FontAwesome key={i} name={style} color="yellow" />);
+}
+
+let name = data.name[0].toUpperCase() + data.name.slice(1);
+
+if (name.length >= 15) {
+  name = name[0].toUpperCase() + name.slice(1, 10) + "..."
+}
+
+  return (
+    <View key={i} style={styles.gameContainer}>
+      <Text style={styles.gameTitle}>{name}</Text>
+      <Image style={styles.jacket} source={{uri: `${data.cover}`, height:100,
+      width: 75 }}/>
+      <View style={styles.starsContainer}>
+        {stars}
+      </View>
+    </View>
+  )
+})
+
+
 
   return (
     <View style={styles.centered}>
       <View style={styles.headIcons}>
-      <FontAwesome name="chevron-left" color="green" size={25} onPress={() => navigation.goBack()}/>
+      <FontAwesome name="chevron-left" color="green" size={25} onPress={() => {
+        navigation.goBack();
+        selectFriend("");
+      
+      }}/>
       </View>
       <View style={styles.me}>
         <Image style={styles.avatar} source={require("../assets/nathanael.png")} />
         <Text style={styles.pseudo}>@{friend}</Text>
       </View>
       <View style={styles.stats}>
-          <Text style={styles.statsText}>1 jeu</Text>
-          <Text style={styles.statsText}>1 ami</Text>
+          <Text style={styles.statsText}>{numberOfGames} jeu{pluralGames}</Text>
+          <Text style={styles.statsText}>{numberOfFriends} ami{pluralFriends}</Text>
       </View>
       <View style={styles.logoutView}>
             <TouchableOpacity style={styles.logoutButton} onPress={() => addAFriend()}>
@@ -138,189 +183,14 @@ function sendRequest() {
       </View>
       <View style={styles.gameDiv}>
         <View style={styles.games}>
-            <Text style={styles.secondTitles}>Ses jeux préférés (5)</Text>
+            <Text style={styles.secondTitles}>Ses jeux préférés ({numberOfGames})</Text>
             <ScrollView horizontal={true} style={styles.listGame}> 
-              <View style={styles.gameContainer}>
-                <Text style={styles.gameTitle}>Mario</Text>
-                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-                <View style={styles.starsContainer}>
-                {stars}
-                </View>
-              </View>
-              <View style={styles.gameContainer}>
-                <Text style={styles.gameTitle}>Mario</Text>
-                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-                <View style={styles.starsContainer}>
-                {stars}
-                </View>
-              </View>
-              <View style={styles.gameContainer}>
-                <Text style={styles.gameTitle}>Mario</Text>
-                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-                <View style={styles.starsContainer}>
-                {stars}
-                </View>
-              </View>
-              <View style={styles.gameContainer}>
-                <Text style={styles.gameTitle}>Mario</Text>
-                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-                <View style={styles.starsContainer}>
-                {stars}
-                </View>
-              </View>
-              <View style={styles.gameContainer}>
-                <Text style={styles.gameTitle}>Mario</Text>
-                <Image style={styles.jacket} source={require("../assets/mario.png")}/>
-                <View style={styles.starsContainer}>
-                {stars}
-                </View>
-              </View>
+              {games}
             </ScrollView>
         </View>
       </View>
-      <View style={styles.myFriendTitleDiv}>
-          <TouchableOpacity style={styles.leftButton} onPress={() => receivedRequest()}>
-            <Text style={styles.friendsReceived}>Demandes reçues (5)</Text>               
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.rightButton} onPress={() => sendRequest()}>
-            <Text style={styles.friendsSent}>Demandes envoyées (4)</Text>               
-          </TouchableOpacity>
-          </View>
-          { defaultFriends ? (
-            <>
-        
-              <ScrollView style={styles.friendsView}>
-              
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudo}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="#7A28CB" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudo}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="#7A28CB" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudo}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="#7A28CB" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudo}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="#7A28CB" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudo}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="#7A28CB" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudo}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="#7A28CB" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudo}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="#7A28CB" size={20} />
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudo}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="#7A28CB" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="#7A28CB" size={20} />
-                  </View>
-              </View>
-            </ScrollView>
-            </> 
-            ) : (
-              <>
-        
-              <ScrollView style={styles.scrollViewBis}>
-              
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="white" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="white" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="white" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="white" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="white" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="white" size={20}/>
-                  </View>
-              </View>
-              <View style={styles.friendsContainer}>
-                  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-                  <Text style={styles.friendsPseudoBis}>@ami1</Text>
-                  <View style={styles.iconContainer}>
-                    <FontAwesome name="user" color="white" size={20} style={styles.iconStyle}/>
-                    <FontAwesome name="trash" color="white" size={20} />
-                  </View>
-              </View>
-            </ScrollView>
-            </> 
-    )}
+      
+          
     </View>
       
   );

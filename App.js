@@ -19,6 +19,7 @@ import SetupScreen from './screens/SetupScreen';
 import Signup3Screen from './screens/Signup3Screen';
 import FriendScreen from './screens/FriendScreen';
 import GamesScreen from './screens/GamesScreen'
+import FriendListScreen from './screens/FriendListScreen';
 //import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Provider } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
@@ -28,6 +29,7 @@ import game from './reducers/game'
 import { persistStore, persistReducer } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import storage from "redux-persist/lib/storage";
+
 
 // importer les differents reducers
 
@@ -121,6 +123,7 @@ export default function App() {
                     <Stack.Screen name="Signup3" component={Signup3Screen} />
                     <Stack.Screen name="Friend" component={FriendScreen} />
                     <Stack.Screen name="Games" component={GamesScreen} />
+                    <Stack.Screen name="FriendList" component={FriendListScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
           </PersistGate>

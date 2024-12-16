@@ -33,6 +33,8 @@ export default function ProfilScreen({ navigation }) {
   const [receivedFriendRequestList, setReceivedFriendRequestList] = useState([])
   const [sentFriendRequestList, setSentFriendRequestList] = useState([])
   const [gameList, setGameList] = useState([]);
+  const [myId, setMyId] = useState("");
+  const [actionOnFriends, setActionOnFriends] = useState(false);
 
   const dispatch = useDispatch();
   const selectFriend = (friendUsername) => {
@@ -49,6 +51,7 @@ export default function ProfilScreen({ navigation }) {
       console.log("c'est le front!", data.infos)
 
       setNumberOfFriends(data.infos.friendsList.length);
+      setMyId(data.infos._id)
 
       console.log("number of friends ", numberOfFriends);
       console.log("Id de list", data.infos.lists[0]);
@@ -93,27 +96,30 @@ export default function ProfilScreen({ navigation }) {
 
 
 
-}, []);
+}, [actionOnFriends]);
+
+//fonctionne mais tourne en boucle... -> à voir comment éviter ça
 
 console.log(gameList);
 
 
 function acceptFriendRequest(senderId) {
   //fetch 1 pour changer le statut pending en accepted dans la collection friend
-/*
+
   fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/acceptFriendRequest/`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ sender: "valeur à remplacer", receiver :"valeur à remplacer" })
+    body: JSON.stringify({ sender: senderId, receiver : myId })
 })
     .then(result => result.json())
     .then(data => {
       console.log("data de l'ajout d'ami", data);
+      setActionOnFriends(!actionOnFriends);
   
    
       
     })
-  */
+  
 
 
   //fetch 2 pour push l'ID du user dans la FriendList de la collection user 
@@ -252,8 +258,13 @@ if (numberOfGames >1) {
         <Text style={styles.pseudo}>@{user.username}</Text>
       </View>
       <View style={styles.stats}>
-          <Text style={styles.statsText}>{numberOfGames} jeu{pluralGames}</Text>
-          <Text style={styles.statsText}>{numberOfFriends} ami{pluralFriends}</Text>
+          <Text style={styles.gameStatsText}>{numberOfGames} jeu{pluralGames}</Text>
+          <TouchableOpacity onPress={() => {
+            navigation.navigate("FriendList")
+            selectFriend(user.username)
+          }}>
+            <Text style={styles.friendStatsText}>{numberOfFriends} ami{pluralFriends}</Text>
+          </TouchableOpacity>
       </View>
       <View style={styles.gameDiv}>
         <View style={styles.games}>
@@ -522,8 +533,14 @@ const styles = StyleSheet.create({
       
     },
 
-    statsText: {
+    friendStatsText: {
       color : '#7A28CB',
+      textDecorationLine: "underline",
+    },
+
+    gameStatsText: {
+      color : '#7A28CB',
+      
     },
 
     scrollViewBis: {
