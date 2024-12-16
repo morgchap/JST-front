@@ -35,6 +35,8 @@ export default function ProfilScreen({ navigation }) {
   const [gameList, setGameList] = useState([]);
   const [myId, setMyId] = useState("");
   const [actionOnFriends, setActionOnFriends] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [gotPP, setGotPP] = useState(false) 
 
   const dispatch = useDispatch();
   const selectFriend = (friendUsername) => {
@@ -52,6 +54,14 @@ export default function ProfilScreen({ navigation }) {
 
       setNumberOfFriends(data.infos.friendsList.length);
       setMyId(data.infos._id)
+
+      console.log("adresse de la PP", data.infos.profilePicture)
+
+      if (data.infos.profilePicture) {
+      setProfilePicture(data.infos.profilePicture);
+      setGotPP(true)
+      } 
+
 
       console.log("number of friends ", numberOfFriends);
       console.log("Id de list", data.infos.lists[0]);
@@ -152,7 +162,7 @@ function acceptFriendRequest(senderId, senderUsername) {
         
       })
 }
-  
+
 
 
 const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
@@ -217,14 +227,17 @@ if (name.length >= 15) {
 }
 
   return (
-    <View key={i} style={styles.gameContainer}>
+    <TouchableOpacity key={i} style={styles.gameContainer} onPress={() => {
+      //navigation.navigate("FriendList", {userFriendList: user.username})
+      navigation.navigate("Games", {gameName: name})
+    }}>
       <Text style={styles.gameTitle}>{name}</Text>
       <Image style={styles.jacket} source={{uri: `${data.cover}`, height:100,
       width: 75 }}/>
       <View style={styles.starsContainer}>
         {stars}
       </View>
-    </View>
+    </TouchableOpacity>
   )
 })
 
@@ -278,7 +291,10 @@ if (!user.token) {
       <FontAwesome name="cog" color="#7A28CB" size={25} onPress={() => navigation.navigate("Setup")}/>
       </View>
       <View style={styles.me}>
-        <Image style={styles.avatar} source={require("../assets/avatar.png")} />
+      { gotPP ? (
+        <Image style={styles.avatar} source={{uri: profilePicture}}/>) : (
+          <Image style={styles.avatar} source={require("../assets/avatar.png")} />
+        )}
         <Text style={styles.pseudo}>@{user.username}</Text>
       </View>
       <View style={styles.stats}>
@@ -361,7 +377,9 @@ const styles = StyleSheet.create({
       borderRadius: 50,
       height: 100,
       width: 100,
-      paddingBottom: 1
+      paddingBottom: 1,
+      borderColor: "#7A28CB",
+      borderWidth: 3,
     },
 
     pseudo: {
