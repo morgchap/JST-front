@@ -64,10 +64,11 @@ export default function ListsScreen({ navigation }) {
     <View style={styles.centered}>
         <View style={styles.headIcons}>
             <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
+            <Text style={styles.topText}>Your lists</Text>
             <FontAwesome name="cog" color="#7A28CB" size={25} onPress={() => navigation.navigate("Setup")}/>
         </View>
         <View style={styles.body}>
-            <Text style={styles.topText}>Your lists</Text>
+            {/* <Text style={styles.topText}>Your lists</Text> */}
             <View style={styles.lists}>
                 <ScrollView>
                     {games}
