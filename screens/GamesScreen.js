@@ -30,7 +30,26 @@ export default function GamesScreen({navigation, route}) {
     const [writtencontent, setWrittentContent]= useState('')
     const [gamereview, setGameReview] = useState([])
     const [heartLiked, setHeartLiked] = useState(false);
+    const [myReviews, setMyReviews] = useState([]);
     //console.log(`game : ${gameName}`)
+
+    function fetchMyReview() {
+
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/byuser/${user.username}`)
+      .then(result => result.json())
+      .then(data => {
+        console.log("data de mes reviews", data.ratings.ratingsID)
+      
+        const theGameReview = data.ratings.filter(((e) => e.game.name == gameName))
+        
+        setMyReviews(theGameReview);
+      
+      })
+    }
+
+    function fetchMyFriendsReviews() {
+      
+    }
 
     const toggleVisibility = () => {
       setVisibility((previous) => !previous);
@@ -80,28 +99,33 @@ export default function GamesScreen({navigation, route}) {
       //console.log(doc.ratings)
       setGameReview( [... gamereview, doc.ratings] );
       setReview(false)
+      fetchMyReview();
     }
   }
   )}
 
-  function likeAComment() {
+  function likeOrDislikeAReview(reviewId) {
     setHeartLiked(!heartLiked);
     console.log("changement de like")
-    /*
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/likeAReview`, {
-      method: "POST",
+    
+    
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/likeOrDislikeAReview`, {
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
-        ratingId : gameName, 
-        userId: user.username
+        ratingId : reviewId, 
+        userId: user.userId
       })
+    }).then(() => {
+      fetchMyReview();
     })
-      */
+    
 
   }
 
+  console.log("log du gamereview", gamereview)
 
-   const myreview = gamereview.map((data, i)=> {
+   const myreview = myReviews.map((data, i)=> {
 
     const mynotestars = []; 
 
@@ -126,7 +150,10 @@ for (let i = 0; i < 5; i++) {
       <View style={styles.useandreview}>
         <View style={styles.userandlike}>
           <Text style={styles.friendsPseudo}>@{user.username}</Text>
-          <FontAwesome name={isLiked} style={styles.heartIcon} size={15} onPress={() => likeAComment()} />
+          <View style={styles.heartAndlikeCounter}>
+              <FontAwesome name={isLiked} style={styles.heartIcon} size={15} onPress={() => likeOrDislikeAReview(data._id)} />
+              <Text>({data.likesNumber.length})</Text>
+          </View>
         </View>
       <View style={styles.starsContainer2}>
            {mynotestars}
@@ -142,6 +169,8 @@ for (let i = 0; i < 5; i++) {
    })
 
       useEffect(() => {
+
+        //fetch le jeu
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/byname`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -156,7 +185,23 @@ for (let i = 0; i < 5; i++) {
             if (summary.length > 100){
             setsummary(summary.slice(100))}
           })
-      }, []);
+
+//fetch mes reviews
+
+
+fetchMyReview();
+
+
+
+
+// fetch les reviews de mes amis
+
+fetchMyFriendsReviews();
+
+
+}, []);
+
+console.log("my review useStatées", myReviews)
      
     const summaryToHTML = gamesinfo.summary
    // console.log(gamesinfo.summary)
@@ -750,6 +795,7 @@ const styles = StyleSheet.create({
       },
       heartIcon: {
         color: "red",
+        paddingRight: 2,
       },
       userandlike: {
         width: 250,
@@ -757,5 +803,13 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+      },
+      heartAndlikeCounter: {
+        display: "flex",
+        flexDirection: "row",
+        alignContent: "center",
+        justifyContent: "center",
+
+
       }
   });
