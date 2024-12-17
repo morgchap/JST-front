@@ -77,7 +77,7 @@ const TabNavigator = () => {
         setProfileBadgeCount(databis.data.length)
       })
   })
-  },[profileBadgeCount])
+  },[ProfilScreen])
 
     return (
       <Tab.Navigator screenOptions={({ route }) => ({
