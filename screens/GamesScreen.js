@@ -29,6 +29,7 @@ export default function GamesScreen({navigation, route}) {
     const [personalNote, setPersonalNote] = useState(0);
     const [writtencontent, setWrittentContent]= useState('')
     const [gamereview, setGameReview] = useState([])
+    const [heartLiked, setHeartLiked] = useState(false);
     //console.log(`game : ${gameName}`)
 
     const toggleVisibility = () => {
@@ -83,9 +84,33 @@ export default function GamesScreen({navigation, route}) {
   }
   )}
 
+  function likeAComment() {
+    setHeartLiked(!heartLiked);
+    console.log("changement de like")
+    /*
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/likeAReview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        ratingId : gameName, 
+        userId: user.username
+      })
+    })
+      */
+
+  }
+
 
    const myreview = gamereview.map((data, i)=> {
+
     const mynotestars = []; 
+
+    let isLiked = "heart-o"
+
+    if (heartLiked == true) {
+      isLiked = "heart"
+    }
+
 for (let i = 0; i < 5; i++) {
     let style = "star-o";
     if (i < data.note+1) {
@@ -93,12 +118,16 @@ for (let i = 0; i < 5; i++) {
     }
     mynotestars.push(<FontAwesome key={i} name={style} color="#f1c40f" size={15}/>);
   }
+
     return(
       <View key={i} style = {styles.friendsReviews}>
       <View style={styles.picanduseandreview}> 
       <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
       <View style={styles.useandreview}>
-      <Text style={styles.friendsPseudo}>@{user.username}</Text>
+        <View style={styles.userandlike}>
+          <Text style={styles.friendsPseudo}>@{user.username}</Text>
+          <FontAwesome name={isLiked} style={styles.heartIcon} size={15} onPress={() => likeAComment()} />
+        </View>
       <View style={styles.starsContainer2}>
            {mynotestars}
           <Text style ={styles.votecount2}>{data.note}</Text>
@@ -718,5 +747,15 @@ const styles = StyleSheet.create({
         width:'100%', 
         alignItems:'center', 
         justifyContent:'center',
+      },
+      heartIcon: {
+        color: "red",
+      },
+      userandlike: {
+        width: 250,
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
       }
   });
