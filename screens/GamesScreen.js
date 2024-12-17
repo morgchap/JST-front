@@ -84,7 +84,7 @@ export default function GamesScreen({navigation, route}) {
   )}
 
 
-   const myreview = gamereview.map((data)=> {
+   const myreview = gamereview.map((data, i)=> {
     const mynotestars = []; 
 for (let i = 0; i < 5; i++) {
     let style = "star-o";
@@ -94,7 +94,7 @@ for (let i = 0; i < 5; i++) {
     mynotestars.push(<FontAwesome key={i} name={style} color="#f1c40f" size={15}/>);
   }
     return(
-      <View style = {styles.friendsReviews}>
+      <View key={i} style = {styles.friendsReviews}>
       <View style={styles.picanduseandreview}> 
       <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
       <View style={styles.useandreview}>
