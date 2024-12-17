@@ -31,27 +31,28 @@ export default function ListsScreen({ navigation }) {
     const [isPublic, setIsPublic] = useState(false);
     const [error, setError] = useState('');
 
+    const fetchGameLists = () => {
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/${user.username}`)
+            .then(response => response.json())
+            .then(data => {
+            dispatch(addListGames(data.lists))
+            });
+    }
+
     // receive the list of the user when loading the page
     useEffect(() => {
-        // if(user.lists.length === 0){ // because it can also be used in GameScreen
-            fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/${user.username}`)
-              .then(response => response.json())
-              .then(data => {
-                dispatch(addListGames(data.lists))
-              });
-        // }
-      }, [isFocused, update]);
+        setGame("")
+        fetchGameLists()
+      }, [isFocused]);
 
-    const handleDelete = (listName) => {
-        dispatch(deleteGame(listName))
-        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/getGames/${listName}/${user.username}`, {
+    const handleDeleteList = (listName) => {
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/${listName}/${user.username}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
         })
-        .then(response => response.json())
-        .then(data => {
-            setUpdate(!update)
-        })
+        .then(() => dispatch(deleteGame(listName)))
+        .then(() => fetchGameLists())
+        .then(() => setModalVisible(false))
     }
 
     const handleSeeList = (listName) => {
@@ -59,31 +60,54 @@ export default function ListsScreen({ navigation }) {
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/getGames/${listName}/${user.username}`)
             .then(response => response.json())
             .then(data => {
-                const games = data.list.map((data, i) => {
-                    let titre
-                    if(data[0].length >= 12){
-                        titre = data[0].slice(0, 9) + "..."
-                    } else {
-                        titre = data[0]
-                    }
-                    return (
-                        <View key={i} style={styles.game}>
-                            <TouchableOpacity onPress={() => handleNavigation() }>
-                                <Image style={styles.jaquette} source={{uri: `${data[1]}`}} />
-                            </TouchableOpacity>
-                            <Text>{titre}</Text>
+                let gamesList
+                if(data.error === "Your list is empty."){
+                    gamesList = [
+                        <View key={0}>
+                            <Text>Votre List est vide</Text>
                         </View>
-                    )
-                })
+                    ]
+                } else {
+                    gamesList = data.list.map((data, i) => {
+                        // data[0] is the title of the game, data[1] is the uri link to the cover of the game
+                        let title
+                        if(data[0].length >= 12){
+                            title = data[0].slice(0, 9) + "..."
+                        } else {
+                            title = data[0]
+                        }
+                        return (
+                            <View key={i} style={styles.game}>
+                                <TouchableOpacity onPress={() => handleNavigation(data[0]) }>
+                                    <Image style={styles.jaquette} source={{uri: `${data[1]}`}} />
+                                </TouchableOpacity>
+                                <Text styles>{title}</Text>
+                                <TouchableOpacity onPress={() => handleDeleteGame(listName, data[0])} style={styles.button} >
+                                    <Text style={styles.textButton} >Delete</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )
+                    })
+                }
                 setModal(true)
-                setGame(games)
+                setGame(gamesList)
         });
     }
 
-const handleNavigation = () => {
-    console.log("navigation")
-    //navigation.navigate("Games", { gameName: data[0] }) fait bug la page !
-}
+    const handleNavigation = (gameName) => {
+        setModal(false)
+        navigation.navigate("Games", { gameName })
+    }
+
+    const handleDeleteGame = (listName, gameName) => {
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/${listName}/${gameName}/${user.username}`, {
+            method: 'DELETE',
+        })
+        //.then((res) => res.json())
+        //.then((data) => console.log(data))
+        .then(() => fetchGameLists())
+        .then(() => setModal(false))
+    }
 
     //const list = user.lists.map((data, i) => {})
     
@@ -127,7 +151,7 @@ const handleNavigation = () => {
 
 
     const games = user.lists.map((data, i) => {
-        let trash_bin = i < 1 ? "" : <FontAwesome name="trash" color="#ffffff" size={16} onPress={() => handleDelete(data.listName)}/>
+        let trash_bin = i < 1 ? "" : <FontAwesome name="trash" color="#ffffff" size={16} onPress={() => handleDeleteList(data.listName)}/>
         let plural = data.gameList.length < 2 ? "jeu" : "jeux"
         return (
             <View key={i} style={styles.gameOfList}>
@@ -199,73 +223,102 @@ const handleNavigation = () => {
                 setModalVisible(!modalVisible);
             }}
         >
-            <View style={styles.modalBackground}>
+            <View style={styles.modalBackgroundList}>
                 <ImageBackground 
-                source={require('../assets/background-blur.png')} 
-                style={styles.backgroundImage}
+                    source={require('../assets/background-blur.png')} 
+                    style={styles.backgroundImageList}
                 >
-                    <View style={styles.backbutton}>
-                        <FontAwesome 
-                        name="times"
-                        color="#7A28CB" 
-                        size={25} 
-                        onPress={() => setModalVisible(false)} 
-                        />
-                    </View>
-                    <View style={styles.modalContainer}>
-                        <TextInput 
-                        placeholder="List Name" 
-                        placeholderTextColor="#7A28CB" 
-                        autoCapitalize="none" 
-                        onChangeText={setListName} 
-                        value={listName} 
-                        style={styles.input} 
-                        />
-
-                        {error && <Text style={styles.errorText}>{error}</Text>}
-                        <View style={styles.switchContainer}>
-                            <Text style={styles.switchLabel}>Private</Text>
-                            <Switch 
-                                trackColor={{ false: '#7A28CB', true: '#33CA7F' }}
-                                thumbColor={isPublic ? '#ffffff' : '#ffffff'} 
-                                ios_backgroundColor="#3e3e3e" 
-                                onValueChange={setIsPublic} 
-                                value={isPublic} 
+                    <View style={styles.modalContainerList}>
+                        <View style={styles.backbutton}>
+                            <FontAwesome 
+                                name="times"
+                                color="#7A28CB" 
+                                size={25} 
+                                onPress={() => setModal(false)} 
                             />
-                            <Text style={styles.switchLabel}>Public</Text>
                         </View>
-                        <TouchableOpacity style={styles.modalButton} onPress={handleAddList}>
-                            <Text style={styles.modalButtonText}>Add List</Text>
-                        </TouchableOpacity>
+                        <View style={styles.gameContainer}>
+                            <ScrollView horizontal={true}>
+                                {game}
+                            </ScrollView>
+                        </View>
                     </View>
                 </ImageBackground>
             </View>
         </Modal>
-    </ImageBackground>
-</View>
+            <Modal
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    /* Alert.alert('Modal has been closed.'); */
+                    setModalVisible(!modalVisible);
+                }}
+            >
+                <View style={styles.modalBackground}>
+                    <ImageBackground 
+                        source={require('../assets/background-blur.png')} 
+                        style={styles.backgroundImage}
+                    >
+                            <View style={styles.backbutton}>
+                                <FontAwesome 
+                                name="times"
+                                color="#7A28CB" 
+                                size={25} 
+                                onPress={() => setModalVisible(false)} 
+                            />
+                            </View>
+                        <View style={styles.modalContainer}>
+                            <TextInput 
+                                placeholder="List Name" 
+                                placeholderTextColor="#7A28CB" 
+                                autoCapitalize="none" 
+                                onChangeText={setListName} 
+                                value={listName} 
+                                style={styles.input} 
+                            />
 
+                            {error && <Text style={styles.errorText}>{error}</Text>}
+                            <View style={styles.switchContainer}>
+                                <Text style={styles.switchLabel}>Private</Text>
+                                <Switch 
+                                    trackColor={{ false: '#7A28CB', true: '#33CA7F' }}
+                                    thumbColor={isPublic ? '#ffffff' : '#ffffff'} 
+                                    ios_backgroundColor="#3e3e3e" 
+                                    onValueChange={setIsPublic} 
+                                    value={isPublic} 
+                                />
+                                <Text style={styles.switchLabel}>Public</Text>
+                            </View>
+                            <TouchableOpacity style={styles.modalButton} onPress={handleAddList}>
+                                <Text style={styles.modalButtonText}>Add List</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </ImageBackground>
+                </View>
+            </Modal>
 
+        </ImageBackground>
+    </View>
 
+if (!user.username){
+    pageContent = 
+    <View style={styles.divLoggedout}>
+      <Text>
+        Create an account or log in to access the list
+      </Text>
+      <TouchableOpacity style={styles.buttonloggedout} onPress={()=> navigation.navigate('Login')}>
+        <Text>
+          Take me to login
+        </Text>
+      </TouchableOpacity>
+    </View>
+  
+    }
 
-    if (!user.username){
-        pageContent = 
-        <View style={styles.divLoggedout}>
-          <Text>
-            Create an account or log in to access the list
-          </Text>
-          <TouchableOpacity style={styles.buttonloggedout} onPress={()=> navigation.navigate('Login')}>
-            <Text>
-              Take me to login
-            </Text>
-          </TouchableOpacity>
-        </View>
-      
-        }
-
-  return (
-   <>
-   {pageContent}
-   </>
+return (
+<>
+{pageContent}
+</>
   );
 }
 
@@ -282,11 +335,28 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)', 
     },
+    modalBackgroundList: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    backgroundImage: {
+        alignItems: "flex-end",
+    },
+    backgroundImageList: {
+        width: '100%',
+    },
     modalContainer: {
-        width: '80%',
         padding: 20,
         borderRadius: 10,
-        alignItems: 'center',
+        alignItems: "center",
+        justifyContent: 'center',
+    },
+    modalContainerList: {
+        padding: 20,
+        borderRadius: 10,
+        alignItems: "flex-end",
         justifyContent: 'center',
     },
     modalButton: {
@@ -445,22 +515,9 @@ const styles = StyleSheet.create({
         height: 160,
         width: 120,
     },
-    modalBackground: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
-      },
-    modalContainer: {
-        width: '80%',
-        padding: 20,
-        backgroundColor: 'white',
-        borderRadius: 10,
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-      },
       backbutton: {
-        width: '100%',
+        width: 20,
+        alignItems: "flex-end",
       },
       divLoggedout:{
         flex:1,

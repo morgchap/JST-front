@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 
 const initialState = {
-  value: { username: '', token: '', lists: [] },
+  value: { username: '', token: '', lists: [], userId: "" },
 };
 
 export const userSlice = createSlice({
@@ -12,6 +12,7 @@ export const userSlice = createSlice({
     updateUsername: (state, action) => {
       state.value.username = action.payload.username;
       state.value.token = action.payload.token;
+      state.value.userId = action.payload.userId;
     },
     addListGames: (state, action) => {
       state.value.lists = [...action.payload]
