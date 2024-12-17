@@ -7,6 +7,7 @@ export default function DiscoveryScreen() {
   const [articles, setArticles] = useState([]);
   const [games, setGames] = useState([]);
   const [friends, setFriends] = useState([]);
+  const user = useSelector((state) => state.user.value);
 
   const newsApiKey = 'da5844b63702429887c8a0b59db638d2';
   const gamesApiKey = process.env.EXPO_PUBLIC_API_KEY;
@@ -82,9 +83,72 @@ export default function DiscoveryScreen() {
     console.log(`Add friend with ID: ${userId}`);
     // Logique pour ajouter un ami
   };
+let pageContent =   <SafeAreaView style={styles.safeArea}>
+<ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
+  <ScrollView vertical contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
+    <View style={styles.headerContainer}>
+      <Text style={styles.pageTitle}>Discovery</Text>
+      <View style={styles.titleUnderline} />
+    </View>
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
+    {/* Section Articles */}
+    <View>
+      <Text style={styles.title}>Cette semaine chez les geek</Text>
+      <View style={styles.encadrer}>
+          <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
+            {articles.map((article, index) => (
+              <View key={index} style={styles.articleItemHorizontal}>
+                <View style={styles.articleTextContainer}>
+                  <Text style={styles.articleTitle}>{article.title}</Text>
+                  <Text style={styles.articleDescription}>{article.description}</Text>
+                </View>
+                <Image style={styles.articleImage} source={{ uri: article.urlToImage }} />
+              </View>
+            ))}
+          </ScrollView>
+      </View>
+    </View>
+
+    {/* Section Jeux */}
+    <View>
+      <Text style={styles.title}>Les prochaines sorties du mois</Text>
+      <View style={styles.encadrer}>
+          <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
+            {games.map((game) => (
+              <View key={game.id} style={styles.gameItemHorizontal}>
+                {game.background_image && (
+                  <Image style={styles.jaquette} source={{ uri: game.background_image }} />
+                )}
+                <Text style={styles.gameTitle}>{game.name}</Text>
+              </View>
+            ))}
+          </ScrollView>
+      </View>
+    </View>
+
+    {/* Section I can know them*/}
+    <View>
+      <Text style={styles.title}>Je pourrais connaitre</Text>
+      <View style={styles.encadrer}>
+      {friends.map((friend) => (
+        <View key={friend.id} style={styles.friendItem}>
+          <Image style={styles.friendsAvatars} source={{ uri: friend.avatar }} />
+          <Text style={styles.friendsPseudo}>{friend.username}</Text>
+          <TouchableOpacity onPress={() => addFriend(friend.id)} style={styles.addButton}>
+            <FontAwesome name="plus" size={20} color="#7A28CB" />
+          </TouchableOpacity>
+        </View>
+      ))}
+      </View>
+    </View>
+  </ScrollView>
+</ImageBackground>
+</SafeAreaView>
+
+
+  if (!user.username){
+    pageContent = 
+      <SafeAreaView style={styles.safeArea}>
       <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
         <ScrollView vertical contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
           <View style={styles.headerContainer}>
@@ -126,25 +190,15 @@ export default function DiscoveryScreen() {
                 </ScrollView>
             </View>
           </View>
-
-          {/* Section I can know them*/}
-          <View>
-            <Text style={styles.title}>Je pourrais connaitre</Text>
-            <View style={styles.encadrer}>
-            {friends.map((friend) => (
-              <View key={friend.id} style={styles.friendItem}>
-                <Image style={styles.friendsAvatars} source={{ uri: friend.avatar }} />
-                <Text style={styles.friendsPseudo}>{friend.username}</Text>
-                <TouchableOpacity onPress={() => addFriend(friend.id)} style={styles.addButton}>
-                  <FontAwesome name="plus" size={20} color="#7A28CB" />
-                </TouchableOpacity>
-              </View>
-            ))}
-            </View>
-          </View>
         </ScrollView>
       </ImageBackground>
     </SafeAreaView>
+  }
+
+  return ( 
+    <>
+  {pageContent}
+  </>
   );
 }
 

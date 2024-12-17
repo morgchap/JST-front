@@ -49,7 +49,7 @@ export default function SnapScreen({navigation}) {
 		  			.then((response) => response.json())
 		  			.then((data) => {
 		  				console.log('data:', data);
-						navigation.navigate('TabNavigator')  
+						navigation.navigate('Signup3')  
 		  			})
 		  			.catch((err) => console.error('Error:', err));
 		  	}
@@ -112,7 +112,7 @@ export default function SnapScreen({navigation}) {
 				.then((response) => response.json())
 				.then((data) => {
 					console.log('data:', data);
-					navigation.navigate('TabNavigator')
+					navigation.navigate('Signup3')
 				})
 				.catch((err) => console.error('Error:', err));
 		}

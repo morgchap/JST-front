@@ -80,6 +80,9 @@ export default function Signup3Screen({ navigation }) {
           <View style={styles.camera}>
             <Text>Camera area</Text>
           </View>
+          <View>
+            <Text style={styles.buttonText2} onPress={navigation.navigate('TabNavigator')}>Take me to JST </Text>
+          </View>
           <Modal
             transparent={true}
             visible={modalVisible}
@@ -210,5 +213,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 5,
   },
+  buttonText2:{
+    fontFamily:'OpenSans_600SemiBold',
+    color : 'balck',
+    textDecorationLine: 'underline',
+    marginTop:'2%'
+},
 });
 

@@ -175,241 +175,344 @@ for (let i = 0; i < 5; i++) {
     mynotestars.push(<FontAwesome key={i} name={style} color="#f1c40f" size={40}/>);
   }
 
+  let pageContent= <View style={styles.centered}>
+  <View style={styles.bgpicture}>
+  <LinearGradient
+  // Background Linear Gradient
+  colors={['rgba(122,40,203,1)', 'rgba(51,202,127,0.4)']}
+  style={styles.gradient}
+>
+  <SafeAreaView style ={styles.Imgview}> 
+  <View style={styles.backbutton}>
+  <FontAwesome name="chevron-left" color="white" size={25} style={styles.icon} onPress={() => navigation.goBack()} />
+  </View>       
+   <Image style={styles.jaquette} source={{uri : gamesinfo.cover}} />
+   <View style={styles.backbutton}>
+  <FontAwesome name="ellipsis-h" color="white" style={styles.icon} size={25} 
+  // onPress={() => navigation.goBack()} 
+  />
+  </View>       
+  </SafeAreaView>
+</LinearGradient>
+  </View>
+  <View style={styles.general}>
+  <ScrollView style= {styles.scroll} 
+  //</View>onContentSizeChange={(1000, 1000)}
+  >
+   <View style ={styles.downside}>
+  <Text style={styles.title}>{gamesinfo.name}</Text>
+  <Text style={styles.date}>{gamesinfo.releaseDate}</Text>
+  <View style={styles.line}></View>
+  <View style={styles.starsContainer}>
+       {stars}
+       <Text style ={styles.votecount}>3,5</Text>
+   </View>
+   <View style={styles.topbutton}>
+      <TouchableOpacity style={styles.greenbutton} 
+      onPress={() => setModalVisible(true)}>
+          <Text style={styles.buttontext}>add to list</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.greenbutton}
+      onPress={()=> setReview(true)}
+      >
+          <Text style={styles.buttontext}>Write a review</Text>
+      </TouchableOpacity>
+   </View>
+   <Text style ={styles.summary}>
+          Summary
+  </Text>
+   <ScrollView style={styles.resumebox}>
+      <HTMLView
+      value={summaryToHTML}
+      stylesheet={styles.resume}
+  />
+   </ScrollView>
+    <SafeAreaView style={styles.container}>
+    <Text style ={styles.summary}>
+          Reviews
+  </Text>
+  <Text style ={styles.summary}>
+         My review
+  </Text>
+      {myreview}
+<TouchableOpacity onPress={toggleVisibility} style={styles.container2}>
+  <Text>My friend's reviews</Text>
+  <FontAwesome name='caret-down' color="black" size={20}/>
+</TouchableOpacity>
+
+<Collapsible isVisible={isVisible}>
+  <View style = {styles.friendsReviews}>
+  <View style={styles.picanduseandreview}> 
+  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+  <View style={styles.useandreview}>
+  <Text style={styles.friendsPseudo}>@monami</Text>
+  <View style={styles.starsContainer2}>
+       {stars2}
+      <Text style ={styles.votecount2}>3,5</Text>
+  </View> 
+  </View>
+  </View>   
+  <View style={styles.comment}>
+      <Text>That is my favorite game i would 100% recommend it</Text>
+  </View>
+  </View>
+  <View style = {styles.friendsReviews}>
+  <View style={styles.picanduseandreview}> 
+  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+  <View style={styles.useandreview}>
+  <Text style={styles.friendsPseudo}>@monami</Text>
+  <View style={styles.starsContainer2}>
+       {stars2}
+      <Text style ={styles.votecount2}>3,5</Text>
+  </View> 
+  </View>
+  </View>   
+  <View style={styles.comment}>
+      <Text>That is my favorite game i would 100% recommend it</Text>
+  </View>
+  </View>
+</Collapsible>
+
+
+
+<TouchableOpacity onPress={toggleVisibility2} style={styles.container2}>
+  <Text style = {styles.collapsedname}>Most liked reviews</Text>
+  <FontAwesome name={icon2} color="black" size={20}/>
+</TouchableOpacity>
+<Collapsible isVisible={isVisible2}>
+
+  <View style = {styles.friendsReviews}>
+  <View style={styles.picanduseandreview}> 
+  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+  <View style={styles.useandreview}>
+  <Text style={styles.friendsPseudo}>@monami</Text>
+  <View style={styles.starsContainer2}>
+       {stars2}
+      <Text style ={styles.votecount2}>3,5</Text>
+  </View> 
+  </View>
+  </View>   
+  <View style={styles.comment}>
+      <Text>That is my favorite game i would 100% recommend it</Text>
+  </View>
+  </View>
+
+  <View style = {styles.friendsReviews}>
+  <View style={styles.picanduseandreview}> 
+  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+  <View style={styles.useandreview}>
+  <Text style={styles.friendsPseudo}>@monami</Text>
+  <View style={styles.starsContainer2}>
+       {stars2}
+      <Text style ={styles.votecount2}>3,5</Text>
+  </View> 
+  </View>
+  </View>   
+  <View style={styles.comment}>
+      <Text>That is my favorite game i would 100% recommend it</Text>
+  </View>
+  </View>
+
+</Collapsible>
+</SafeAreaView>
+   </View> 
+   <View style ={styles.footer}>
+  </View>  
+  </ScrollView>
+  </View>
+
+
+  <Modal
+      transparent={true}
+      visible={modalVisible}
+      onRequestClose={() => {
+        Alert.alert('Modal has been closed.');
+        setModalVisible(!modalVisible);
+      }}
+    >
+      <View style={styles.modalBackground}>
+        <View style={styles.modalContainer}>
+        <View style={styles.backbutton}>
+        <FontAwesome 
+          name="times"
+          color="#7A28CB" 
+          size={25} 
+          onPress={() => setModalVisible(false)} 
+        />
+      </View> 
+          <ScrollView style={styles.scroll2}>
+            {lists}  
+          </ScrollView>  
+        </View>
+    </View> 
+    </Modal>
+
+    <Modal
+      transparent={true}
+      visible={message}
+    >
+      <View style={styles.modalBackground}>
+        <View style={styles.modalContainer}>
+        <View style={styles.backbutton}>
+        <FontAwesome 
+          name="times"
+          color="#7A28CB" 
+          size={25} 
+          onPress={() => setmessage(false)} 
+        />
+      </View> 
+         <Text>Votre jeux a bien été ajoutéé</Text>
+        </View>
+    </View> 
+    </Modal>
+
+    <Modal
+      transparent={true}
+      visible={review}
+      onRequestClose={() => {
+        Alert.alert('Modal has been closed.');
+        setReview(!review);
+      }}
+    >
+      <View style={styles.modalBackground}>
+        <View style={styles.modalContainer3}>
+        <View style={styles.backbutton}>
+        <FontAwesome 
+          name="times"
+          color="#7A28CB" 
+          size={25} 
+          onPress={() => setReview(false)} 
+        />
+      </View> 
+        <View style ={styles.scrollcont}>
+         <ScrollView style={styles.reviewcont}>
+           <View style={styles.starsContainer}>
+             {personalStars}
+          </View>
+          <View style={styles.reviewinputcont}>
+          <TextInput style={styles.reviewinput}
+            placeholder='my review'
+            enterKeyHint='send'
+            onChangeText={(value) => setWrittentContent(value)}
+            value={writtencontent}
+            onSubmitEditing={()=> handlesubmit()}   
+            >
+            </TextInput>
+          </View>
+         </ScrollView>
+         </View>
+         <View>
+
+         </View>
+        </View>
+    </View> 
+    </Modal>
+</View>
+
+
+
+// if user is not logged in : 
+
+  if (!user.username){
+    pageContent = <View style={styles.centered}>
+    <View style={styles.bgpicture}>
+    <LinearGradient
+    // Background Linear Gradient
+    colors={['rgba(122,40,203,1)', 'rgba(51,202,127,0.4)']}
+    style={styles.gradient}
+  >
+    <SafeAreaView style ={styles.Imgview}> 
+    <View style={styles.backbutton}>
+    <FontAwesome name="chevron-left" color="white" size={25} style={styles.icon} onPress={() => navigation.goBack()} />
+    </View>       
+     <Image style={styles.jaquette} source={{uri : gamesinfo.cover}} />
+     <View style={styles.backbutton}>
+    <FontAwesome name="ellipsis-h" color="white" style={styles.icon} size={25} 
+    // onPress={() => navigation.goBack()} 
+    />
+    </View>       
+    </SafeAreaView>
+  </LinearGradient>
+    </View>
+    <View style={styles.general}>
+    <ScrollView style= {styles.scroll} 
+    //</View>onContentSizeChange={(1000, 1000)}
+    >
+     <View style ={styles.downside}>
+    <Text style={styles.title}>{gamesinfo.name}</Text>
+    <Text style={styles.date}>{gamesinfo.releaseDate}</Text>
+    <View style={styles.line}></View>
+    <View style={styles.starsContainer}>
+         {stars}
+         <Text style ={styles.votecount}>3,5</Text>
+     </View>
+
+     <Text style ={styles.summary}>
+            Summary
+    </Text>
+     <ScrollView style={styles.resumebox}>
+        <HTMLView
+        value={summaryToHTML}
+        stylesheet={styles.resume}
+    />
+     </ScrollView>
+      <SafeAreaView style={styles.container}>
+      <Text style ={styles.summary}>
+            Reviews
+    </Text>
+
+  <TouchableOpacity onPress={toggleVisibility2} style={styles.container2}>
+    <Text style = {styles.collapsedname}>Most liked reviews</Text>
+    <FontAwesome name={icon2} color="black" size={20}/>
+  </TouchableOpacity>
+  <Collapsible isVisible={isVisible2}>
+
+    <View style = {styles.friendsReviews}>
+    <View style={styles.picanduseandreview}> 
+    <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+    <View style={styles.useandreview}>
+    <Text style={styles.friendsPseudo}>@monami</Text>
+    <View style={styles.starsContainer2}>
+         {stars2}
+        <Text style ={styles.votecount2}>3,5</Text>
+    </View> 
+    </View>
+    </View>   
+    <View style={styles.comment}>
+        <Text>That is my favorite game i would 100% recommend it</Text>
+    </View>
+    </View>
+
+    <View style = {styles.friendsReviews}>
+    <View style={styles.picanduseandreview}> 
+    <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+    <View style={styles.useandreview}>
+    <Text style={styles.friendsPseudo}>@monami</Text>
+    <View style={styles.starsContainer2}>
+         {stars2}
+        <Text style ={styles.votecount2}>3,5</Text>
+    </View> 
+    </View>
+    </View>   
+    <View style={styles.comment}>
+        <Text>That is my favorite game i would 100% recommend it</Text>
+    </View>
+    </View>
+
+  </Collapsible>
+</SafeAreaView>
+     </View> 
+     <View style ={styles.footer}>
+    </View> 
+    </ScrollView>
+    </View>
+    </View>
+  }
 
   return (
-    <View style={styles.centered}>
-        <View style={styles.bgpicture}>
-        <LinearGradient
-        // Background Linear Gradient
-        colors={['rgba(122,40,203,1)', 'rgba(51,202,127,0.4)']}
-        style={styles.gradient}
-      >
-        <SafeAreaView style ={styles.Imgview}> 
-        <View style={styles.backbutton}>
-        <FontAwesome name="chevron-left" color="white" size={25} style={styles.icon} onPress={() => navigation.goBack()} />
-        </View>       
-         <Image style={styles.jaquette} source={{uri : gamesinfo.cover}} />
-         <View style={styles.backbutton}>
-        <FontAwesome name="ellipsis-h" color="white" style={styles.icon} size={25} 
-        // onPress={() => navigation.goBack()} 
-        />
-        </View>       
-        </SafeAreaView>
-      </LinearGradient>
-        </View>
-        <View style={styles.general}>
-        <ScrollView style= {styles.scroll} 
-        //</View>onContentSizeChange={(1000, 1000)}
-        >
-         <View style ={styles.downside}>
-        <Text style={styles.title}>{gamesinfo.name}</Text>
-        <Text style={styles.date}>{gamesinfo.releaseDate}</Text>
-        <View style={styles.line}></View>
-        <View style={styles.starsContainer}>
-             {stars}
-             <Text style ={styles.votecount}>3,5</Text>
-         </View>
-         <View style={styles.topbutton}>
-            <TouchableOpacity style={styles.greenbutton} 
-            onPress={() => setModalVisible(true)}>
-                <Text style={styles.buttontext}>add to list</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.greenbutton}
-            onPress={()=> setReview(true)}
-            >
-                <Text style={styles.buttontext}>Write a review</Text>
-            </TouchableOpacity>
-         </View>
-         <Text style ={styles.summary}>
-                Summary
-        </Text>
-         <ScrollView style={styles.resumebox}>
-            <HTMLView
-            value={summaryToHTML}
-            stylesheet={styles.resume}
-        />
-         </ScrollView>
-          <SafeAreaView style={styles.container}>
-          <Text style ={styles.summary}>
-                Reviews
-        </Text>
-        <Text style ={styles.summary}>
-               My review
-        </Text>
-            {myreview}
-      <TouchableOpacity onPress={toggleVisibility} style={styles.container2}>
-        <Text>My friend's reviews</Text>
-        <FontAwesome name='caret-down' color="black" size={20}/>
-      </TouchableOpacity>
-
-      <Collapsible isVisible={isVisible}>
-        <View style = {styles.friendsReviews}>
-        <View style={styles.picanduseandreview}> 
-        <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-        <View style={styles.useandreview}>
-        <Text style={styles.friendsPseudo}>@monami</Text>
-        <View style={styles.starsContainer2}>
-             {stars2}
-            <Text style ={styles.votecount2}>3,5</Text>
-        </View> 
-        </View>
-        </View>   
-        <View style={styles.comment}>
-            <Text>That is my favorite game i would 100% recommend it</Text>
-        </View>
-        </View>
-        <View style = {styles.friendsReviews}>
-        <View style={styles.picanduseandreview}> 
-        <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-        <View style={styles.useandreview}>
-        <Text style={styles.friendsPseudo}>@monami</Text>
-        <View style={styles.starsContainer2}>
-             {stars2}
-            <Text style ={styles.votecount2}>3,5</Text>
-        </View> 
-        </View>
-        </View>   
-        <View style={styles.comment}>
-            <Text>That is my favorite game i would 100% recommend it</Text>
-        </View>
-        </View>
-      </Collapsible>
-
-
-
-      <TouchableOpacity onPress={toggleVisibility2} style={styles.container2}>
-        <Text style = {styles.collapsedname}>Most liked reviews</Text>
-        <FontAwesome name={icon2} color="black" size={20}/>
-      </TouchableOpacity>
-      <Collapsible isVisible={isVisible2}>
-
-        <View style = {styles.friendsReviews}>
-        <View style={styles.picanduseandreview}> 
-        <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-        <View style={styles.useandreview}>
-        <Text style={styles.friendsPseudo}>@monami</Text>
-        <View style={styles.starsContainer2}>
-             {stars2}
-            <Text style ={styles.votecount2}>3,5</Text>
-        </View> 
-        </View>
-        </View>   
-        <View style={styles.comment}>
-            <Text>That is my favorite game i would 100% recommend it</Text>
-        </View>
-        </View>
-
-        <View style = {styles.friendsReviews}>
-        <View style={styles.picanduseandreview}> 
-        <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-        <View style={styles.useandreview}>
-        <Text style={styles.friendsPseudo}>@monami</Text>
-        <View style={styles.starsContainer2}>
-             {stars2}
-            <Text style ={styles.votecount2}>3,5</Text>
-        </View> 
-        </View>
-        </View>   
-        <View style={styles.comment}>
-            <Text>That is my favorite game i would 100% recommend it</Text>
-        </View>
-        </View>
-
-      </Collapsible>
-    </SafeAreaView>
-         </View> 
-         <View style ={styles.footer}>
-        </View>  
-        </ScrollView>
-        </View>
-
-
-        <Modal
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-              setModalVisible(!modalVisible);
-            }}
-          >
-            <View style={styles.modalBackground}>
-              <View style={styles.modalContainer}>
-              <View style={styles.backbutton}>
-              <FontAwesome 
-                name="times"
-                color="#7A28CB" 
-                size={25} 
-                onPress={() => setModalVisible(false)} 
-              />
-            </View> 
-                <ScrollView style={styles.scroll2}>
-                  {lists}  
-                </ScrollView>  
-              </View>
-          </View> 
-          </Modal>
-
-          <Modal
-            transparent={true}
-            visible={message}
-          >
-            <View style={styles.modalBackground}>
-              <View style={styles.modalContainer}>
-              <View style={styles.backbutton}>
-              <FontAwesome 
-                name="times"
-                color="#7A28CB" 
-                size={25} 
-                onPress={() => setmessage(false)} 
-              />
-            </View> 
-               <Text>Votre jeux a bien été ajoutéé</Text>
-              </View>
-          </View> 
-          </Modal>
-
-          <Modal
-            transparent={true}
-            visible={review}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-              setReview(!review);
-            }}
-          >
-            <View style={styles.modalBackground}>
-              <View style={styles.modalContainer3}>
-              <View style={styles.backbutton}>
-              <FontAwesome 
-                name="times"
-                color="#7A28CB" 
-                size={25} 
-                onPress={() => setReview(false)} 
-              />
-            </View> 
-              <View style ={styles.scrollcont}>
-               <ScrollView style={styles.reviewcont}>
-                 <View style={styles.starsContainer}>
-                   {personalStars}
-                </View>
-                <View style={styles.reviewinputcont}>
-                <TextInput style={styles.reviewinput}
-                  placeholder='my review'
-                  enterKeyHint='send'
-                  onChangeText={(value) => setWrittentContent(value)}
-                  value={writtencontent}
-                  onSubmitEditing={()=> handlesubmit()}   
-                  >
-                  </TextInput>
-                </View>
-               </ScrollView>
-               </View>
-               <View>
-
-               </View>
-              </View>
-          </View> 
-          </Modal>
-    </View>
+    <>
+    {pageContent}
+    </>
   );
 }
 
