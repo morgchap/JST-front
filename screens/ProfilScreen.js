@@ -238,7 +238,7 @@ if (name.length >= 15) {
   return (
     <TouchableOpacity key={i} style={styles.gameContainer} onPress={() => {
       //navigation.navigate("FriendList", {userFriendList: user.username})
-      navigation.navigate("Games", {gameName: name})
+      navigation.navigate("Games", {gameName: data.name})
     }}>
       <Text style={styles.gameTitle}>{name}</Text>
       <Image style={styles.jacket} source={{uri: `${data.cover}`, height:100,
