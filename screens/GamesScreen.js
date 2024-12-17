@@ -11,9 +11,9 @@ import { addListGames } from '../reducers/user';
 export default function GamesScreen({navigation, route}) {
 
     //const gamedata = useSelector((state) => state.game.value);
-    //console.log(`reducer : ${gamedata}`)
+    //console.log(`reducer : ${gamedata}`)a
     const dispatch = useDispatch();
-    const {gameName} = route.params
+    const {gameName} = route.params;
     const user = useSelector((state) => state.user.value)
     const currentUser = user.username
 

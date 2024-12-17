@@ -42,41 +42,7 @@ export default function HomeScreen() {
     }
     return stars;
   };
-console.log('revew :',ratings);
-  const ratingsNewsFeed = ratings[0].map((index, review) => {
-    return (
-      <View key={index}>
-       <View key={review._id} style={styles.ratingContainer}>
-          <Text style={styles.timestamp}>{formatDate(review.createdAt)}</Text>
 
-          <View style={styles.ratingContent}>
-            <View style={styles.userInfoContainer}>
-              <Image style={styles.avatar} source={{ uri: review.user.profilePicture }}  /* source={require('../assets/avatar.png')} *//>
-              
-              <View style={styles.userInfo}>
-                <Text style={styles.userName}>{/* {review.user.username} */}Username</Text>
-                
-                <View style={styles.starsContainer}>
-                  {renderStars(review.note)} {/* Affichage des étoiles */}
-                  <Text style={styles.textNote} >{review.note}</Text>
-                </View>
-
-              </View>
-            </View>
-
-            <View style={styles.gameReviewContainer}>
-              <Image style={styles.gameCover} /* source={{ uri: review.game.cover }}*/ source={require('../assets/mario.png')}/>
-              <View style={styles.reviewContent} >
-                <Text style={styles.reviewGameTitle}>Mario {/* {review.game.name} */}</Text>
-                <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-    </View>
-    )
-  })
-    
   return (
     <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
       <SafeAreaView style={styles.safeArea}>

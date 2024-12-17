@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { SafeAreaView, View, Text, Image, StyleSheet, ImageBackground, ScrollView, TouchableOpacity} from 'react-native';
+import { SafeAreaView, View, Text, Image, StyleSheet, ImageBackground, ScrollView, TouchableOpacity, Linking} from 'react-native';
 import { useSelector } from 'react-redux';
 
-export default function DiscoveryScreen() {
+export default function DiscoveryScreen({navigation}) {
   const [articles, setArticles] = useState([]);
   const [games, setGames] = useState([]);
   const [friends, setFriends] = useState([]);
   const user = useSelector((state) => state.user.value);
-
   const newsApiKey = 'da5844b63702429887c8a0b59db638d2';
-  const gamesApiKey = process.env.EXPO_PUBLIC_API_KEY;
 
   /* Pour les articles */
   useEffect(() => {
@@ -39,7 +37,7 @@ export default function DiscoveryScreen() {
       try 
       {
         const response = await fetch(
-          `https://api.rawg.io/api/games?page_size=10&key=${gamesApiKey}`
+          `https://api.rawg.io/api/games?key=${process.env.EXPO_PUBLIC_API_KEY}`
         );
         if (!response.ok) 
         {
@@ -56,6 +54,7 @@ export default function DiscoveryScreen() {
 
     fetchGames();
   }, []);
+
 
   /* Pour I can know them (a continuer)*/
   useEffect(() => {
@@ -89,6 +88,15 @@ export default function DiscoveryScreen() {
     // Logique pour ajouter un ami
   };
 
+  const handlePress = (url) => {
+    Linking.openURL(url);
+  };
+
+  const handlePressGame = (gameName) => {
+    console.log(gameName);
+    navigation.navigate('Games', { gameName: gameName });
+  }
+  
   return (
     <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
       <SafeAreaView style={styles.safeArea}>
@@ -109,7 +117,9 @@ export default function DiscoveryScreen() {
                         <Text style={styles.articleTitle}>{article.title}</Text>
                         <Text style={styles.articleDescription}>{article.description}</Text>
                       </View>
-                      <Image style={styles.articleImage} source={{ uri: article.urlToImage }} />
+                      <TouchableOpacity onPress={() => handlePress(article.url)}>
+                        <Image style={styles.articleImage} source={{ uri: article.urlToImage }} />
+                      </TouchableOpacity>
                     </View>
                   ))}
                 </ScrollView>
@@ -118,13 +128,15 @@ export default function DiscoveryScreen() {
 
           {/* Section Jeux */}
           <View>
-            <Text style={styles.title}>Les prochaines sorties du mois</Text>
+            <Text style={styles.title}>Nos recommandations</Text>
             <View style={styles.encadrer}>
                 <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
                   {games.map((game) => (
                     <View key={game.id} style={styles.gameItemHorizontal}>
                       {game.background_image && (
-                        <Image style={styles.jaquette} source={{ uri: game.background_image }} />
+                        <TouchableOpacity onPress={() => handlePressGame(game.name)}>
+                          <Image style={styles.jaquette} source={{ uri: game.background_image }} />
+                        </TouchableOpacity>
                       )}
                       <Text style={styles.gameTitle}>{game.name}</Text>
                     </View>
