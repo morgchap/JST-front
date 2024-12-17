@@ -292,19 +292,20 @@ if (numberOfGames >1) {
 // };
 
 
-  return (
+
+
     // <SafeAreaProvider>
-    <View style={styles.centered}>
+   let pageContent= <View style={styles.centered}>
+       <LinearGradient
+        // Background Linear Gradient
+        colors={['74deg, rgba(214,203,253,1) 0%', 'rgba(212,253,198,1) 100%']}
+        style={styles.gradient}
+      >
       <ScrollView
         Style={styles.scrollView}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
-         <LinearGradient
-        // Background Linear Gradient
-        colors={['74deg, rgba(214,203,253,1) 0%', 'rgba(212,253,198,1) 100%']}
-        style={styles.gradient}
-      >
       <View style={styles.headIcons}>
       <FontAwesome name="chevron-left" color="white" size={25} onPress={() => navigation.goBack()}/>
       <FontAwesome name="cog" color="white" size={25} onPress={() => navigation.navigate("Setup")}/>
@@ -325,7 +326,6 @@ if (numberOfGames >1) {
             <Text style={styles.friendStatsText}>{numberOfFriends} ami{pluralFriends}</Text>
           </TouchableOpacity>
       </View>
-      </LinearGradient>
       <View style={styles.gameDiv}>
         <View style={styles.games}>
             <Text style={styles.secondTitles}>Mes jeux préférés ({numberOfGames})</Text>
@@ -360,9 +360,30 @@ if (numberOfGames >1) {
             </> 
     )}
         </ScrollView>
+     </LinearGradient>
     </View>
 
-      
+
+
+if (!user.username){
+  pageContent = 
+  <View style={styles.divLoggedout}>
+    <Text>
+      Create an account or log in to access your profile
+    </Text>
+    <TouchableOpacity style={styles.buttonloggedout} onPress={()=> navigation.navigate('Login')}>
+      <Text>
+        Take me to login
+      </Text>
+    </TouchableOpacity>
+  </View>
+
+  }
+
+return (
+<>
+{pageContent}
+</>      
   );
 }
 
@@ -372,7 +393,7 @@ const styles = StyleSheet.create({
         flex:1,
         alignItems: 'start',
         justifyContent: 'start',
-        backgroundColor:'#F0F0F0'
+        //backgroundColor:'#F0F0F0'
     },
 
     headIcons: {
@@ -634,13 +655,27 @@ const styles = StyleSheet.create({
       flex: 1,
     },
     scrollView: {
-      flex: 1,
-      backgroundColor: 'pink',
-      alignItems: 'center',
-      justifyContent: 'center',
+      // flex: 1,
+      // backgroundColor: 'pink',
+      // alignItems: 'center',
+      // justifyContent: 'center',
     },
     gradient:{
-      height:'flex 1/4'
+      height:'100%'
+    }, 
+    divLoggedout:{
+      flex:1,
+      alignItems:'center', 
+      justifyContent:'center',
+      backgroundColor:'#D6CBFD'
+    }, 
+    buttonloggedout:{
+      // borderColor:'black', 
+      // borderWidth:1,
+      padding:'2%',
+      marginTop:'3%',
+      backgroundColor:'white',
+      borderRadius:5
     }
     
   });

@@ -8,7 +8,8 @@ import {
     ImageBackground,
     Modal,
     TextInput,
-    Switch
+    Switch, 
+    Pressable
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useState, useEffect } from 'react';
@@ -147,102 +148,124 @@ const handleNavigation = () => {
         )
     })
 
-  return (
-    <View style={styles.centered}>
-        <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
-            <View style={styles.headIcons}>
-                <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
-                <Text style={styles.topText}>Your lists</Text>
-                <FontAwesome name="cog" color="#7A28CB" size={25} onPress={() => navigation.navigate("Setup")}/>
+    let pageContent =  <View style={styles.centered}>
+    <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
+        <View style={styles.headIcons}>
+            <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
+            <Text style={styles.topText}>Your lists</Text>
+            <FontAwesome name="cog" color="#7A28CB" size={25} onPress={() => navigation.navigate("Setup")}/>
+        </View>
+        <View style={styles.body}>
+            <View style={styles.lists}>
+                <ScrollView>
+                    {games}
+                </ScrollView>
             </View>
-            <View style={styles.body}>
-                <View style={styles.lists}>
-                    <ScrollView>
-                        {games}
+            <View>
+                <TouchableOpacity style={styles.button} onPress={() => handleAddListButton()} activeOpacity={0.8}>
+                    <Text style={styles.textButton} >Add list</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+
+    <Modal
+        transparent={true}
+        visible={modal}
+    >
+        <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+                <View style={styles.backbutton}>
+                    <FontAwesome 
+                        name="times"
+                        color="#7A28CB" 
+                        size={25} 
+                        onPress={() => setModal(false)} 
+                    />
+                </View>
+                <View style={styles.gameContainer}>
+                    <ScrollView horizontal={true}>
+                        {game}
                     </ScrollView>
                 </View>
-                <View>
-                    <TouchableOpacity style={styles.button} onPress={() => handleAddListButton()} activeOpacity={0.8}>
-                        <Text style={styles.textButton} >Add list</Text>
-                    </TouchableOpacity>
-                </View>
             </View>
-    
+        </View> 
+    </Modal>
+
         <Modal
             transparent={true}
-            visible={modal}
+            visible={modalVisible}
+            onRequestClose={() => {
+                /* Alert.alert('Modal has been closed.'); */
+                setModalVisible(!modalVisible);
+            }}
         >
             <View style={styles.modalBackground}>
-                <View style={styles.modalContainer}>
+                <ImageBackground 
+                source={require('../assets/background-blur.png')} 
+                style={styles.backgroundImage}
+                >
                     <View style={styles.backbutton}>
                         <FontAwesome 
-                            name="times"
-                            color="#7A28CB" 
-                            size={25} 
-                            onPress={() => setModal(false)} 
+                        name="times"
+                        color="#7A28CB" 
+                        size={25} 
+                        onPress={() => setModalVisible(false)} 
                         />
                     </View>
-                    <View style={styles.gameContainer}>
-                        <ScrollView horizontal={true}>
-                            {game}
-                        </ScrollView>
+                    <View style={styles.modalContainer}>
+                        <TextInput 
+                        placeholder="List Name" 
+                        placeholderTextColor="#7A28CB" 
+                        autoCapitalize="none" 
+                        onChangeText={setListName} 
+                        value={listName} 
+                        style={styles.input} 
+                        />
+
+                        {error && <Text style={styles.errorText}>{error}</Text>}
+                        <View style={styles.switchContainer}>
+                            <Text style={styles.switchLabel}>Private</Text>
+                            <Switch 
+                                trackColor={{ false: '#7A28CB', true: '#33CA7F' }}
+                                thumbColor={isPublic ? '#ffffff' : '#ffffff'} 
+                                ios_backgroundColor="#3e3e3e" 
+                                onValueChange={setIsPublic} 
+                                value={isPublic} 
+                            />
+                            <Text style={styles.switchLabel}>Public</Text>
+                        </View>
+                        <TouchableOpacity style={styles.modalButton} onPress={handleAddList}>
+                            <Text style={styles.modalButtonText}>Add List</Text>
+                        </TouchableOpacity>
                     </View>
-                </View>
-            </View> 
+                </ImageBackground>
+            </View>
         </Modal>
+    </ImageBackground>
+</View>
 
-            <Modal
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                    /* Alert.alert('Modal has been closed.'); */
-                    setModalVisible(!modalVisible);
-                }}
-            >
-                <View style={styles.modalBackground}>
-                    <ImageBackground 
-                    source={require('../assets/background-blur.png')} 
-                    style={styles.backgroundImage}
-                    >
-                        <View style={styles.backbutton}>
-                            <FontAwesome 
-                            name="times"
-                            color="#7A28CB" 
-                            size={25} 
-                            onPress={() => setModalVisible(false)} 
-                            />
-                        </View>
-                        <View style={styles.modalContainer}>
-                            <TextInput 
-                            placeholder="List Name" 
-                            placeholderTextColor="#7A28CB" 
-                            autoCapitalize="none" 
-                            onChangeText={setListName} 
-                            value={listName} 
-                            style={styles.input} 
-                            />
 
-                            {error && <Text style={styles.errorText}>{error}</Text>}
-                            <View style={styles.switchContainer}>
-                                <Text style={styles.switchLabel}>Private</Text>
-                                <Switch 
-                                    trackColor={{ false: '#7A28CB', true: '#33CA7F' }}
-                                    thumbColor={isPublic ? '#ffffff' : '#ffffff'} 
-                                    ios_backgroundColor="#3e3e3e" 
-                                    onValueChange={setIsPublic} 
-                                    value={isPublic} 
-                                />
-                                <Text style={styles.switchLabel}>Public</Text>
-                            </View>
-                            <TouchableOpacity style={styles.modalButton} onPress={handleAddList}>
-                                <Text style={styles.modalButtonText}>Add List</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </ImageBackground>
-                </View>
-            </Modal>
-        </ImageBackground>
-    </View>
+
+
+    if (!user.username){
+        pageContent = 
+        <View style={styles.divLoggedout}>
+          <Text>
+            Create an account or log in to access the list
+          </Text>
+          <TouchableOpacity style={styles.buttonloggedout} onPress={()=> navigation.navigate('Login')}>
+            <Text>
+              Take me to login
+            </Text>
+          </TouchableOpacity>
+        </View>
+      
+        }
+
+  return (
+   <>
+   {pageContent}
+   </>
   );
 }
 
@@ -439,4 +462,18 @@ const styles = StyleSheet.create({
       backbutton: {
         width: '100%',
       },
+      divLoggedout:{
+        flex:1,
+        alignItems:'center', 
+        justifyContent:'center',
+        backgroundColor:'#D6CBFD'
+      }, 
+      buttonloggedout:{
+        // borderColor:'black', 
+        // borderWidth:1,
+        padding:'2%',
+        marginTop:'3%',
+        backgroundColor:'white',
+        borderRadius:5
+      }
 });

@@ -7,6 +7,7 @@ export default function DiscoveryScreen() {
   const [articles, setArticles] = useState([]);
   const [games, setGames] = useState([]);
   const [friends, setFriends] = useState([]);
+  const user = useSelector((state) => state.user.value);
 
   const newsApiKey = 'da5844b63702429887c8a0b59db638d2';
   const gamesApiKey = process.env.EXPO_PUBLIC_API_KEY;

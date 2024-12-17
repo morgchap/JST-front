@@ -13,6 +13,8 @@ export default function FriendScreen({ navigation, route }) {
     const [numberOfGames, setNumberOfGames] = useState(123);
     const [gameList, setGameList] = useState([]);
     const { friendName } = route.params
+    const [gotPP, setGotPP] = useState(false) 
+    const [profilePicture, setProfilePicture] = useState(null);
 
 
     const dispatch = useDispatch();
@@ -29,12 +31,17 @@ export default function FriendScreen({ navigation, route }) {
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`)
     .then(result => result.json())
     .then(data => {
-      console.log("c'est le front!", data.infos)
+      console.log("c'est le front de FriendScreen", data.infos.profilePicture)
 
       setNumberOfFriends(data.infos.friendsList.length)
 
       console.log("number of friends ", numberOfFriends);
       console.log("Id de list", data.infos.lists[0])
+
+      if (data.infos.profilePicture) {
+        setProfilePicture(data.infos.profilePicture);
+        setGotPP(true)
+        } 
 
     
   
@@ -49,6 +56,7 @@ export default function FriendScreen({ navigation, route }) {
     .then(data => {
       console.log("data du fetch des listes de jeux", data);
       setNumberOfGames(data.data.gameList.length)
+      console.log("le fetch qui sert à setter le nombre de jeu :", data.data.gameList.length)
       console.log("number of games", numberOfGames);
       setGameList(data.data.gameList)
     })
@@ -56,8 +64,10 @@ export default function FriendScreen({ navigation, route }) {
 
 
 
-}, []);
+}, [friendName]);
 
+console.log("number of games il all my games list :", gameList.length)
+console.log(profilePicture)
 
 
 const stars = [];
@@ -153,12 +163,20 @@ if (name.length >= 15) {
       }}/>
       </View>
       <View style={styles.me}>
-        <Image style={styles.avatar} source={require("../assets/nathanael.png")} />
+        { gotPP ? (
+                <Image style={styles.avatar} source={{uri: profilePicture}}/>) : (
+                  <Image style={styles.avatar} source={require("../assets/avatar.png")} />
+                )}
         <Text style={styles.pseudo}>@{friendName}</Text>
       </View>
       <View style={styles.stats}>
           <Text style={styles.statsText}>{numberOfGames} jeu{pluralGames}</Text>
-          <Text style={styles.statsText}>{numberOfFriends} ami{pluralFriends}</Text>
+          <TouchableOpacity onPress={() => {
+                      navigation.navigate("FriendList", {userFriendList: friendName})
+                      //selectFriend(user.username)
+                    }}>
+                      <Text style={styles.friendStatsText}>{numberOfFriends} ami{pluralFriends}</Text>
+                    </TouchableOpacity>
       </View>
       <View style={styles.logoutView}>
             <TouchableOpacity style={styles.logoutButton} onPress={() => addAFriend()}>
@@ -412,6 +430,13 @@ const styles = StyleSheet.create({
     statsText: {
       color : 'green',
     },
+
+    friendStatsText: {
+      color : 'green',
+      textDecorationLine: "underline",
+    },
+
+   
 
     scrollViewBis: {
       display: "flex",
