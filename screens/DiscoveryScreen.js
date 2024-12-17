@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { SafeAreaView, View, Text, Image, StyleSheet, ImageBackground, ScrollView } from 'react-native';
+import { SafeAreaView, View, Text, Image, StyleSheet, ImageBackground, ScrollView, TouchableOpacity} from 'react-native';
 import { useSelector } from 'react-redux';
 
 export default function DiscoveryScreen() {
@@ -60,21 +60,26 @@ export default function DiscoveryScreen() {
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        const response = await fetch(
-          `${process.env.EXPO_PUBLIC_BACKEND_URL}/`
-        );
+        const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getall`);
         if (!response.ok) {
           throw new Error('Failed to fetch users');
         }
         const data = await response.json();
-        // Mélange les users et sélectionne les 10 premiers
-        const shuffledUsers = data.results.sort(() => 0.5 - Math.random()).slice(0, 10);
-        setFriends(shuffledUsers);
+
+        const shuffledFriends = (data.friends || [])
+          .sort(() => 0.5 - Math.random()) 
+          .slice(0, 10) 
+          .map(friend => ({
+            id: friend._id,
+            username: friend.username.slice(0, 15) + (friend.username.length > 15 ? "..." : ""),
+            profilPicture: friend.profilPicture || require('../assets/avatar.png'),
+          }));
+        setFriends(shuffledFriends);
       } catch (error) {
         console.error('Error fetching users:', error);
       }
     };
-  
+
     fetchFriends();
   }, []);
 
@@ -84,8 +89,8 @@ export default function DiscoveryScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
+    <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
+      <SafeAreaView style={styles.safeArea}>
         <ScrollView vertical contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
           <View style={styles.headerContainer}>
             <Text style={styles.pageTitle}>Discovery</Text>
@@ -131,20 +136,20 @@ export default function DiscoveryScreen() {
           <View>
             <Text style={styles.title}>Je pourrais connaitre</Text>
             <View style={styles.encadrer}>
-            {friends.map((friend) => (
-              <View key={friend.id} style={styles.friendItem}>
-                <Image style={styles.friendsAvatars} source={{ uri: friend.avatar }} />
-                <Text style={styles.friendsPseudo}>{friend.username}</Text>
-                <TouchableOpacity onPress={() => addFriend(friend.id)} style={styles.addButton}>
-                  <FontAwesome name="plus" size={20} color="#7A28CB" />
-                </TouchableOpacity>
-              </View>
-            ))}
+              {friends.map((friend) => (
+                <View key={friend.id} style={styles.friendItem}>
+                  <Image style={styles.friendsAvatars} source={{ uri: friend.profilPicture }} defaultSource={require('../assets/avatar.png')}/>
+                  <Text style={styles.friendsPseudo}>{friend.username}</Text>
+                  <TouchableOpacity onPress={() => addFriend(friend.id)} style={styles.addButton}>
+                    <FontAwesome name="plus" size={20} color="#7A28CB" />
+                  </TouchableOpacity>
+                </View>
+              ))}
             </View>
           </View>
         </ScrollView>
-      </ImageBackground>
-    </SafeAreaView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
