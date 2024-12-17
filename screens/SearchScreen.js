@@ -126,7 +126,7 @@ const fetchgames = async (query) => {
      let searchButton;
      let searchBar;
 
-     if (search === 'game') {
+     if (search === 'game' && CurrentUsername) {
        searchButton = (
          <View style={styles.searchcont}>
            <TouchableOpacity style={styles.searchOn} onPress={() => setSearch('game')}>
@@ -168,11 +168,11 @@ const fetchgames = async (query) => {
             </View>
        )
 
-     } else if (search === 'user') {
+     } else if (search === 'user' && CurrentUsername) {
        searchButton = (
          <View style={styles.searchcont}>
            <TouchableOpacity style={styles.searchOff} onPress={() => setSearch('game')}>
-             <Text>Game</Text>
+             <Text>Game</Text> 
            </TouchableOpacity>
            <TouchableOpacity style={styles.searchOn} onPress={() => setSearch('user')}>
              <Text>User</Text>
@@ -209,6 +209,37 @@ const fetchgames = async (query) => {
           </View> 
           </View>
        )
+     } else {
+      searchBar = (
+       <View style={styles.searchContainer}>
+         <TextInput
+           style={styles.input} 
+           onChangeText={(value) => handleinput(value)}
+           value={gameName}
+           placeholder='Search for a Game'
+           returnKeyType='search'
+           onSubmitEditing={(gameName) => handlesubmit(gameName)}
+           placeholderTextColor="black"
+         />
+         <View style={styles.suggestiontcontainer}>
+         {loadingRace && <Text>Chargement...</Text>}
+         {suggestionGame.length > 0 && (
+           <FlatList
+             data={suggestionGame}
+             keyExtractor={(item, index) => `${item._id}-${index}`}
+             renderItem={({ item }) => (
+               <TouchableOpacity
+                 style={styles.suggestionItem}
+                 onPress={() => handleSuggestionGame(item.name)}
+               >
+                 <Text style={styles.suggestionText}>{item.name}</Text>
+               </TouchableOpacity>
+             )}
+           /> )}   
+           {error && <Text style={styles.errorText}>{error}</Text>}     
+           </View> 
+           </View>
+      )
      }
 
 

@@ -29,7 +29,27 @@ export default function GamesScreen({navigation, route}) {
     const [personalNote, setPersonalNote] = useState(0);
     const [writtencontent, setWrittentContent]= useState('')
     const [gamereview, setGameReview] = useState([])
+    const [heartLiked, setHeartLiked] = useState(false);
+    const [myReviews, setMyReviews] = useState([]);
     //console.log(`game : ${gameName}`)
+
+    function fetchMyReview() {
+
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/byuser/${user.username}`)
+      .then(result => result.json())
+      .then(data => {
+        console.log("data de mes reviews", data.ratings.ratingsID)
+      
+        const theGameReview = data.ratings.filter(((e) => e.game.name == gameName))
+        
+        setMyReviews(theGameReview);
+      
+      })
+    }
+
+    function fetchMyFriendsReviews() {
+      
+    }
 
     const toggleVisibility = () => {
       setVisibility((previous) => !previous);
@@ -79,13 +99,42 @@ export default function GamesScreen({navigation, route}) {
       //console.log(doc.ratings)
       setGameReview( [... gamereview, doc.ratings] );
       setReview(false)
+      fetchMyReview();
     }
   }
   )}
 
+  function likeOrDislikeAReview(reviewId) {
+    setHeartLiked(!heartLiked);
+    console.log("changement de like")
+    
+    
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/likeOrDislikeAReview`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        ratingId : reviewId, 
+        userId: user.userId
+      })
+    }).then(() => {
+      fetchMyReview();
+    })
+    
 
-   const myreview = gamereview.map((data, i)=> {
+  }
+
+  console.log("log du gamereview", gamereview)
+
+   const myreview = myReviews.map((data, i)=> {
+
     const mynotestars = []; 
+
+    let isLiked = "heart-o"
+
+    if (heartLiked == true) {
+      isLiked = "heart"
+    }
+
 for (let i = 0; i < 5; i++) {
     let style = "star-o";
     if (i < data.note+1) {
@@ -93,12 +142,19 @@ for (let i = 0; i < 5; i++) {
     }
     mynotestars.push(<FontAwesome key={i} name={style} color="#f1c40f" size={15}/>);
   }
+
     return(
       <View key={i} style = {styles.friendsReviews}>
       <View style={styles.picanduseandreview}> 
       <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
       <View style={styles.useandreview}>
-      <Text style={styles.friendsPseudo}>@{user.username}</Text>
+        <View style={styles.userandlike}>
+          <Text style={styles.friendsPseudo}>@{user.username}</Text>
+          <View style={styles.heartAndlikeCounter}>
+              <FontAwesome name={isLiked} style={styles.heartIcon} size={15} onPress={() => likeOrDislikeAReview(data._id)} />
+              <Text>({data.likesNumber.length})</Text>
+          </View>
+        </View>
       <View style={styles.starsContainer2}>
            {mynotestars}
           <Text style ={styles.votecount2}>{data.note}</Text>
@@ -113,6 +169,8 @@ for (let i = 0; i < 5; i++) {
    })
 
       useEffect(() => {
+
+        //fetch le jeu
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/byname`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -127,7 +185,23 @@ for (let i = 0; i < 5; i++) {
             if (summary.length > 100){
             setsummary(summary.slice(100))}
           })
-      }, []);
+
+//fetch mes reviews
+
+
+fetchMyReview();
+
+
+
+
+// fetch les reviews de mes amis
+
+fetchMyFriendsReviews();
+
+
+}, []);
+
+console.log("my review useStatées", myReviews)
      
     const summaryToHTML = gamesinfo.summary
    // console.log(gamesinfo.summary)
@@ -175,241 +249,344 @@ for (let i = 0; i < 5; i++) {
     mynotestars.push(<FontAwesome key={i} name={style} color="#f1c40f" size={40}/>);
   }
 
+  let pageContent= <View style={styles.centered}>
+  <View style={styles.bgpicture}>
+  <LinearGradient
+  // Background Linear Gradient
+  colors={['rgba(122,40,203,1)', 'rgba(51,202,127,0.4)']}
+  style={styles.gradient}
+>
+  <SafeAreaView style ={styles.Imgview}> 
+  <View style={styles.backbutton}>
+  <FontAwesome name="chevron-left" color="white" size={25} style={styles.icon} onPress={() => navigation.goBack()} />
+  </View>       
+   <Image style={styles.jaquette} source={{uri : gamesinfo.cover}} />
+   <View style={styles.backbutton}>
+  <FontAwesome name="ellipsis-h" color="white" style={styles.icon} size={25} 
+  // onPress={() => navigation.goBack()} 
+  />
+  </View>       
+  </SafeAreaView>
+</LinearGradient>
+  </View>
+  <View style={styles.general}>
+  <ScrollView style= {styles.scroll} 
+  //</View>onContentSizeChange={(1000, 1000)}
+  >
+   <View style ={styles.downside}>
+  <Text style={styles.title}>{gamesinfo.name}</Text>
+  <Text style={styles.date}>{gamesinfo.releaseDate}</Text>
+  <View style={styles.line}></View>
+  <View style={styles.starsContainer}>
+       {stars}
+       <Text style ={styles.votecount}>3,5</Text>
+   </View>
+   <View style={styles.topbutton}>
+      <TouchableOpacity style={styles.greenbutton} 
+      onPress={() => setModalVisible(true)}>
+          <Text style={styles.buttontext}>add to list</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.greenbutton}
+      onPress={()=> setReview(true)}
+      >
+          <Text style={styles.buttontext}>Write a review</Text>
+      </TouchableOpacity>
+   </View>
+   <Text style ={styles.summary}>
+          Summary
+  </Text>
+   <ScrollView style={styles.resumebox}>
+      <HTMLView
+      value={summaryToHTML}
+      stylesheet={styles.resume}
+  />
+   </ScrollView>
+    <SafeAreaView style={styles.container}>
+    <Text style ={styles.summary}>
+          Reviews
+  </Text>
+  <Text style ={styles.summary}>
+         My review
+  </Text>
+      {myreview}
+<TouchableOpacity onPress={toggleVisibility} style={styles.container2}>
+  <Text>My friend's reviews</Text>
+  <FontAwesome name='caret-down' color="black" size={20}/>
+</TouchableOpacity>
+
+<Collapsible isVisible={isVisible}>
+  <View style = {styles.friendsReviews}>
+  <View style={styles.picanduseandreview}> 
+  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+  <View style={styles.useandreview}>
+  <Text style={styles.friendsPseudo}>@monami</Text>
+  <View style={styles.starsContainer2}>
+       {stars2}
+      <Text style ={styles.votecount2}>3,5</Text>
+  </View> 
+  </View>
+  </View>   
+  <View style={styles.comment}>
+      <Text>That is my favorite game i would 100% recommend it</Text>
+  </View>
+  </View>
+  <View style = {styles.friendsReviews}>
+  <View style={styles.picanduseandreview}> 
+  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+  <View style={styles.useandreview}>
+  <Text style={styles.friendsPseudo}>@monami</Text>
+  <View style={styles.starsContainer2}>
+       {stars2}
+      <Text style ={styles.votecount2}>3,5</Text>
+  </View> 
+  </View>
+  </View>   
+  <View style={styles.comment}>
+      <Text>That is my favorite game i would 100% recommend it</Text>
+  </View>
+  </View>
+</Collapsible>
+
+
+
+<TouchableOpacity onPress={toggleVisibility2} style={styles.container2}>
+  <Text style = {styles.collapsedname}>Most liked reviews</Text>
+  <FontAwesome name={icon2} color="black" size={20}/>
+</TouchableOpacity>
+<Collapsible isVisible={isVisible2}>
+
+  <View style = {styles.friendsReviews}>
+  <View style={styles.picanduseandreview}> 
+  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+  <View style={styles.useandreview}>
+  <Text style={styles.friendsPseudo}>@monami</Text>
+  <View style={styles.starsContainer2}>
+       {stars2}
+      <Text style ={styles.votecount2}>3,5</Text>
+  </View> 
+  </View>
+  </View>   
+  <View style={styles.comment}>
+      <Text>That is my favorite game i would 100% recommend it</Text>
+  </View>
+  </View>
+
+  <View style = {styles.friendsReviews}>
+  <View style={styles.picanduseandreview}> 
+  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+  <View style={styles.useandreview}>
+  <Text style={styles.friendsPseudo}>@monami</Text>
+  <View style={styles.starsContainer2}>
+       {stars2}
+      <Text style ={styles.votecount2}>3,5</Text>
+  </View> 
+  </View>
+  </View>   
+  <View style={styles.comment}>
+      <Text>That is my favorite game i would 100% recommend it</Text>
+  </View>
+  </View>
+
+</Collapsible>
+</SafeAreaView>
+   </View> 
+   <View style ={styles.footer}>
+  </View>  
+  </ScrollView>
+  </View>
+
+
+  <Modal
+      transparent={true}
+      visible={modalVisible}
+      onRequestClose={() => {
+        Alert.alert('Modal has been closed.');
+        setModalVisible(!modalVisible);
+      }}
+    >
+      <View style={styles.modalBackground}>
+        <View style={styles.modalContainer}>
+        <View style={styles.backbutton}>
+        <FontAwesome 
+          name="times"
+          color="#7A28CB" 
+          size={25} 
+          onPress={() => setModalVisible(false)} 
+        />
+      </View> 
+          <ScrollView style={styles.scroll2}>
+            {lists}  
+          </ScrollView>  
+        </View>
+    </View> 
+    </Modal>
+
+    <Modal
+      transparent={true}
+      visible={message}
+    >
+      <View style={styles.modalBackground}>
+        <View style={styles.modalContainer}>
+        <View style={styles.backbutton}>
+        <FontAwesome 
+          name="times"
+          color="#7A28CB" 
+          size={25} 
+          onPress={() => setmessage(false)} 
+        />
+      </View> 
+         <Text>Votre jeux a bien été ajoutéé</Text>
+        </View>
+    </View> 
+    </Modal>
+
+    <Modal
+      transparent={true}
+      visible={review}
+      onRequestClose={() => {
+        Alert.alert('Modal has been closed.');
+        setReview(!review);
+      }}
+    >
+      <View style={styles.modalBackground}>
+        <View style={styles.modalContainer3}>
+        <View style={styles.backbutton}>
+        <FontAwesome 
+          name="times"
+          color="#7A28CB" 
+          size={25} 
+          onPress={() => setReview(false)} 
+        />
+      </View> 
+        <View style ={styles.scrollcont}>
+         <ScrollView style={styles.reviewcont}>
+           <View style={styles.starsContainer}>
+             {personalStars}
+          </View>
+          <View style={styles.reviewinputcont}>
+          <TextInput style={styles.reviewinput}
+            placeholder='my review'
+            enterKeyHint='send'
+            onChangeText={(value) => setWrittentContent(value)}
+            value={writtencontent}
+            onSubmitEditing={()=> handlesubmit()}   
+            >
+            </TextInput>
+          </View>
+         </ScrollView>
+         </View>
+         <View>
+
+         </View>
+        </View>
+    </View> 
+    </Modal>
+</View>
+
+
+
+// if user is not logged in : 
+
+  if (!user.username){
+    pageContent = <View style={styles.centered}>
+    <View style={styles.bgpicture}>
+    <LinearGradient
+    // Background Linear Gradient
+    colors={['rgba(122,40,203,1)', 'rgba(51,202,127,0.4)']}
+    style={styles.gradient}
+  >
+    <SafeAreaView style ={styles.Imgview}> 
+    <View style={styles.backbutton}>
+    <FontAwesome name="chevron-left" color="white" size={25} style={styles.icon} onPress={() => navigation.goBack()} />
+    </View>       
+     <Image style={styles.jaquette} source={{uri : gamesinfo.cover}} />
+     <View style={styles.backbutton}>
+    <FontAwesome name="ellipsis-h" color="white" style={styles.icon} size={25} 
+    // onPress={() => navigation.goBack()} 
+    />
+    </View>       
+    </SafeAreaView>
+  </LinearGradient>
+    </View>
+    <View style={styles.general}>
+    <ScrollView style= {styles.scroll} 
+    //</View>onContentSizeChange={(1000, 1000)}
+    >
+     <View style ={styles.downside}>
+    <Text style={styles.title}>{gamesinfo.name}</Text>
+    <Text style={styles.date}>{gamesinfo.releaseDate}</Text>
+    <View style={styles.line}></View>
+    <View style={styles.starsContainer}>
+         {stars}
+         <Text style ={styles.votecount}>3,5</Text>
+     </View>
+
+     <Text style ={styles.summary}>
+            Summary
+    </Text>
+     <ScrollView style={styles.resumebox}>
+        <HTMLView
+        value={summaryToHTML}
+        stylesheet={styles.resume}
+    />
+     </ScrollView>
+      <SafeAreaView style={styles.container}>
+      <Text style ={styles.summary}>
+            Reviews
+    </Text>
+
+  <TouchableOpacity onPress={toggleVisibility2} style={styles.container2}>
+    <Text style = {styles.collapsedname}>Most liked reviews</Text>
+    <FontAwesome name={icon2} color="black" size={20}/>
+  </TouchableOpacity>
+  <Collapsible isVisible={isVisible2}>
+
+    <View style = {styles.friendsReviews}>
+    <View style={styles.picanduseandreview}> 
+    <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+    <View style={styles.useandreview}>
+    <Text style={styles.friendsPseudo}>@monami</Text>
+    <View style={styles.starsContainer2}>
+         {stars2}
+        <Text style ={styles.votecount2}>3,5</Text>
+    </View> 
+    </View>
+    </View>   
+    <View style={styles.comment}>
+        <Text>That is my favorite game i would 100% recommend it</Text>
+    </View>
+    </View>
+
+    <View style = {styles.friendsReviews}>
+    <View style={styles.picanduseandreview}> 
+    <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+    <View style={styles.useandreview}>
+    <Text style={styles.friendsPseudo}>@monami</Text>
+    <View style={styles.starsContainer2}>
+         {stars2}
+        <Text style ={styles.votecount2}>3,5</Text>
+    </View> 
+    </View>
+    </View>   
+    <View style={styles.comment}>
+        <Text>That is my favorite game i would 100% recommend it</Text>
+    </View>
+    </View>
+
+  </Collapsible>
+</SafeAreaView>
+     </View> 
+     <View style ={styles.footer}>
+    </View> 
+    </ScrollView>
+    </View>
+    </View>
+  }
 
   return (
-    <View style={styles.centered}>
-        <View style={styles.bgpicture}>
-        <LinearGradient
-        // Background Linear Gradient
-        colors={['rgba(122,40,203,1)', 'rgba(51,202,127,0.4)']}
-        style={styles.gradient}
-      >
-        <SafeAreaView style ={styles.Imgview}> 
-        <View style={styles.backbutton}>
-        <FontAwesome name="chevron-left" color="white" size={25} style={styles.icon} onPress={() => navigation.goBack()} />
-        </View>       
-         <Image style={styles.jaquette} source={{uri : gamesinfo.cover}} />
-         <View style={styles.backbutton}>
-        <FontAwesome name="ellipsis-h" color="white" style={styles.icon} size={25} 
-        // onPress={() => navigation.goBack()} 
-        />
-        </View>       
-        </SafeAreaView>
-      </LinearGradient>
-        </View>
-        <View style={styles.general}>
-        <ScrollView style= {styles.scroll} 
-        //</View>onContentSizeChange={(1000, 1000)}
-        >
-         <View style ={styles.downside}>
-        <Text style={styles.title}>{gamesinfo.name}</Text>
-        <Text style={styles.date}>{gamesinfo.releaseDate}</Text>
-        <View style={styles.line}></View>
-        <View style={styles.starsContainer}>
-             {stars}
-             <Text style ={styles.votecount}>3,5</Text>
-         </View>
-         <View style={styles.topbutton}>
-            <TouchableOpacity style={styles.greenbutton} 
-            onPress={() => setModalVisible(true)}>
-                <Text style={styles.buttontext}>add to list</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.greenbutton}
-            onPress={()=> setReview(true)}
-            >
-                <Text style={styles.buttontext}>Write a review</Text>
-            </TouchableOpacity>
-         </View>
-         <Text style ={styles.summary}>
-                Summary
-        </Text>
-         <ScrollView style={styles.resumebox}>
-            <HTMLView
-            value={summaryToHTML}
-            stylesheet={styles.resume}
-        />
-         </ScrollView>
-          <SafeAreaView style={styles.container}>
-          <Text style ={styles.summary}>
-                Reviews
-        </Text>
-        <Text style ={styles.summary}>
-               My review
-        </Text>
-            {myreview}
-      <TouchableOpacity onPress={toggleVisibility} style={styles.container2}>
-        <Text>My friend's reviews</Text>
-        <FontAwesome name='caret-down' color="black" size={20}/>
-      </TouchableOpacity>
-
-      <Collapsible isVisible={isVisible}>
-        <View style = {styles.friendsReviews}>
-        <View style={styles.picanduseandreview}> 
-        <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-        <View style={styles.useandreview}>
-        <Text style={styles.friendsPseudo}>@monami</Text>
-        <View style={styles.starsContainer2}>
-             {stars2}
-            <Text style ={styles.votecount2}>3,5</Text>
-        </View> 
-        </View>
-        </View>   
-        <View style={styles.comment}>
-            <Text>That is my favorite game i would 100% recommend it</Text>
-        </View>
-        </View>
-        <View style = {styles.friendsReviews}>
-        <View style={styles.picanduseandreview}> 
-        <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-        <View style={styles.useandreview}>
-        <Text style={styles.friendsPseudo}>@monami</Text>
-        <View style={styles.starsContainer2}>
-             {stars2}
-            <Text style ={styles.votecount2}>3,5</Text>
-        </View> 
-        </View>
-        </View>   
-        <View style={styles.comment}>
-            <Text>That is my favorite game i would 100% recommend it</Text>
-        </View>
-        </View>
-      </Collapsible>
-
-
-
-      <TouchableOpacity onPress={toggleVisibility2} style={styles.container2}>
-        <Text style = {styles.collapsedname}>Most liked reviews</Text>
-        <FontAwesome name={icon2} color="black" size={20}/>
-      </TouchableOpacity>
-      <Collapsible isVisible={isVisible2}>
-
-        <View style = {styles.friendsReviews}>
-        <View style={styles.picanduseandreview}> 
-        <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-        <View style={styles.useandreview}>
-        <Text style={styles.friendsPseudo}>@monami</Text>
-        <View style={styles.starsContainer2}>
-             {stars2}
-            <Text style ={styles.votecount2}>3,5</Text>
-        </View> 
-        </View>
-        </View>   
-        <View style={styles.comment}>
-            <Text>That is my favorite game i would 100% recommend it</Text>
-        </View>
-        </View>
-
-        <View style = {styles.friendsReviews}>
-        <View style={styles.picanduseandreview}> 
-        <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-        <View style={styles.useandreview}>
-        <Text style={styles.friendsPseudo}>@monami</Text>
-        <View style={styles.starsContainer2}>
-             {stars2}
-            <Text style ={styles.votecount2}>3,5</Text>
-        </View> 
-        </View>
-        </View>   
-        <View style={styles.comment}>
-            <Text>That is my favorite game i would 100% recommend it</Text>
-        </View>
-        </View>
-
-      </Collapsible>
-    </SafeAreaView>
-         </View> 
-         <View style ={styles.footer}>
-        </View>  
-        </ScrollView>
-        </View>
-
-
-        <Modal
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-              setModalVisible(!modalVisible);
-            }}
-          >
-            <View style={styles.modalBackground}>
-              <View style={styles.modalContainer}>
-              <View style={styles.backbutton}>
-              <FontAwesome 
-                name="times"
-                color="#7A28CB" 
-                size={25} 
-                onPress={() => setModalVisible(false)} 
-              />
-            </View> 
-                <ScrollView style={styles.scroll2}>
-                  {lists}  
-                </ScrollView>  
-              </View>
-          </View> 
-          </Modal>
-
-          <Modal
-            transparent={true}
-            visible={message}
-          >
-            <View style={styles.modalBackground}>
-              <View style={styles.modalContainer}>
-              <View style={styles.backbutton}>
-              <FontAwesome 
-                name="times"
-                color="#7A28CB" 
-                size={25} 
-                onPress={() => setmessage(false)} 
-              />
-            </View> 
-               <Text>Votre jeux a bien été ajoutéé</Text>
-              </View>
-          </View> 
-          </Modal>
-
-          <Modal
-            transparent={true}
-            visible={review}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-              setReview(!review);
-            }}
-          >
-            <View style={styles.modalBackground}>
-              <View style={styles.modalContainer3}>
-              <View style={styles.backbutton}>
-              <FontAwesome 
-                name="times"
-                color="#7A28CB" 
-                size={25} 
-                onPress={() => setReview(false)} 
-              />
-            </View> 
-              <View style ={styles.scrollcont}>
-               <ScrollView style={styles.reviewcont}>
-                 <View style={styles.starsContainer}>
-                   {personalStars}
-                </View>
-                <View style={styles.reviewinputcont}>
-                <TextInput style={styles.reviewinput}
-                  placeholder='my review'
-                  enterKeyHint='send'
-                  onChangeText={(value) => setWrittentContent(value)}
-                  value={writtencontent}
-                  onSubmitEditing={()=> handlesubmit()}   
-                  >
-                  </TextInput>
-                </View>
-               </ScrollView>
-               </View>
-               <View>
-
-               </View>
-              </View>
-          </View> 
-          </Modal>
-    </View>
+    <>
+    {pageContent}
+    </>
   );
 }
 
@@ -718,5 +895,24 @@ const styles = StyleSheet.create({
         width:'100%', 
         alignItems:'center', 
         justifyContent:'center',
+      },
+      heartIcon: {
+        color: "red",
+        paddingRight: 2,
+      },
+      userandlike: {
+        width: 250,
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+      },
+      heartAndlikeCounter: {
+        display: "flex",
+        flexDirection: "row",
+        alignContent: "center",
+        justifyContent: "center",
+
+
       }
   });

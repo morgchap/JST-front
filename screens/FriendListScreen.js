@@ -26,6 +26,11 @@ export default function FriendListScreen({ navigation, route }) {
     const { userFriendList } = route.params;
     const [numberOfFriends, setNumberOfFriends] = useState(123);
     const [friendList, setFriendList] = useState([]);
+    const [gotPP, setGotPP] = useState(false) 
+    const [profilePicture, setProfilePicture] = useState(null); 
+    const [friendPP, setFriendPP] = useState(false);
+    const [friendProfilePicture, setFriendProfilePicture] = useState(null);
+
 
 
 
@@ -46,11 +51,16 @@ export default function FriendListScreen({ navigation, route }) {
           console.log("last data", data);
 
           setFriendList(data.infos.friendsList);
+
+          if (data.infos.profilePicture) {
+            setProfilePicture(data.infos.profilePicture);
+            setGotPP(true)
+            } 
     
 
           return data
         })
-      }, [])
+      }, [userFriendList])
 
       console.log("state friendlist à exploiter", friendList);
 
@@ -59,6 +69,12 @@ export default function FriendListScreen({ navigation, route }) {
     
     const friendListContent = friendList.map((data, i) => {
 
+      let fpp = <Image style={styles.friendsAvatars} source={require("../assets/avatar.png")} />;
+
+      if (data.profilePicture) {
+         fpp = <Image style={styles.friendsAvatars} source={{uri: data.profilePicture}}/>
+        }
+
         return (
           <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
             navigation.navigate("Friend", {friendName : data.username});
@@ -66,7 +82,7 @@ export default function FriendListScreen({ navigation, route }) {
             
             
             }}>
-            <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+            {fpp}
             <Text style={styles.friendsPseudoBis}>@{data.username}</Text>
             <View style={styles.iconContainer}>
             </View>
@@ -82,10 +98,13 @@ export default function FriendListScreen({ navigation, route }) {
                 <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
             </View>
             <View style={styles.me}>
-                <Image style={styles.avatar} source={require("../assets/avatar.png")} />
+                 { gotPP ? (
+                                <Image style={styles.avatar} source={{uri: profilePicture}}/>) : (
+                                  <Image style={styles.avatar} source={require("../assets/avatar.png")} />
+                                )}
                 <Text style={styles.pseudo}>@{userFriendList}</Text>
             </View>
-            <Text style={styles.titleFriendList}>Liste d'amis ({numberOfFriends})</Text>
+            <Text style={styles.titleFriendList}>Liste d'amis ({friendList.length})</Text>
             <View style={styles.friendListContainer}>
                 
                 {friendListContent}

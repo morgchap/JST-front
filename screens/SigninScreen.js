@@ -31,7 +31,7 @@ const handlesignin = () => {
         //console.log(data);
         setUsername('')
         setpassword('')
-        dispatch(updateUsername({username: username, token:data.token}));
+        dispatch(updateUsername({username: username, token:data.token, userId: data.userId}));
         //console.log(`username:${username} and reducers:${CurrentUsername}`)
         navigation.navigate('TabNavigator')
     } else {

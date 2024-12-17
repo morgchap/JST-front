@@ -8,7 +8,8 @@ import {
     ImageBackground,
     Modal,
     TextInput,
-    Switch
+    Switch, 
+    Pressable
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useState, useEffect } from 'react';
@@ -171,30 +172,56 @@ export default function ListsScreen({ navigation }) {
         )
     })
 
-  return (
-    <View style={styles.centered}>
-        <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
-            <View style={styles.headIcons}>
-                <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
-                <Text style={styles.topText}>Your lists</Text>
-                <FontAwesome name="cog" color="#7A28CB" size={25} onPress={() => navigation.navigate("Setup")}/>
+    let pageContent =  <View style={styles.centered}>
+    <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
+        <View style={styles.headIcons}>
+            <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
+            <Text style={styles.topText}>Your lists</Text>
+            <FontAwesome name="cog" color="#7A28CB" size={25} onPress={() => navigation.navigate("Setup")}/>
+        </View>
+        <View style={styles.body}>
+            <View style={styles.lists}>
+                <ScrollView>
+                    {games}
+                </ScrollView>
             </View>
-            <View style={styles.body}>
-                <View style={styles.lists}>
-                    <ScrollView>
-                        {games}
+            <View>
+                <TouchableOpacity style={styles.button} onPress={() => handleAddListButton()} activeOpacity={0.8}>
+                    <Text style={styles.textButton} >Add list</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+
+    <Modal
+        transparent={true}
+        visible={modal}
+    >
+        <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+                <View style={styles.backbutton}>
+                    <FontAwesome 
+                        name="times"
+                        color="#7A28CB" 
+                        size={25} 
+                        onPress={() => setModal(false)} 
+                    />
+                </View>
+                <View style={styles.gameContainer}>
+                    <ScrollView horizontal={true}>
+                        {game}
                     </ScrollView>
                 </View>
-                <View>
-                    <TouchableOpacity style={styles.button} onPress={() => handleAddListButton()} activeOpacity={0.8}>
-                        <Text style={styles.textButton} >Add list</Text>
-                    </TouchableOpacity>
-                </View>
             </View>
-    
+        </View> 
+    </Modal>
+
         <Modal
             transparent={true}
-            visible={modal}
+            visible={modalVisible}
+            onRequestClose={() => {
+                /* Alert.alert('Modal has been closed.'); */
+                setModalVisible(!modalVisible);
+            }}
         >
             <View style={styles.modalBackgroundList}>
                 <ImageBackground 
@@ -272,6 +299,26 @@ export default function ListsScreen({ navigation }) {
 
         </ImageBackground>
     </View>
+
+if (!user.username){
+    pageContent = 
+    <View style={styles.divLoggedout}>
+      <Text>
+        Create an account or log in to access the list
+      </Text>
+      <TouchableOpacity style={styles.buttonloggedout} onPress={()=> navigation.navigate('Login')}>
+        <Text>
+          Take me to login
+        </Text>
+      </TouchableOpacity>
+    </View>
+  
+    }
+
+return (
+<>
+{pageContent}
+</>
   );
 }
 
@@ -472,4 +519,18 @@ const styles = StyleSheet.create({
         width: 20,
         alignItems: "flex-end",
       },
+      divLoggedout:{
+        flex:1,
+        alignItems:'center', 
+        justifyContent:'center',
+        backgroundColor:'#D6CBFD'
+      }, 
+      buttonloggedout:{
+        // borderColor:'black', 
+        // borderWidth:1,
+        padding:'2%',
+        marginTop:'3%',
+        backgroundColor:'white',
+        borderRadius:5
+      }
 });
