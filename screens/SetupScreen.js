@@ -46,6 +46,8 @@ export default function SetupScreen({ navigation }) {
     const [newEmail, setNewEmail] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [email, setEmail] = useState("");
+    const [gotPP, setGotPP] = useState(false) 
+    const [profilePicture, setProfilePicture] = useState(null);
 
   function updateMyUsername(myNewUsername) {
 
@@ -117,7 +119,7 @@ export default function SetupScreen({ navigation }) {
 
         console.log("ça marche");
     
-        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/${user.username}`)
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`)
         .then(result => result.json())
         .then(data => {
           console.log("c'est le front!", data.infos)
@@ -125,6 +127,11 @@ export default function SetupScreen({ navigation }) {
           setEmail(data.infos.email)
 
           console.log("email: ", email);
+
+          if (data.infos.profilePicture) {
+            setProfilePicture(data.infos.profilePicture);
+            setGotPP(true)
+            } 
     
         
       
@@ -134,22 +141,42 @@ export default function SetupScreen({ navigation }) {
       })
   }, [])
 
-
+  console.log("reducer de la page setup", user)
 
   return (
     <View style={styles.centered}>
+      <ScrollView style={styles.scrollContainer}>
     <View style={styles.headIcons}>
     <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
     </View>
     <View style={styles.me}>
-      <Image style={styles.avatar} source={require("../assets/avatar.png")} />
+      { gotPP ? (
+              <Image style={styles.avatar} source={{uri: profilePicture}}/>) : (
+                <Image style={styles.avatar} source={require("../assets/avatar.png")} />
+              )}
       <Text style={styles.pseudo}>@{changedUsername}</Text>
     </View>
+    <View style={styles.logoutView}>
+                    <TouchableOpacity style={styles.logoutButton} onPress={() => {
+                        updateUser("");
+                        navigation.navigate("Profil");
+                        
+                        }} >
+                        <Text style={styles.logoutText}>Logout</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.logoutButton} onPress={() => {
+                        navigation.navigate("ProfilePicture2");
+                        
+                        }} >
+                        <Text style={styles.logoutText}>Modify my profile picture</Text>
+                    </TouchableOpacity>
+                </View>
     
     <View style={styles.infoDiv}>
       <View style={styles.myInformations}>
+      
           <Text style={styles.secondTitles}>Mes informations</Text>
-            <View> 
+            <View style={styles.randomView}> 
                 <View style={styles.inputView}>
                     <Text style={styles.infoText}>Your pseudo : @{changedUsername}</Text>
                     <View style={styles.inputSaved}>
@@ -177,20 +204,12 @@ export default function SetupScreen({ navigation }) {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={styles.logoutView}>
-                    <TouchableOpacity style={styles.logoutButton} onPress={() => {
-                        updateUser("");
-                        navigation.navigate("Login");
-                        
-                        }} >
-                        <Text style={styles.logoutText}>Logout</Text>
-                    </TouchableOpacity>
-                </View>
+            
             </View>
       </View>
     </View>
     
-      
+    </ScrollView>
   </View>
   );
 }
@@ -216,14 +235,17 @@ centered: {
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
+    paddingBottom: 30,
+  
 
   },
   avatar: {
     borderRadius: 50,
     height: 100,
     width: 100,
-    paddingBottom: 1
+    paddingBottom: 1,
+    borderColor: "#7A28CB",
+    borderWidth: 3,
   },
   pseudo: {
     fontSize: 20,
@@ -258,7 +280,7 @@ centered: {
     alignItems: "center",
     paddingBottom: 10,
     borderRadius: 10,
-    marginBottom: 300,
+    marginBottom: 200,
 
   
   },
@@ -273,23 +295,7 @@ centered: {
     paddingTop: 15,
     paddingBottom: 20,
   },
-  
-  infoListView: {
-    display: "flex",
-    flexDirection: "column",
-    marginHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-   
-  },
-  infoList: {
-    flexGrow: 1,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
 
-  },
   inputStyle: {
         height: 40, 
         width: 200,
@@ -362,6 +368,7 @@ centered: {
       padding: 20,
       borderRadius: 10,
       margin: 10,
+
   },
   inputSaved: {
     display: "flex",
@@ -369,20 +376,23 @@ centered: {
     justifyContent: "center",
     alignItems: "center",
   },
+
   logoutView: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    alignItems: "center",
 
   },
 
   logoutButton: {
     borderRadius: 10,
-    height: 35,
-    width: 70,
+    height: 50,
+    width: 150,
     backgroundColor: '#7A28CB',
     justifyContent: "center",
     alignItems: "center",
+    marginHorizontal: 20,
 
   },
 
@@ -391,7 +401,11 @@ centered: {
     fontWeight: "bold",
     marginHorizontal: 10,
     justifyContent: "center",
-    alignItems: "center",
+    textAlign: "center",
+  },
+  scrollContainer: {
+  },
+  randomView: {
   }
   
   

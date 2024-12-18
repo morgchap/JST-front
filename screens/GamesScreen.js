@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image, SafeAreaView, KeyboardAvoidingView, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
+import { Text, View, StyleSheet, Image, SafeAreaView, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -31,6 +31,7 @@ export default function GamesScreen({navigation, route}) {
     const [gamereview, setGameReview] = useState([])
     const [heartLiked, setHeartLiked] = useState(false);
     const [myReviews, setMyReviews] = useState([]);
+    const [likedMyReviews, setLikedMyReviews] = useState({});
     //console.log(`game : ${gameName}`)
 
     function fetchMyReview() {
@@ -38,7 +39,12 @@ export default function GamesScreen({navigation, route}) {
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/byuser/${user.username}`)
       .then(result => result.json())
       .then(data => {
+<<<<<<< HEAD
         //console.log("data de mes reviews", data.ratings.ratingsID)
+=======
+        //console.log("data de mes reviews", data.ratings)
+        //console.log("nombre de likes", data.ratings.likesNumber)
+>>>>>>> d80f1f843216ecf9d2be8fe1fdb9f966605d292d
       
         const theGameReview = data.ratings.filter(((e) => e.game.name == gameName))
         
@@ -88,6 +94,7 @@ export default function GamesScreen({navigation, route}) {
     }
       
    const  handlesubmit = () => {
+    console.log('ok')
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/newreview`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -106,7 +113,16 @@ export default function GamesScreen({navigation, route}) {
 
   function likeOrDislikeAReview(reviewId) {
     setHeartLiked(!heartLiked);
+<<<<<<< HEAD
     //console.log("changement de like")
+=======
+
+    //console.log("changement de like")
+    setLikedMyReviews(prevState => ({
+      ...prevState,
+      [reviewId]: !prevState[reviewId],
+    }));
+>>>>>>> d80f1f843216ecf9d2be8fe1fdb9f966605d292d
     
     
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/likeOrDislikeAReview`, {
@@ -129,11 +145,7 @@ export default function GamesScreen({navigation, route}) {
 
     const mynotestars = []; 
 
-    let isLiked = "heart-o"
-
-    if (heartLiked == true) {
-      isLiked = "heart"
-    }
+    const isLiked = likedMyReviews[data._id] ? "heart" : "heart-o";
 
 for (let i = 0; i < 5; i++) {
     let style = "star-o";
@@ -151,7 +163,7 @@ for (let i = 0; i < 5; i++) {
         <View style={styles.userandlike}>
           <Text style={styles.friendsPseudo}>@{user.username}</Text>
           <View style={styles.heartAndlikeCounter}>
-              <FontAwesome name={isLiked} style={styles.heartIcon} size={15} onPress={() => likeOrDislikeAReview(data._id)} />
+              <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={15} onPress={() => likeOrDislikeAReview(data._id)} />
               <Text>({data.likesNumber.length})</Text>
           </View>
         </View>
@@ -167,8 +179,9 @@ for (let i = 0; i < 5; i++) {
       </View>
     )
    })
+   
 
-      useEffect(() => {
+useEffect(() => {
 
         // fetch the lists if it isn't already done elswhere
         if(user.lists.length === 0){
@@ -456,7 +469,7 @@ for (let i = 0; i < 5; i++) {
         setReview(!review);
       }}
     >
-      <View style={styles.modalBackground}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}  style={styles.modalBackground}>
         <View style={styles.modalContainer3}>
         <View style={styles.backbutton}>
         <FontAwesome 
@@ -468,26 +481,37 @@ for (let i = 0; i < 5; i++) {
       </View> 
         <View style ={styles.scrollcont}>
          <ScrollView style={styles.reviewcont}>
+          <Text>My note</Text>
            <View style={styles.starsContainer}>
              {personalStars}
           </View>
           <View style={styles.reviewinputcont}>
           <TextInput style={styles.reviewinput}
             placeholder='my review'
-            enterKeyHint='send'
+            placeholderTextColor={'grey'}
+            maxLength='100'
+            multiline={true}
+            enterKeyHint='return'
             onChangeText={(value) => setWrittentContent(value)}
             value={writtencontent}
-            onSubmitEditing={()=> handlesubmit()}   
+            //onSubmitEditing={()=> handlesubmit()}   
             >
             </TextInput>
           </View>
          </ScrollView>
+         <View style ={styles.scrollcont}>
+            <TouchableOpacity style={styles.submitbutton} onPress={()=> handlesubmit()}>
+              <Text style={styles.buttontext2}>
+                Submit my review
+              </Text>
+            </TouchableOpacity>
+          </View>
          </View>
          <View>
 
          </View>
         </View>
-    </View> 
+    </KeyboardAvoidingView> 
     </Modal>
 </View>
 
@@ -664,6 +688,7 @@ const styles = StyleSheet.create({
         alignItems:'center',
         justifyContent:'center',
         paddingTop: 5,
+        paddingBottom:10
       },
       starsContainer2: {
         // borderColor:'black', 
@@ -858,10 +883,11 @@ const styles = StyleSheet.create({
         alignContent:'center',
       }, 
       reviewcont:{
-        borderColor:'#7A28CB', 
-        borderWidth:1,
+        // borderColor:'#7A28CB', 
+        // borderWidth:1,
         width:'100%',
-        height:'90%',
+        height:'70%',
+        padding:4
       }, 
       modalContainer3:{
         width: '80%',
@@ -877,9 +903,12 @@ const styles = StyleSheet.create({
         backgroundColor:'#F0F0F0',
         height:'80%',
         padding:5,
+        margintop:10
       }, 
       reviewinputcont:{
         marginHorizontal:5,
+        // borderWidth:1, 
+        // borderColor:'black,'
       }, 
       greenbutton2:{
         borderColor:'#33CA7F', 
@@ -921,6 +950,17 @@ const styles = StyleSheet.create({
         alignContent: "center",
         justifyContent: "center",
 
-
+      }, 
+      submitbutton:{
+        borderWidth:1, 
+        borderColor:'#33CA7F',
+        alignItems:'center', 
+        justifyContent:'center',
+        width:'50%',
+        borderRadius:5,
+        backgroundColor:'#D4FDC6',
+      }, 
+      buttontext2:{
+        padding:6
       }
   });

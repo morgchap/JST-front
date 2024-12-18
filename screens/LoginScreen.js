@@ -1,4 +1,6 @@
 import { Text, StyleSheet, ImageBackground, Pressable} from 'react-native';
+import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
 import AppLoading from 'expo-app-loading';
 import {
   useFonts,
@@ -18,6 +20,15 @@ import {
 
     
   export default function LoginScreen({ navigation }) {
+
+    const user = useSelector((state) => state.user.value);
+    console.log(user)
+    
+    useEffect(() => {
+      user.token && navigation.navigate("TabNavigator", { screen: "Home" })
+      
+    }, []);
+
     let [fontsLoaded] = useFonts({
       OpenSans_300Light,
       OpenSans_400Regular,

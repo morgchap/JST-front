@@ -7,6 +7,7 @@ export default function DiscoveryScreen({navigation}) {
   const [articles, setArticles] = useState([]);
   const [games, setGames] = useState([]);
   const [friends, setFriends] = useState([]);
+ // const [pageContent, setPageContent]= useState('')
   const user = useSelector((state) => state.user.value);
   const newsApiKey = 'da5844b63702429887c8a0b59db638d2';
 
@@ -97,72 +98,129 @@ export default function DiscoveryScreen({navigation}) {
     navigation.navigate('Games', { gameName: gameName });
   }
   
-  return (
-    <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView vertical contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
-          <View style={styles.headerContainer}>
-            <Text style={styles.pageTitle}>Discovery</Text>
-            <View style={styles.titleUnderline} />
-          </View>
 
-          {/* Section Articles */}
-          <View>
-            <Text style={styles.title}>Cette semaine chez les geek</Text>
-            <View style={styles.encadrer}>
-                <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
-                  {articles.map((article, index) => (
-                    <View key={index} style={styles.articleItemHorizontal}>
-                      <View style={styles.articleTextContainer}>
-                        <Text style={styles.articleTitle}>{article.title}</Text>
-                        <Text style={styles.articleDescription}>{article.description}</Text>
-                      </View>
-                      <TouchableOpacity onPress={() => handlePress(article.url)}>
-                        <Image style={styles.articleImage} source={{ uri: article.urlToImage }} />
+  let pageContent 
+  if(user.username){
+    pageContent = <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView vertical contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.pageTitle}>Discovery</Text>
+          <View style={styles.titleUnderline} />
+        </View>
+
+        {/* Section Articles */}
+        <View>
+          <Text style={styles.title}>Cette semaine chez les geek</Text>
+          <View style={styles.encadrer}>
+              <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
+                {articles.map((article, index) => (
+                  <View key={index} style={styles.articleItemHorizontal}>
+                    <View style={styles.articleTextContainer}>
+                      <Text style={styles.articleTitle}>{article.title}</Text>
+                      <Text style={styles.articleDescription}>{article.description}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => handlePress(article.url)}>
+                      <Image style={styles.articleImage} source={{ uri: article.urlToImage }} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+          </View>
+        </View>
+
+        {/* Section Jeux */}
+        <View>
+          <Text style={styles.title}>Nos recommandations</Text>
+          <View style={styles.encadrer}>
+              <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
+                {games.map((game) => (
+                  <View key={game.id} style={styles.gameItemHorizontal}>
+                    {game.background_image && (
+                      <TouchableOpacity onPress={() => handlePressGame(game.name)}>
+                        <Image style={styles.jaquette} source={{ uri: game.background_image }} />
                       </TouchableOpacity>
-                    </View>
-                  ))}
-                </ScrollView>
-            </View>
+                    )}
+                    <Text style={styles.gameTitle}>{game.name}</Text>
+                  </View>
+                ))}
+              </ScrollView>
           </View>
+        </View>
 
-          {/* Section Jeux */}
-          <View>
-            <Text style={styles.title}>Nos recommandations</Text>
-            <View style={styles.encadrer}>
-                <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
-                  {games.map((game) => (
-                    <View key={game.id} style={styles.gameItemHorizontal}>
-                      {game.background_image && (
-                        <TouchableOpacity onPress={() => handlePressGame(game.name)}>
-                          <Image style={styles.jaquette} source={{ uri: game.background_image }} />
-                        </TouchableOpacity>
-                      )}
-                      <Text style={styles.gameTitle}>{game.name}</Text>
-                    </View>
-                  ))}
-                </ScrollView>
-            </View>
+        {/* Section I can know them*/}
+        <View>
+          <Text style={styles.title}>Je pourrais connaitre</Text>
+          <View style={styles.encadrer}>
+            {friends.map((friend) => (
+              <View key={friend.id} style={styles.friendItem}>
+                <Image style={styles.friendsAvatars} source={{ uri: friend.profilPicture }} defaultSource={require('../assets/avatar.png')}/>
+                <Text style={styles.friendsPseudo}>{friend.username}</Text>
+                <TouchableOpacity onPress={() => addFriend(friend.id)} style={styles.addButton}>
+                  <FontAwesome name="plus" size={20} color="#7A28CB" />
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  </ImageBackground>
+  } else {
+    pageContent= <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView vertical contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.pageTitle}>Discovery</Text>
+          <View style={styles.titleUnderline} />
+        </View>
 
-          {/* Section I can know them*/}
-          <View>
-            <Text style={styles.title}>Je pourrais connaitre</Text>
-            <View style={styles.encadrer}>
-              {friends.map((friend) => (
-                <View key={friend.id} style={styles.friendItem}>
-                  <Image style={styles.friendsAvatars} source={{ uri: friend.profilPicture }} defaultSource={require('../assets/avatar.png')}/>
-                  <Text style={styles.friendsPseudo}>{friend.username}</Text>
-                  <TouchableOpacity onPress={() => addFriend(friend.id)} style={styles.addButton}>
-                    <FontAwesome name="plus" size={20} color="#7A28CB" />
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </View>
+        {/* Section Articles */}
+        <View>
+          <Text style={styles.title}>Cette semaine chez les geek</Text>
+          <View style={styles.encadrer}>
+              <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
+                {articles.map((article, index) => (
+                  <View key={index} style={styles.articleItemHorizontal}>
+                    <View style={styles.articleTextContainer}>
+                      <Text style={styles.articleTitle}>{article.title}</Text>
+                      <Text style={styles.articleDescription}>{article.description}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => handlePress(article.url)}>
+                      <Image style={styles.articleImage} source={{ uri: article.urlToImage }} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
           </View>
-        </ScrollView>
-      </SafeAreaView>
-    </ImageBackground>
+        </View>
+
+        {/* Section Jeux */}
+        <View>
+          <Text style={styles.title}>Nos recommandations</Text>
+          <View style={styles.encadrer}>
+              <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
+                {games.map((game) => (
+                  <View key={game.id} style={styles.gameItemHorizontal}>
+                    {game.background_image && (
+                      <TouchableOpacity onPress={() => handlePressGame(game.name)}>
+                        <Image style={styles.jaquette} source={{ uri: game.background_image }} />
+                      </TouchableOpacity>
+                    )}
+                    <Text style={styles.gameTitle}>{game.name}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  </ImageBackground>
+  }
+  return (
+    <>
+    {pageContent}
+    </>
   );
 }
 

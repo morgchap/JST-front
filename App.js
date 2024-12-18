@@ -21,6 +21,7 @@ import FriendScreen from './screens/FriendScreen';
 import GamesScreen from './screens/GamesScreen';
 import ProfilePicture from'./screens/ProfilePicture';
 import FriendListScreen from './screens/FriendListScreen';
+import ProfilePicture2 from "./screens/ProfilePicture2";
 //import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Provider } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
@@ -29,9 +30,11 @@ import friend from "./reducers/friend"
 import game from './reducers/game'
 import { persistStore, persistReducer } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
-import storage from "redux-persist/lib/storage";
+import storage from "redux-persist/es/storage";
 import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
+import AsyncStorage from "@react-native-async-storage/async-storage"
+
 
 // importer les differents reducers
 
@@ -42,7 +45,10 @@ import { useState, useEffect } from 'react';
 
 const reducers = combineReducers({ user, friend, game });
 
-const persistConfig = { key: 'JST', storage }; // pensez a y mettre les different reducer importe
+const persistConfig = { 
+  key: 'JST', 
+  storage: AsyncStorage
+}; // pensez a y mettre les different reducer importe
 
 const store = configureStore({
   reducer: persistReducer(persistConfig, reducers),
@@ -133,8 +139,8 @@ const TabNavigator = () => {
 export default function App() {
   return (
         //<GoogleOAuthProvider clientId="40832813030-m32nvk4dn7uh7dkjn86eh9n9innlh0a3.apps.googleusercontent.com">
-         <Provider store={store}>
-          <PersistGate persistor={persistor}>
+        <Provider store={store}>
+        <PersistGate persistor={persistor}>
             <NavigationContainer>
                 <Stack.Navigator screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Login" component={LoginScreen} />
@@ -149,6 +155,7 @@ export default function App() {
                     <Stack.Screen name="Games" component={GamesScreen} />
                     <Stack.Screen name="FriendList" component={FriendListScreen} />
                     <Stack.Screen name="ProfilePicture" component={ProfilePicture} />
+                    <Stack.Screen name="ProfilePicture2" component={ProfilePicture2} />
                 </Stack.Navigator>
             </NavigationContainer>
           </PersistGate>

@@ -122,8 +122,13 @@ export default function ProfilScreen({ navigation }) {
 
 //fonctionne mais tourne en boucle... -> à voir comment éviter ça
 
+<<<<<<< HEAD
 //console.log(gameList);
 //console.log("reducer", user)
+=======
+console.log(gameList);
+console.log("reducer de la page profile", user)
+>>>>>>> d80f1f843216ecf9d2be8fe1fdb9f966605d292d
 
 
 function acceptFriendRequest(senderId, senderUsername) {

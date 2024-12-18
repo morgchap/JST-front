@@ -9,7 +9,8 @@ import {
     Modal,
     TextInput,
     Switch, 
-    Pressable
+    Pressable,
+    SafeAreaView
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useState, useEffect } from 'react';
@@ -172,12 +173,10 @@ export default function ListsScreen({ navigation }) {
         )
     })
 
-    let pageContent =  <View style={styles.centered}>
-    <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
+    let pageContent =   <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
+    <SafeAreaView style={styles.centered}>
         <View style={styles.headIcons}>
             <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
-            <Text style={styles.topText}>Your lists</Text>
-            <FontAwesome name="cog" color="#7A28CB" size={25} onPress={() => navigation.navigate("Setup")}/>
         </View>
         <View style={styles.body}>
             <View style={styles.lists}>
@@ -273,9 +272,8 @@ export default function ListsScreen({ navigation }) {
                     </ImageBackground>
                 </View>
             </Modal>
-
-        </ImageBackground>
-    </View>
+    </SafeAreaView>
+    </ImageBackground>
 
 if (!user.username){
     pageContent = 
@@ -388,13 +386,13 @@ const styles = StyleSheet.create({
     headIcons: {
         width: "100%",
         height: "10%",
-        paddingTop: 35,
+        paddingTop: 20,
         paddingLeft: 20,
         paddingRight: 20,
         flexDirection: "row",
         justifyContent: "space-between",
-        borderBottomWidth: 2,
-        borderColor: "#7A28CB",
+        // borderBottomWidth: 2,
+        // borderColor: "#7A28CB",
     },
     body: {
         width: "100%",
