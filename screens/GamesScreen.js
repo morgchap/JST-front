@@ -15,7 +15,7 @@ export default function GamesScreen({navigation, route}) {
     const dispatch = useDispatch();
     const {gameName} = route.params;
     const user = useSelector((state) => state.user.value)
-    const currentUser = user.username
+    //const currentUser = user.username
 
     const [isVisible, setVisibility] = useState(false);
     const [icon, setIcon]= useState('caret-down')
@@ -38,7 +38,7 @@ export default function GamesScreen({navigation, route}) {
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/byuser/${user.username}`)
       .then(result => result.json())
       .then(data => {
-        console.log("data de mes reviews", data.ratings.ratingsID)
+        //console.log("data de mes reviews", data.ratings.ratingsID)
       
         const theGameReview = data.ratings.filter(((e) => e.game.name == gameName))
         
@@ -81,7 +81,7 @@ export default function GamesScreen({navigation, route}) {
               if(!data.result){
                 console.log(data.error)
               } else {
-                console.log(data.message)
+                //console.log(data.message)
                 dispatch(updateChange())
               }
             });
@@ -106,7 +106,7 @@ export default function GamesScreen({navigation, route}) {
 
   function likeOrDislikeAReview(reviewId) {
     setHeartLiked(!heartLiked);
-    console.log("changement de like")
+    //console.log("changement de like")
     
     
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/likeOrDislikeAReview`, {
@@ -123,7 +123,7 @@ export default function GamesScreen({navigation, route}) {
 
   }
 
-  console.log("log du gamereview", gamereview)
+  //console.log("log du gamereview", gamereview)
 
    const myreview = myReviews.map((data, i)=> {
 
@@ -170,6 +170,14 @@ for (let i = 0; i < 5; i++) {
 
       useEffect(() => {
 
+        // fetch the lists if it isn't already done elswhere
+        if(user.lists.length === 0){
+          fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/${user.username}`)
+            .then(response => response.json())
+            .then(data => {
+            dispatch(addListGames(data.lists))
+            });
+        }
         //fetch le jeu
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/byname`, {
             method: "POST",
@@ -201,7 +209,7 @@ fetchMyFriendsReviews();
 
 }, []);
 
-console.log("my review useStatées", myReviews)
+//console.log("my review useStatées", myReviews)
      
     const summaryToHTML = gamesinfo.summary
    // console.log(gamesinfo.summary)

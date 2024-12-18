@@ -1,8 +1,9 @@
-import { Text, View, StyleSheet, Image, ScrollView, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, Image, Modal, ScrollView, TouchableOpacity, ImageBackground } from "react-native";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { clickedFriend } from '../reducers/friend';
+import { addListGames } from '../reducers/user';
 
 
 
@@ -11,10 +12,14 @@ export default function FriendScreen({ navigation, route }) {
     const user = useSelector((state) => state.user.value)
     const [numberOfFriends, setNumberOfFriends] = useState(123);
     const [numberOfGames, setNumberOfGames] = useState(123);
+    const [numberOfList, setNumberOfList] = useState(123)
     const [gameList, setGameList] = useState([]);
+    const [allLists, setAllLists] = useState([])
+    const [game, setGame] = useState("")
     const { friendName } = route.params
     const [gotPP, setGotPP] = useState(false) 
     const [profilePicture, setProfilePicture] = useState(null);
+    const [modal, setModal] = useState(false)
 
 
     const dispatch = useDispatch();
@@ -26,48 +31,51 @@ export default function FriendScreen({ navigation, route }) {
   
   useEffect(() => {
 
-    console.log("ça marche");
+    //console.log("ça marche");
 
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`)
     .then(result => result.json())
     .then(data => {
-      console.log("c'est le front de FriendScreen", data.infos.profilePicture)
+      //console.log("c'est le front de FriendScreen", data.infos.profilePicture)
 
       setNumberOfFriends(data.infos.friendsList.length)
 
-      console.log("number of friends ", numberOfFriends);
-      console.log("Id de list", data.infos.lists[0])
+      //console.log("number of friends ", numberOfFriends);
+      //console.log("Id de list", data.infos.lists[0])
 
       if (data.infos.profilePicture) {
         setProfilePicture(data.infos.profilePicture);
         setGotPP(true)
         } 
 
-    
-  
-
       return data
      
   })
   .then(data => {
-    console.log("deuxième data", data);
+    //console.log("deuxième data", data);
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`)
     .then(result => result.json())
     .then(data => {
-      console.log("data du fetch des listes de jeux", data);
+      //console.log("data du fetch des listes de jeux", data);
       setNumberOfGames(data.data.gameList.length)
-      console.log("le fetch qui sert à setter le nombre de jeu :", data.data.gameList.length)
-      console.log("number of games", numberOfGames);
+      //console.log("le fetch qui sert à setter le nombre de jeu :", data.data.gameList.length)
+      //console.log("number of games", numberOfGames);
       setGameList(data.data.gameList)
     })
   })
 
-
+  // recuperer les lists de l'utilisateur qu'on regarde
+  fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/${friendName}`)
+    .then(response => response.json())
+    .then(data => {
+      setNumberOfList(data.lists.length)
+      setAllLists(data.lists)
+  });
 
 }, [friendName]);
 
-console.log("number of games il all my games list :", gameList.length)
-console.log(profilePicture)
+//console.log("number of games in all my games list :", gameList.length)
+//console.log(profilePicture)
 
 
 const stars = [];
@@ -142,8 +150,9 @@ if (name.length >= 15) {
   return (
     <View key={i} style={styles.gameContainer}>
       <Text style={styles.gameTitle}>{name}</Text>
-      <Image style={styles.jacket} source={{uri: `${data.cover}`, height:100,
-      width: 75 }}/>
+        <TouchableOpacity onPress={() => navigation.navigate("Games", { gameName: data.name })} activeOpacity={0.8}>
+          <Image style={styles.jacket} source={{uri: `${data.cover}`, height:100,width: 75 }}/>
+        </TouchableOpacity>
       <View style={styles.starsContainer}>
         {stars}
       </View>
@@ -151,7 +160,64 @@ if (name.length >= 15) {
   )
 })
 
+  const lists = allLists.map((data, i) => {
+    let title = data.listName.length >= 13 ? data.listName.slice(0, 10) + "..." : data.listName
+    let plural = data.gameList.length < 2 ? "jeu" : "jeux"
+    return (
+      <View key={i} style={styles.boxOfLists}>
+        <Text style={styles.listName}>{title}</Text>
+        <TouchableOpacity onPress={() => handleSeeList(data.listName)} activeOpacity={0.8}>
+          <Image style={styles.jacket} source={require("../assets/mario.png")} />
+        </TouchableOpacity>
+        <View style={styles.textOfListBottom}>
+          <Text style={styles.listLength}>{data.gameList.length} {plural}</Text>
+        </View>
+      </View>
+    )
+  })
 
+
+  const handleSeeList = (listName) => {
+    listName = listName.replaceAll(" ", "_")
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/getGames/${listName}/${friendName}`)
+        .then(response => response.json())
+        .then(data => {
+          let gamesList
+          if(data.error === "Your list is empty."){
+            gamesList = [
+              <View key={0}>
+                <Text>Votre List est vide</Text>
+              </View>
+            ]
+          } else {
+            gamesList = data.list.map((data, i) => {
+              // data[0] is the title of the game, data[1] is the uri link to the cover of the game
+              let title
+              if(data[0].length >= 12){
+                title = data[0].slice(0, 9) + "..."
+              } else {
+                title = data[0]
+              }
+              console.log(data)
+            return (
+              <View key={i} style={styles.game}>
+                <TouchableOpacity onPress={() => handleNavigation(data[0]) }>
+                  <Image style={styles.jaquette} source={{uri: `${data[1]}`}} />
+                </TouchableOpacity>
+                <Text styles>{title}</Text>
+              </View>
+              )
+            })
+          }
+          setModal(true)
+          setGame(gamesList)
+        });
+  }
+
+  const handleNavigation = (gameName) => {
+    setModal(false)
+    navigation.navigate("Games", { gameName })
+  }
 
   return (
     <View style={styles.centered}>
@@ -159,7 +225,6 @@ if (name.length >= 15) {
       <FontAwesome name="chevron-left" color="green" size={25} onPress={() => {
         navigation.goBack();
         selectFriend("");
-      
       }}/>
       </View>
       <View style={styles.me}>
@@ -170,7 +235,7 @@ if (name.length >= 15) {
         <Text style={styles.pseudo}>@{friendName}</Text>
       </View>
       <View style={styles.stats}>
-          <Text style={styles.statsText}>{numberOfGames} jeu{pluralGames}</Text>
+        <Text style={styles.statsText}>{numberOfGames} jeu{pluralGames}</Text>
           <TouchableOpacity onPress={() => {
                       navigation.navigate("FriendList", {userFriendList: friendName})
                       //selectFriend(user.username)
@@ -191,7 +256,47 @@ if (name.length >= 15) {
             </ScrollView>
         </View>
       </View>
-      
+
+      <View style={styles.listDiv}>
+        <View style={styles.lists}>
+          <Text style={styles.secondTitles}>Ses Listes ({numberOfList})</Text>
+            <ScrollView horizontal={true} style={styles.listLists}> 
+              {lists}
+            </ScrollView>
+        </View>
+      </View>
+
+      <Modal
+        transparent={true}
+        visible={modal}
+        onRequestClose={() => {
+          /* Alert.alert('Modal has been closed.'); */
+          setModal(true);
+        }}
+      >
+        <View style={styles.modalBackground}>
+          <ImageBackground 
+            source={require('../assets/background-blur.png')} 
+            style={styles.backgroundImage}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.backbutton}>
+                <FontAwesome 
+                  name="times"
+                  color="#7A28CB" 
+                  size={25} 
+                  onPress={() => setModal(false)} 
+                />
+              </View>
+              <View style={styles.gameContainerList}>
+                <ScrollView horizontal={true}>
+                  {game}
+                </ScrollView>
+              </View>
+            </View>
+          </ImageBackground>
+        </View>
+      </Modal>
           
     </View>
       
@@ -271,12 +376,8 @@ const styles = StyleSheet.create({
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
-      borderBottomWidth: 2,
-      borderBottomColor: 'green',
       paddingBottom: 10,
       borderRadius: 10,
-
-    
     },
 
     secondTitles: {
@@ -306,7 +407,6 @@ const styles = StyleSheet.create({
       height: 100,
       width: 75,
       marginTop: 10,
-  
     },
 
     listGame: {
@@ -473,8 +573,79 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         textAlign: "center"
-      }
-    
+      },
+
+      listDiv: {
+        
+      },
+
+      lists: {
+        margin: 10,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "green",
+        marginHorizontal: 10,
+        borderRadius: 10,
+      },
+      
+      listLists: {
+        display: "flex",
+        flexDirection: "row",
+      },
+
+      listLists: {
+        marginHorizontal: 10,
+      },
+
+      boxOfLists: {
+        width: 100,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingHorizontal: 7,
+        paddingVertical: 10,
+      },
+
+      listName:{
+        color: "white"
+      },
+      listLength:{
+        color: "white"
+      },
+
+      modalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    },
+    backgroundImage: {
+      width: '100%',
+    },
+    modalContainer: {
+      padding: 20,
+      borderRadius: 10,
+      alignItems: "center",
+      justifyContent: 'center',
+    },
+    gameContainerList: {
+      flexDirection: "row",
+    },
+    jaquette: {
+      height: 160,
+      width: 120,
+    },
+    game: {
+      marginVertical: 10,
+      marginRight: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    backbutton: {
+      width: 20,
+      alignItems: "flex-end",
+    },
     
   });
   

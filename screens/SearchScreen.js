@@ -29,7 +29,7 @@ export default function SearchScreen({navigation}) {
   const gamedata = useSelector((state) => state.game.value);
   //console.log(`reducer : ${gamedata}`)
 
-  console.log(`user : ${suggestionUser}`)
+  //console.log(`user : ${suggestionUser}`)
 
 const fetchgames = async (query) => {
     if (!query) {
@@ -44,7 +44,7 @@ const fetchgames = async (query) => {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       if (data && Array.isArray(data.data)) {
         setSuggestionGame(data.data);
       } else {
@@ -71,7 +71,7 @@ const fetchgames = async (query) => {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
           const data = await response.json();
-          console.log(data);
+          //console.log(data);
           if (data && Array.isArray(data.data)) {
             setSuggestionUser(data.data);
           } else {
@@ -258,7 +258,7 @@ const fetchgames = async (query) => {
       }),
     }).then(response => response.json()).then(data => {
       if (data){
-        console.log(`result : ${data.gameid}`)
+        //console.log(`result : ${data.gameid}`)
         
         dispatch(searchedgamevalue(gameName))
       } else {
@@ -303,7 +303,7 @@ const fetchgames = async (query) => {
   };
 
 const handleList = ()=> {
-  console.log('ok')
+  //console.log('ok')
   fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/allgames`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -320,7 +320,7 @@ const handleList = ()=> {
   .then(data => {
     //console.log(data)
     if (data.result) {
-      console.log(`${data} added`);
+      //console.log(`${data} added`);
       setModalVisible(false);
     } else {
       setError(data.error);

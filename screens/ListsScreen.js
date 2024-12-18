@@ -103,8 +103,8 @@ export default function ListsScreen({ navigation }) {
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/${listName}/${gameName}/${user.username}`, {
             method: 'DELETE',
         })
-        //.then((res) => res.json())
-        //.then((data) => console.log(data))
+        .then((res) => res.json())
+        .then((data) => console.log(data))
         .then(() => fetchGameLists())
         .then(() => setModal(false))
     }

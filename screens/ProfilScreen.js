@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { clickedFriend } from '../reducers/friend';
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useIsFocused } from '@react-navigation/native';
 
 import {
   useFonts,
@@ -40,6 +41,7 @@ export default function ProfilScreen({ navigation }) {
   const [profilePicture, setProfilePicture] = useState(null);
   const [gotPP, setGotPP] = useState(false) 
   const [refreshing, setRefreshing] = React.useState(false);
+  const isFocused = useIsFocused()
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -55,7 +57,7 @@ export default function ProfilScreen({ navigation }) {
 
   useEffect(() => {
     if (!refreshing) {
-      console.log("ça marche");
+      //console.log("ça marche");
 
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`)
       .then(result => result.json())
@@ -64,7 +66,7 @@ export default function ProfilScreen({ navigation }) {
         setNumberOfFriends(data.infos.friendsList.length);
         setMyId(data.infos._id)
 
-      console.log("adresse de la PP", data.infos.profilePicture)
+      //console.log("adresse de la PP", data.infos.profilePicture)
 
       if (data.infos.profilePicture) {
       setProfilePicture(data.infos.profilePicture);
@@ -98,13 +100,13 @@ export default function ProfilScreen({ navigation }) {
        
       })
       .then(data => {
-        console.log("deuxième data", data);
+        //console.log("deuxième data", data);
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`)
         .then(result => result.json())
         .then(data => {
-          console.log("data du fetch des liste de jeux", data);
+          //console.log("data du fetch des liste de jeux", data);
           setNumberOfGames(data.data.gameList.length)
-          console.log("number of Games", numberOfGames);
+          //console.log("number of Games", numberOfGames);
           setGameList(data.data.gameList)
           
         })
@@ -116,13 +118,12 @@ export default function ProfilScreen({ navigation }) {
     
 
 
-
-}, [actionOnFriends, refreshing]);
+}, [actionOnFriends, refreshing, isFocused]);
 
 //fonctionne mais tourne en boucle... -> à voir comment éviter ça
 
-console.log(gameList);
-console.log("reducer", user)
+//console.log(gameList);
+//console.log("reducer", user)
 
 
 function acceptFriendRequest(senderId, senderUsername) {
@@ -135,7 +136,7 @@ function acceptFriendRequest(senderId, senderUsername) {
 })
     .then(result => result.json())
     .then(data => {
-      console.log("data de l'ajout d'ami", data);
+      //console.log("data de l'ajout d'ami", data);
       setActionOnFriends(!actionOnFriends);
   
    
@@ -153,7 +154,7 @@ function acceptFriendRequest(senderId, senderUsername) {
 })
     .then(result => result.json())
     .then(data => {
-      console.log("data de l'ajout d'ami", data);
+      //console.log("data de l'ajout d'ami", data);
       
     })
 
@@ -166,7 +167,7 @@ function acceptFriendRequest(senderId, senderUsername) {
   })
       .then(result => result.json())
       .then(data => {
-        console.log("data de l'ajout d'ami2", data);
+        //console.log("data de l'ajout d'ami2", data);
     
      
         
@@ -182,7 +183,7 @@ const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
       navigation.navigate("Friend", {friendName: data.sender.username});
       //{ gameName: gameName }('Games',{ gameName: gameName })
       selectFriend(data.sender.username);
-      console.log(friend);
+      //console.log(friend);
       
       }}>
       <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
@@ -192,7 +193,7 @@ const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
     <View style={styles.icons}>
     <FontAwesome name="plus-circle" color="green" size={25} style={styles.iconStyle} onPress={() => {
       selectFriend(data.sender.username);
-      console.log(friend);
+      //console.log(friend);
       acceptFriendRequest(data.sender._id, data.sender.username);
 
       }}/>
@@ -207,7 +208,7 @@ const mySentFriendRequests = sentFriendRequestList.map((data, i) => {
     <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
       navigation.navigate("Friend");
       selectFriend(data.receiver.username);
-      console.log(friend);
+      //console.log(friend);
       
       }}>
       <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
@@ -256,13 +257,13 @@ if (name.length >= 15) {
 
   function sendRequest() {
     setDefaultFriends(false);
-    console.log(defaultFriends);
+    //console.log(defaultFriends);
 
   };
 
   function receivedRequest() {
     setDefaultFriends(true);
-    console.log(defaultFriends);
+    //console.log(defaultFriends);
   }
 
 
