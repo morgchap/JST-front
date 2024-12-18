@@ -17,7 +17,8 @@ export default function SnapScreen({navigation}) {
 	//const user = useSelector((state: { user: UserState }) => state.user.value);
 	//console.log("pic:", user.photos)
     const user = useSelector((state) => state.user.value.username)
-
+	console.log(user);
+	
     const pickImageAsync = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ['images'],

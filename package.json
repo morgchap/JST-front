@@ -11,13 +11,14 @@
   "dependencies": {
     "@ant-design/icons": "^5.5.2",
     "@expo-google-fonts/open-sans": "^0.2.3",
+    "@react-native-async-storage/async-storage": "^2.1.0",
     "@react-native-community/blur": "^4.4.1",
     "@react-native-google-signin/google-signin": "^13.1.0",
     "@react-navigation/bottom-tabs": "6",
     "@react-navigation/native": "6",
     "@react-navigation/native-stack": "6",
     "@react-oauth/google": "^0.12.1",
-    "@reduxjs/toolkit": "^1.8.3",
+    "@reduxjs/toolkit": "^2.5.0",
     "@tarekraafat/autocomplete.js": "^10.2.9",
     "antd": "^5.22.4",
     "blur": "^1.0.5",
@@ -43,7 +44,7 @@
     "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "~4.0.0",
     "react-native-web": "~0.19.10",
-    "react-redux": "^8.0.2",
+    "react-redux": "^9.2.0",
     "redux-persist": "^6.0.0"
   },
   "devDependencies": {

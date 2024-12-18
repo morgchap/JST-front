@@ -1,22 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, TouchableOpacity, View, Text, SafeAreaView } from "react-native";
-import { CameraView, CameraType, FlashMode, Camera } from "expo-camera";
-import { useDispatch, useSelector } from "react-redux";
-import { addPhoto, UserState } from "../reducers/user";
+import { CameraView, Camera } from "expo-camera";
+import { useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useIsFocused } from "@react-navigation/native";
 import * as ImagePicker from 'expo-image-picker';
 import Button from '../components/Button';
-import ImageViewer from '../components/imageViewer';
+//import ImageViewer from '../components/imageViewer';
 
 //const PlaceholderImage = require('../assets/background-blur.png');
 
 export default function SnapScreen2({navigation}) {
-    const dispatch = useDispatch();
+
     const isFocused = useIsFocused();
-    //const user = useSelector((state: { user: UserState }) => state.user.value);
-    //console.log("pic:", user.photos)
-    const user = useSelector((state) => state.user.value.username)
+  
+    const user = useSelector((state) => state.user.value)
+    console.log("reducer de la page profilePic2", user)
 
     const pickImageAsync = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -38,7 +37,7 @@ export default function SnapScreen2({navigation}) {
                     type: 'image/jpeg',
                 });
                 console.log('je rentre dans la route')
-                formData.append('username', user); // Append username separately
+                formData.append('username', user.username); // Append username separately
           
                 console.log('formData:', formData);
           
@@ -49,7 +48,7 @@ export default function SnapScreen2({navigation}) {
                     .then((response) => response.json())
                     .then((data) => {
                         console.log('data:', data);
-                        navigation.navigate('Signup3')  
+                        navigation.navigate('Profil')  
                     })
                     .catch((err) => console.error('Error:', err));
             }
@@ -101,7 +100,7 @@ export default function SnapScreen2({navigation}) {
                 type: 'image/jpeg',
             });
             console.log('je rentre dans la route')
-            formData.append('username', user); // Append username separately
+            formData.append('username', user.username); // Append username separately
     
             console.log('formData:', formData);
     
@@ -112,7 +111,7 @@ export default function SnapScreen2({navigation}) {
                 .then((response) => response.json())
                 .then((data) => {
                     console.log('data:', data);
-                    navigation.navigate('Signup3')
+                    navigation.navigate('Profil')
                 })
                 .catch((err) => console.error('Error:', err));
         }
@@ -153,7 +152,7 @@ export default function SnapScreen2({navigation}) {
             </View>
         </View>
         <View>
-            <Text style={styles.buttonText2} onPress={()=> navigation.navigate('Signup3')}>I'll do it later</Text>
+            <Text style={styles.buttonText2} onPress={()=> navigation.navigate('Profil')}>I'll do it later</Text>
         </View>
         </View>
     );
