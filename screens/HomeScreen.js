@@ -5,6 +5,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function HomeScreen() {
   const [ratings, setRatings] = useState([]); // Pour stocker les avis des amis
+  const [publicRating, setPublicRatings]= useState([]);
   const user = useSelector((state) => state.user.value); // Récupérer l'utilisateur actuel depuis Redux
   const [refreshing, setRefreshing] = React.useState(false);
   const [search, setSearch] = useState('Friends')
@@ -22,6 +23,7 @@ export default function HomeScreen() {
 
  useEffect(() => {
   if (!refreshing) {
+    if(user.username){
    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/friendsreview`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -29,8 +31,14 @@ export default function HomeScreen() {
       })
      .then(response => response.json())
      .then(data => {
-      console.log(data.ratings)
+      //console.log(data.ratings)
       setRatings(data.ratings);
+     });}
+
+     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/all`).then(response => response.json())
+     .then(data => {
+      //console.log(data.ratings)
+      setPublicRatings(data.ratings);
      });
 }}, [refreshing]);
 
@@ -51,7 +59,14 @@ export default function HomeScreen() {
     return stars;
   };
 //console.log('revew :',ratings);
-  const ratingsNewsFeed = ratings.map((review, i) => {
+
+
+  let ratingsNewsFeed 
+  
+  
+  if (search === 'Friends' && user.username) {
+    
+    ratingsNewsFeed = ratings.map((review, i) => {
 
     //console.log(review.game.cover)
     return (
@@ -83,7 +98,38 @@ export default function HomeScreen() {
         </View>
     </View>
     )
-  })
+  })} else {
+    ratingsNewsFeed = publicRating.map((review, i)=> {
+      return (
+        <View key={i}>
+         <View style={styles.ratingContainerPublic}>
+            <View style={styles.ratingContent}>
+              <View style={styles.userInfoContainer}>
+               <Image style={styles.avatar} source={{ uri: review.profilePicture }}  /* source={require('../assets/avatar.png')} *//> 
+                
+                <View style={styles.userInfo}>
+                  <Text style={styles.userName}>@{review.username}</Text>
+                  
+                  <View style={styles.starsContainer}>
+                    {renderStars(review.note)} {/* Affichage des étoiles */}
+                    <Text style={styles.textNote} >{review.note}</Text>
+                  </View>
+  
+                </View>
+              </View>
+  
+              <View style={styles.gameReviewContainer}>
+                <Image style={styles.gameCover} source={{ uri: review.gameCover }}/>
+                <View style={styles.reviewContent} >
+                  <Text style={styles.reviewGameTitle}>{review.gameName}</Text>
+                  <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+      </View>)
+    })
+  }
 
 
   let newsfeed;
@@ -103,7 +149,7 @@ export default function HomeScreen() {
      } else if (search === 'Public' && user.username) {
        newsfeed = (
          <View style={styles.searchcont}>
-           <TouchableOpacity style={styles.searchOn} onPress={() => setSearch('Public')}>
+           <TouchableOpacity style={styles.searchOnPublic} onPress={() => setSearch('Public')}>
              <Text>Public</Text> 
            </TouchableOpacity>
            <TouchableOpacity style={styles.searchOff} onPress={() => setSearch('Friends')}>
@@ -112,9 +158,7 @@ export default function HomeScreen() {
          </View>
        );
       
-     } else {
-    
-     }
+     } 
     
   return (
       <SafeAreaView style={styles.safeArea}>
@@ -143,7 +187,7 @@ const styles = StyleSheet.create({
   ratingsContainer: { paddingHorizontal: 20, paddingBottom: 20 },
   ratingContainer: { backgroundColor: '#D6CBFD', borderRadius: 10, padding: 20, margin: 20 },
   timestamp: { fontSize: 12, color: '#888', marginBottom: 10 }, 
-
+  ratingContainerPublic: { backgroundColor: '#D4FDC6', borderRadius: 10, padding: 20, margin: 20 },
   ratingContent: { flexDirection: 'column' },
   userInfoContainer: { flexDirection: 'row', marginBottom: 10 },
   avatar: { width: 60, height: 60, borderRadius: 25, marginRight: 10 },
@@ -183,5 +227,14 @@ const styles = StyleSheet.create({
     width:'100%',
     justifyContent:'space-around'
   }, 
-
+  searchOnPublic:{
+    backgroundColor: '#D4FDC6',
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+    width:'40%', 
+    borderWidth:1, 
+    borderColor:'#33CA7F',
+    alignItems:'center',
+  }, 
 });

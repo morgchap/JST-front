@@ -153,7 +153,7 @@ export default function SnapScreen({navigation}) {
             </View>
         </View>
         <View>
-            <Text style={styles.buttonText2} onPress={()=> navigation.navigate('Signup2')}>I'll do it later</Text>
+            <Text style={styles.buttonText2} onPress={()=> navigation.navigate('Signup3')}>I'll do it later</Text>
         </View>
         </View>
 	);

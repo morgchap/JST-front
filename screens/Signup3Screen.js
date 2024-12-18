@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 
-export default function Signup3Screen({ navigation }) {
+export default function Signup3({ navigation }) {
 
   const [game, setGame] = useState('')
   const [modalVisible, setModalVisible] = useState(false);
@@ -77,11 +77,8 @@ export default function Signup3Screen({ navigation }) {
             onChangeText={(value) => setGame(value)}
             value={game} />
           <Text>{error}</Text>
-          <View style={styles.camera}>
-            <Text>Camera area</Text>
-          </View>
           <View>
-            <Text style={styles.buttonText2} onPress={navigation.navigate('TabNavigator')}>Take me to JST </Text>
+            <Text style={styles.buttonText2} onPress={()=> {navigation.navigate('TabNavigator')}}>Take me to JST </Text>
           </View>
           <Modal
             transparent={true}
