@@ -22,7 +22,7 @@ export default function ListsScreen({ navigation }) {
     const isFocused = useIsFocused()
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user.value)
-    const [update, setUpdate] = useState(false)
+    //const [update, setUpdate] = useState(false)
     const [modal, setModal] = useState(false)
     const [game, setGame] = useState("")
 
@@ -191,35 +191,12 @@ export default function ListsScreen({ navigation }) {
             </View>
         </View>
 
-    <Modal
-        transparent={true}
-        visible={modal}
-    >
-        <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-                <View style={styles.backbutton}>
-                    <FontAwesome 
-                        name="times"
-                        color="#7A28CB" 
-                        size={25} 
-                        onPress={() => setModal(false)} 
-                    />
-                </View>
-                <View style={styles.gameContainer}>
-                    <ScrollView horizontal={true}>
-                        {game}
-                    </ScrollView>
-                </View>
-            </View>
-        </View> 
-    </Modal>
-
         <Modal
             transparent={true}
-            visible={modalVisible}
+            visible={modal}
             onRequestClose={() => {
                 /* Alert.alert('Modal has been closed.'); */
-                setModalVisible(!modalVisible);
+                setModal(true);
             }}
         >
             <View style={styles.modalBackgroundList}>
