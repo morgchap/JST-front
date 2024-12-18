@@ -9,8 +9,34 @@ export default function HomeScreen() {
   const user = useSelector((state) => state.user.value); // Récupérer l'utilisateur actuel depuis Redux
   const [refreshing, setRefreshing] = React.useState(false);
   const [search, setSearch] = useState('Friends')
+  const [likedReviews, setLikedReviews] = useState({});
   //console.log(ratings);
 
+  function likeOrDislikeAReview(reviewId) {
+    
+
+    console.log("changement de like")
+    setLikedReviews(prevState => ({
+      ...prevState,
+      [reviewId]: !prevState[reviewId],
+    }));
+    
+    
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/likeOrDislikeAReview`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        ratingId : reviewId, 
+        userId: user.userId
+      })
+    }).then(() => {
+      fetchFriendsReviews();
+      fetchAll();
+    })
+    
+
+  }
+  
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -19,27 +45,35 @@ export default function HomeScreen() {
     }, 2000);
   }, []);
 
+  function fetchFriendsReviews() {
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/friendsreview`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user.username }),
+    })
+   .then(response => response.json())
+   .then(data => {
+    //console.log(data.ratings)
+    setRatings(data.ratings);
+   });
+  }
+
+  function fetchAll() {
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/all`).then(response => response.json())
+    .then(data => {
+     //console.log(data.ratings)
+     setPublicRatings(data.ratings);
+    });
+  }
 
 
  useEffect(() => {
   if (!refreshing) {
     if(user.username){
-   fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/friendsreview`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: user.username }),
-      })
-     .then(response => response.json())
-     .then(data => {
-      //console.log(data.ratings)
-      setRatings(data.ratings);
-     });}
-
-     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/all`).then(response => response.json())
-     .then(data => {
-      //console.log(data.ratings)
-      setPublicRatings(data.ratings);
-     });
+      fetchFriendsReviews();
+   }
+   fetchAll()
+     
 }}, [refreshing]);
 
   // Fonction pour formater la date
@@ -67,6 +101,9 @@ export default function HomeScreen() {
   if (search === 'Friends' && user.username) {
     
     ratingsNewsFeed = ratings.map((review, i) => {
+      console.log("counter nblikes", review.nbLikes)
+
+      const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
 
     //console.log(review.game.cover)
     return (
@@ -77,8 +114,13 @@ export default function HomeScreen() {
              <Image style={styles.avatar} source={{ uri: review.profilePicture }}  /* source={require('../assets/avatar.png')} *//> 
               
               <View style={styles.userInfo}>
-                <Text style={styles.userName}>@{review.username}</Text>
-                
+                <View style={styles.userandlike}>
+                  <Text style={styles.userName}>@{review.username}</Text>
+                  <View style={styles.heartAndlikeCounter}>
+                      <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
+                      <Text>({review.nbLikes})</Text>
+                  </View>
+                </View>
                 <View style={styles.starsContainer}>
                   {renderStars(review.note)} {/* Affichage des étoiles */}
                   <Text style={styles.textNote} >{review.note}</Text>
@@ -237,4 +279,25 @@ const styles = StyleSheet.create({
     borderColor:'#33CA7F',
     alignItems:'center',
   }, 
+  heartIcon: {
+    color: "red",
+    paddingRight: 2,
+  },
+  userandlike: {
+    width: 250,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  heartAndlikeCounter: {
+    display: "flex",
+    flexDirection: "row",
+    alignContent: "center",
+    justifyContent: "center",
+    marginRight: 20,
+
+
+  }
+
 });

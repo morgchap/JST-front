@@ -31,6 +31,7 @@ export default function GamesScreen({navigation, route}) {
     const [gamereview, setGameReview] = useState([])
     const [heartLiked, setHeartLiked] = useState(false);
     const [myReviews, setMyReviews] = useState([]);
+    const [likedMyReviews, setLikedMyReviews] = useState({});
     //console.log(`game : ${gameName}`)
 
     function fetchMyReview() {
@@ -107,7 +108,12 @@ export default function GamesScreen({navigation, route}) {
 
   function likeOrDislikeAReview(reviewId) {
     setHeartLiked(!heartLiked);
+
     console.log("changement de like")
+    setLikedMyReviews(prevState => ({
+      ...prevState,
+      [reviewId]: !prevState[reviewId],
+    }));
     
     
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/likeOrDislikeAReview`, {
@@ -130,11 +136,7 @@ export default function GamesScreen({navigation, route}) {
 
     const mynotestars = []; 
 
-    let isLiked = "heart-o"
-
-    if (heartLiked == true) {
-      isLiked = "heart"
-    }
+    const isLiked = likedMyReviews[data._id] ? "heart" : "heart-o";
 
 for (let i = 0; i < 5; i++) {
     let style = "star-o";
@@ -152,7 +154,7 @@ for (let i = 0; i < 5; i++) {
         <View style={styles.userandlike}>
           <Text style={styles.friendsPseudo}>@{user.username}</Text>
           <View style={styles.heartAndlikeCounter}>
-              <FontAwesome name={isLiked} style={styles.heartIcon} size={15} onPress={() => likeOrDislikeAReview(data._id)} />
+              <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={15} onPress={() => likeOrDislikeAReview(data._id)} />
               <Text>({data.likesNumber.length})</Text>
           </View>
         </View>
