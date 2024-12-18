@@ -185,6 +185,13 @@ export default function SetupScreen({ navigation }) {
                         }} >
                         <Text style={styles.logoutText}>Logout</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity style={styles.logoutButton} onPress={() => {
+                        updateUser("");
+                        navigation.navigate("ProfilePicture");
+                        
+                        }} >
+                        <Text style={styles.logoutText}>Modify my profile picture</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
       </View>

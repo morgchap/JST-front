@@ -13,28 +13,24 @@ export default function HomeScreen() {
   //console.log(ratings);
 
   function likeOrDislikeAReview(reviewId) {
-    
-
-    console.log("changement de like")
+    console.log("changement de like");
+  
     setLikedReviews(prevState => ({
       ...prevState,
       [reviewId]: !prevState[reviewId],
     }));
-    
-    
+  
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/likeOrDislikeAReview`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
-        ratingId : reviewId, 
+        ratingId: reviewId, 
         userId: user.userId
       })
     }).then(() => {
       fetchFriendsReviews();
       fetchAll();
-    })
-    
-
+    });
   }
   
 
@@ -51,19 +47,32 @@ export default function HomeScreen() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: user.username }),
     })
-   .then(response => response.json())
-   .then(data => {
-    //console.log(data.ratings)
-    setRatings(data.ratings);
-   });
+      .then(response => response.json())
+      .then(data => {
+        setRatings(data.ratings);
+  
+        // Met à jour l'état `likedReviews` pour les reviews des amis
+        const liked = {};
+        data.ratings.forEach(review => {
+          liked[review._id] = review.likesCounter.includes(user.userId);
+        });
+        setLikedReviews(liked);
+      });
   }
-
+  
   function fetchAll() {
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/all`).then(response => response.json())
-    .then(data => {
-     //console.log(data.ratings)
-     setPublicRatings(data.ratings);
-    });
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/all`)
+      .then(response => response.json())
+      .then(data => {
+        setPublicRatings(data.ratings);
+  
+        // Met à jour l'état `likedReviews` pour les reviews publiques
+        const liked = {};
+        data.ratings.forEach(review => {
+          liked[review._id] = review.likesCounter.includes(user.userId);
+        });
+        setLikedReviews(prevLiked => ({ ...prevLiked, ...liked }));
+      });
   }
 
 
@@ -101,7 +110,7 @@ export default function HomeScreen() {
   if (search === 'Friends' && user.username) {
     
     ratingsNewsFeed = ratings.map((review, i) => {
-      console.log("counter nblikes", review.nbLikes)
+      console.log("counter likesCounter", review.likesCounter)
 
       const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
 
@@ -118,7 +127,7 @@ export default function HomeScreen() {
                   <Text style={styles.userName}>@{review.username}</Text>
                   <View style={styles.heartAndlikeCounter}>
                       <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
-                      <Text>({review.nbLikes})</Text>
+                      <Text>({review.likesCounter.length})</Text>
                   </View>
                 </View>
                 <View style={styles.starsContainer}>
@@ -142,6 +151,9 @@ export default function HomeScreen() {
     )
   })} else {
     ratingsNewsFeed = publicRating.map((review, i)=> {
+      const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
+      console.log("counter likesCounter2", review.likesCounter)
+
       return (
         <View key={i}>
          <View style={styles.ratingContainerPublic}>
@@ -150,8 +162,13 @@ export default function HomeScreen() {
                <Image style={styles.avatar} source={{ uri: review.profilePicture }}  /* source={require('../assets/avatar.png')} *//> 
                 
                 <View style={styles.userInfo}>
+                <View style={styles.userandlike}>
                   <Text style={styles.userName}>@{review.username}</Text>
-                  
+                    <View style={styles.heartAndlikeCounter}>
+                        <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
+                        <Text>({review.likesCounter.length})</Text>
+                    </View>
+                  </View>
                   <View style={styles.starsContainer}>
                     {renderStars(review.note)} {/* Affichage des étoiles */}
                     <Text style={styles.textNote} >{review.note}</Text>
