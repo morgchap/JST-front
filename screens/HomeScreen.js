@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Text, View, StyleSheet, Image, SafeAreaView, ImageBackground, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const [ratings, setRatings] = useState([]); // Pour stocker les avis des amis
   const [publicRating, setPublicRatings]= useState([]);
   const user = useSelector((state) => state.user.value); // Récupérer l'utilisateur actuel depuis Redux
@@ -111,6 +111,18 @@ export default function HomeScreen() {
     
     ratingsNewsFeed = ratings.map((review, i) => {
       console.log("counter likesCounter", review.likesCounter)
+      
+      let fpp = <TouchableOpacity onPress={() => {
+        navigation.navigate("Friend", {friendName : review.username})}}>
+        <Image style={styles.avatar} source={require("../assets/avatar.png")}/>
+        </TouchableOpacity>;
+
+      if (review.profilePicture) {
+        fpp = <TouchableOpacity onPress={() => {
+          navigation.navigate("Friend", {friendName : review.username})}}>
+            <Image style={styles.avatar} source={{uri: review.profilePicture}}/>;
+        </TouchableOpacity>
+      }
 
       const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
 
@@ -120,7 +132,8 @@ export default function HomeScreen() {
        <View style={styles.ratingContainer}>
           <View style={styles.ratingContent}>
             <View style={styles.userInfoContainer}>
-             <Image style={styles.avatar} source={{ uri: review.profilePicture }}  /* source={require('../assets/avatar.png')} *//> 
+             
+             {fpp}
               
               <View style={styles.userInfo}>
                 <View style={styles.userandlike}>
@@ -139,7 +152,10 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.gameReviewContainer}>
-              <Image style={styles.gameCover} source={{ uri: review.gameCover }}/>
+            <TouchableOpacity onPress={() => {
+                navigation.navigate("Games", {gameName : review.gameName})}}>
+                <Image style={styles.gameCover} source={{ uri: review.gameCover }}/>
+                </TouchableOpacity>
               <View style={styles.reviewContent} >
                 <Text style={styles.reviewGameTitle}>{review.gameName}</Text>
                 <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
@@ -152,22 +168,42 @@ export default function HomeScreen() {
   })} else {
     ratingsNewsFeed = publicRating.map((review, i)=> {
       const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
-      console.log("counter likesCounter2", review.likesCounter)
+      console.log("data", review)
+      
+      let likable;
+
+      if (user.token) {
+        likable = <View style={styles.heartAndlikeCounter}>
+        <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
+        <Text>({review.likesCounter.length})</Text>
+    </View>
+      }
+
+
+      let fpp = <TouchableOpacity onPress={() => {
+        navigation.navigate("Friend", {friendName : review.username})}}>
+        <Image style={styles.avatar} source={require("../assets/avatar.png")}/>
+        </TouchableOpacity>;
+
+      if (review.profilePicture) {
+        fpp = <TouchableOpacity onPress={() => {
+                navigation.navigate("Friend", {friendName : review.username})}}>
+                  <Image style={styles.avatar} source={{uri: review.profilePicture}}/>;
+              </TouchableOpacity>
+
+        }
 
       return (
         <View key={i}>
          <View style={styles.ratingContainerPublic}>
             <View style={styles.ratingContent}>
               <View style={styles.userInfoContainer}>
-               <Image style={styles.avatar} source={{ uri: review.profilePicture }}  /* source={require('../assets/avatar.png')} *//> 
+               {fpp}
                 
                 <View style={styles.userInfo}>
                 <View style={styles.userandlike}>
                   <Text style={styles.userName}>@{review.username}</Text>
-                    <View style={styles.heartAndlikeCounter}>
-                        <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
-                        <Text>({review.likesCounter.length})</Text>
-                    </View>
+                    {likable}
                   </View>
                   <View style={styles.starsContainer}>
                     {renderStars(review.note)} {/* Affichage des étoiles */}
@@ -178,7 +214,10 @@ export default function HomeScreen() {
               </View>
   
               <View style={styles.gameReviewContainer}>
+              <TouchableOpacity onPress={() => {
+                navigation.navigate("Games", {gameName : review.gameName})}}>
                 <Image style={styles.gameCover} source={{ uri: review.gameCover }}/>
+              </TouchableOpacity>
                 <View style={styles.reviewContent} >
                   <Text style={styles.reviewGameTitle}>{review.gameName}</Text>
                   <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
