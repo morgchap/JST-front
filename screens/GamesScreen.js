@@ -38,7 +38,8 @@ export default function GamesScreen({navigation, route}) {
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/byuser/${user.username}`)
       .then(result => result.json())
       .then(data => {
-        console.log("data de mes reviews", data.ratings.ratingsID)
+        console.log("data de mes reviews", data.ratings)
+        console.log("nombre de likes", data.ratings.likesNumber)
       
         const theGameReview = data.ratings.filter(((e) => e.game.name == gameName))
         
@@ -167,8 +168,9 @@ for (let i = 0; i < 5; i++) {
       </View>
     )
    })
+   
 
-      useEffect(() => {
+useEffect(() => {
 
         //fetch le jeu
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/byname`, {
