@@ -30,7 +30,7 @@ import friend from "./reducers/friend"
 import game from './reducers/game'
 import { persistStore, persistReducer } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
-import storage from "redux-persist/es/storage";
+//import storage from "redux-persist/es/storage";
 import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
 import AsyncStorage from "@react-native-async-storage/async-storage"
