@@ -223,15 +223,15 @@ const renderComments = (reviewId) => {
                   <Text>({review.likesCounter.length})</Text>
                </View>              
                 </View>
-               <View style={styles.starsContainer}>
-                 <>
-                 {renderStars(review.note)} 
-                 </>
-                 <Text style={styles.textNote} >{review.note}</Text>
-               </View>
+                <View style={styles.starsContainer}>
+                  <>
+                  {renderStars(review.note)}
+                  </>
+                  <Text style={styles.textNote} >{review.note}</Text>
+                </View>
 
-             </View>
-           </View>
+              </View>
+            </View>
 
            <View style={styles.gameReviewContainer}>
            <TouchableOpacity onPress={() => {
