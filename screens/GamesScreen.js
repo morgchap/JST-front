@@ -29,9 +29,11 @@ export default function GamesScreen({navigation, route}) {
     const [personalNote, setPersonalNote] = useState(0);
     const [writtencontent, setWrittentContent]= useState('')
     const [gamereview, setGameReview] = useState([])
+    const [friendsGR, setFriendsGR] = useState([])
     const [heartLiked, setHeartLiked] = useState(false);
     const [myReviews, setMyReviews] = useState([]);
     const [likedMyReviews, setLikedMyReviews] = useState({});
+    const [likedReviews, setLikedReviews] = useState({});
     //console.log(`game : ${gameName}`)
 
     function fetchMyReview() {
@@ -44,13 +46,40 @@ export default function GamesScreen({navigation, route}) {
         const theGameReview = data.ratings.filter(((e) => e.game.name == gameName))
         
         setMyReviews(theGameReview);
+
+        const liked = {};
+        data.ratings.forEach(review => {
+        liked[review._id] = review.likesNumber.includes(user.userId);
+      });
+
+      
+      setLikedMyReviews(liked)
       
       })
     }
 
     function fetchMyFriendsReviews() {
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/friendsreview/bygame`,{
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user.username, name: gameName }),
+    }).then(response => response.json())
+    .then(data => {
+      console.log("data du fetch des avis de mes amis", data)
+      setFriendsGR(data.ratings)
+      const liked = {};
+      data.ratings.forEach(review => {
+        liked[review._id] = review.likesCounter.includes(user.userId);
+      });
+      setLikedReviews(liked);
+    })
+        //console.log("data de mes reviews", data.ratings)
+        //console.log("nombre de likes", data.ratings.likesNumber)
+      
+        
       
     }
+    console.log(friendsGR)
 
     const toggleVisibility = () => {
       setVisibility((previous) => !previous);
@@ -109,10 +138,9 @@ export default function GamesScreen({navigation, route}) {
   function likeOrDislikeAReview(reviewId) {
     setHeartLiked(!heartLiked);
 
-    //console.log("changement de like")
     setLikedMyReviews(prevState => ({
       ...prevState,
-      [reviewId]: !prevState[reviewId],
+      [reviewId]: !prevState[reviewId],  // Toggle l'état du like pour cette revue
     }));
     
     
@@ -125,6 +153,7 @@ export default function GamesScreen({navigation, route}) {
       })
     }).then(() => {
       fetchMyReview();
+      fetchMyFriendsReviews();
     })
     
 
@@ -170,6 +199,47 @@ for (let i = 0; i < 5; i++) {
       </View>
     )
    })
+
+
+   const myFriendsreviews = friendsGR.map((data, i)=> {
+
+    const mynotestars = []; 
+
+    const isLiked = likedReviews[data._id] ? "heart" : "heart-o";
+
+for (let i = 0; i < 5; i++) {
+    let style = "star-o";
+    if (i < data.note+1) {
+      style =  style = "star";
+    }
+    mynotestars.push(<FontAwesome key={i} name={style} color="#f1c40f" size={15}/>);
+  }
+
+    return(
+      <View key={i} style = {styles.friendsReviews}>
+      <View style={styles.picanduseandreview}> 
+      <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+      <View style={styles.useandreview}>
+        <View style={styles.userandlike}>
+          <Text style={styles.friendsPseudo}>@{data.username}</Text>
+          <View style={styles.heartAndlikeCounter}>
+              <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={15} onPress={() => likeOrDislikeAReview(data._id)} />
+              <Text>({data.likesCounter.length})</Text>
+          </View>
+        </View>
+      <View style={styles.starsContainer2}>
+           {mynotestars}
+          <Text style ={styles.votecount2}>{data.note}</Text>
+      </View> 
+      </View>
+      </View>   
+      <View style={styles.comment}>
+          <Text>{data.writtenOpinion}</Text>
+      </View>
+      </View>
+    )
+   })
+   
    
 
 useEffect(() => {
@@ -327,36 +397,8 @@ for (let i = 0; i < 5; i++) {
 </TouchableOpacity>
 
 <Collapsible isVisible={isVisible}>
-  <View style = {styles.friendsReviews}>
-  <View style={styles.picanduseandreview}> 
-  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-  <View style={styles.useandreview}>
-  <Text style={styles.friendsPseudo}>@monami</Text>
-  <View style={styles.starsContainer2}>
-       {stars2}
-      <Text style ={styles.votecount2}>3,5</Text>
-  </View> 
-  </View>
-  </View>   
-  <View style={styles.comment}>
-      <Text>That is my favorite game i would 100% recommend it</Text>
-  </View>
-  </View>
-  <View style = {styles.friendsReviews}>
-  <View style={styles.picanduseandreview}> 
-  <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-  <View style={styles.useandreview}>
-  <Text style={styles.friendsPseudo}>@monami</Text>
-  <View style={styles.starsContainer2}>
-       {stars2}
-      <Text style ={styles.votecount2}>3,5</Text>
-  </View> 
-  </View>
-  </View>   
-  <View style={styles.comment}>
-      <Text>That is my favorite game i would 100% recommend it</Text>
-  </View>
-  </View>
+{myFriendsreviews}
+  
 </Collapsible>
 
 

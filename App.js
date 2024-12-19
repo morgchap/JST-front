@@ -122,23 +122,11 @@ const TabNavigator = () => {
     );
   };
 
-  // version avec reducer, ne marche pas
-/*export default function App() {
-    return (
-        <Provider store={store}>
-            <NavigationContainer>
-                <Stack.Navigator screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="Login" component={LoginScreen} />
-                    <Stack.Screen name="TabNavigator" component={TabNavigator} />
-                </Stack.Navigator>
-            </NavigationContainer>
-        </Provider>
-    )
-}*/
+
 
 export default function App() {
   return (
-        //<GoogleOAuthProvider clientId="40832813030-m32nvk4dn7uh7dkjn86eh9n9innlh0a3.apps.googleusercontent.com">
+
         <Provider store={store}>
         <PersistGate persistor={persistor}>
             <NavigationContainer>
@@ -160,6 +148,6 @@ export default function App() {
             </NavigationContainer>
           </PersistGate>
         </Provider>
-       // </GoogleOAuthProvider>
+
   )
 }
