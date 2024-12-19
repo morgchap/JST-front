@@ -75,7 +75,7 @@ const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"
           </Pressable>  
         <View style={styles.middlepart}>
           <View style={styles.line}></View>
-          <Text style={styles.text}>OU</Text>
+          <Text style={styles.text}>OR</Text>
           <View style={styles.line}></View>
         </View> 
           <TextInput style={styles.input} 
@@ -105,7 +105,7 @@ const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"
              style={styles.button}
             title="steam"
             onPress={() => handlesignup()}>
-              <Text style={styles.buttonText}>next</Text>
+              <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>  
       </View>  
         </KeyboardAvoidingView>

@@ -175,7 +175,7 @@ export default function SetupScreen({ navigation }) {
     <View style={styles.infoDiv}>
       <View style={styles.myInformations}>
       
-          <Text style={styles.secondTitles}>Mes informations</Text>
+          <Text style={styles.secondTitles}>My information</Text>
             <View style={styles.randomView}> 
                 <View style={styles.inputView}>
                     <Text style={styles.infoText}>Your pseudo : @{changedUsername}</Text>

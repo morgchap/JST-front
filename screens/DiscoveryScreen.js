@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { SafeAreaView, View, Text, Image, StyleSheet, ImageBackground, ScrollView, TouchableOpacity, Linking} from 'react-native';
+import { SafeAreaView, View, Text, Image, StyleSheet, ImageBackground, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { useSelector } from 'react-redux';
 
-export default function DiscoveryScreen({navigation}) {
+export default function DiscoveryScreen({ navigation }) {
+  // Déclare les états pour les articles, les jeux et les amis
   const [articles, setArticles] = useState([]);
   const [games, setGames] = useState([]);
   const [name, setName] = useState('')
   const [friends, setFriends] = useState([]);
- // const [pageContent, setPageContent]= useState('')
+
+  // Récupère les informations de l'utilisateur depuis le store Redux
   const user = useSelector((state) => state.user.value);
 
   const newsApiKey = process.env.EXPO_PUBLIC_NEWS_API_KEY
@@ -24,7 +25,10 @@ export default function DiscoveryScreen({navigation}) {
           throw new Error('Failed to fetch articles');
         }
         const data = await response.json();
-        setArticles(data.articles?.map(article => ({ ...article, title: article.title.slice(0, 15) + (article.title.length > 15 ? "..." : "") })));
+        setArticles(data.articles?.map(article => ({
+          ...article,
+          title: article.title.slice(0, 15) + (article.title.length > 15 ? "..." : "")
+        })));
       } catch (error) {
         console.error('Error fetching articles:', error);
       }
@@ -33,21 +37,19 @@ export default function DiscoveryScreen({navigation}) {
     fetchArticles();
   }, []);
 
-  /* Pour les jeux */
+  // Récupère les jeux à l'aide de l'API RAWG
   useEffect(() => {
-    const fetchGames = async () => 
-    {
-      try 
-      {
+    const fetchGames = async () => {
+      try {
         const response = await fetch(
           `https://api.rawg.io/api/games?key=${process.env.EXPO_PUBLIC_API_KEY}`
         );
-        if (!response.ok) 
-        {
+        if (!response.ok) {
           throw new Error('Failed to fetch games');
         }
         const data = await response.json();
-        // Mélange les jeux et sélectionne les 10 premiers
+
+        // Mélange et sélectionne les 10 premiers jeux
         const shuffledGames = data.results.sort(() => 0.5 - Math.random()).slice(0, 10);
         setGames(shuffledGames)
         //console.log(shuffledGames)
@@ -89,34 +91,30 @@ export default function DiscoveryScreen({navigation}) {
   }, []);
 
 
-  /* Pour I can know them (a continuer)*/
-  
-  const addFriend = (userId) => {
-    //console.log(`Add friend with ID: ${userId}`);
-    // Logique pour ajouter un ami
-  };
-
+  // Fonction pour ouvrir un lien dans le navigateur
   const handlePress = (url) => {
     Linking.openURL(url);
   };
-
+ // Navigation vers l'écran des jeux avec le nom du jeu sélectionné
   const handlePressGame = async (gameName) => {
     //console.log(gameName);
     navigation.navigate('Games', { gameName: gameName });
   }
   
 
-  let pageContent 
-  if(user.username){
-    pageContent = <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView vertical contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.pageTitle}>Discovery</Text>
-          <View style={styles.titleUnderline} />
-        </View>
-
-        {/* Section Articles */}
+  // Affichage de la page si l'utilisateur est connecte
+  let pageContent;
+  if (user.username) {
+    pageContent = (
+      <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
+        <SafeAreaView style={styles.safeArea}>
+          <ScrollView contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
+            {/* En-tête */}
+            <View style={styles.headerContainer}>
+              <Text style={styles.pageTitle}>Discovery</Text>
+              <View style={styles.titleUnderline} />
+            </View>
+            {/* Section Articles */}
         <View>
           <Text style={styles.title}>Cette semaine chez les geek</Text>
           <View style={styles.encadrer}>
@@ -136,121 +134,109 @@ export default function DiscoveryScreen({navigation}) {
           </View>
         </View>
 
-        {/* Section Jeux */}
-        <View>
-          <Text style={styles.title}>Nos recommandations</Text>
-          <View style={styles.encadrer}>
-              <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
-                  {games.map((game) => {
-                          let gamename = game.name;
-                          if (game.name.length > 15) {
-                            gamename = game.name.slice(0, 15) + "..."; 
-                          }
-        
-                  return ( 
+
+            {/* Section Jeux */}
+            <View>
+              <Text style={styles.title}>Our recommendations</Text>
+              <View style={styles.encadrer}>
+                <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
+                  {games.map((game) => (
                     <View key={game.id} style={styles.gameItemHorizontal}>
                       {game.background_image && (
                         <TouchableOpacity onPress={() => handlePressGame(game.name)}>
                           <Image style={styles.jaquette} source={{ uri: game.background_image }} />
                         </TouchableOpacity>
                       )}
-                      <Text style={styles.gameTitle}>{gamename}</Text>
+                      <Text style={styles.gameTitle}>{game.name}</Text>
                     </View>
-                  );
-      })}
-              </ScrollView>
-          </View>
-        </View>
-
-        {/* Section I can know them*/}
-        <View>
-          <Text style={styles.title}>Je pourrais connaitre</Text>
-          <View style={styles.encadrer}>
-            {friends.map((friend) => (
-              <View key={friend.id} style={styles.friendItem}>
-                <Image style={styles.friendsAvatars} source={{ uri: friend.profilPicture }} defaultSource={require('../assets/avatar.png')}/>
-                <Text style={styles.friendsPseudo}>{friend.username}</Text>
-                <TouchableOpacity onPress={() => addFriend(friend.id)} style={styles.addButton}>
-                  <FontAwesome name="plus" size={20} color="#7A28CB" />
-                </TouchableOpacity>
+                  ))}
+                </ScrollView>
               </View>
-            ))}
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  </ImageBackground>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </ImageBackground>
+    );
   } else {
-    pageContent= <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView vertical contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.pageTitle}>Discovery</Text>
-          <View style={styles.titleUnderline} />
-        </View>
+    //Affichage de la page si l'utilisateur n'est pas connecte
+    pageContent = (
+      <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}>
+        <SafeAreaView style={styles.safeArea}>
+          <ScrollView contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
+            {/* En-tête */}
+            <View style={styles.headerContainer}>
+              <Text style={styles.pageTitle}>Discovery</Text>
+              <View style={styles.titleUnderline} />
+            </View>
 
-        {/* Section Articles */}
-        <View>
-          <Text style={styles.title}>Cette semaine chez les geek</Text>
-          <View style={styles.encadrer}>
-              <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
-                {articles.map((article, index) => (
-                  <View key={index} style={styles.articleItemHorizontal}>
-                    <View style={styles.articleTextContainer}>
-                      <Text style={styles.articleTitle}>{article.title}</Text>
-                      <Text style={styles.articleDescription}>{article.description}</Text>
-                    </View>
-                    <TouchableOpacity onPress={() => handlePress(article.url)}>
-                      <Image style={styles.articleImage} source={{ uri: article.urlToImage }} />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </ScrollView>
-          </View>
-        </View>
-
-        {/* Section Jeux */}
-        <View>
-          <Text style={styles.title}>Nos recommandations</Text>
-          <View style={styles.encadrer}>
-              <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
-                {games.map((game) => (
-                  <View key={game.id} style={styles.gameItemHorizontal}>
-                    {game.background_image && (
-                      <TouchableOpacity onPress={() => handlePressGame(game.name)}>
-                        <Image style={styles.jaquette} source={{ uri: game.background_image }} />
+            {/* Section Articles */}
+            <View>
+              <Text style={styles.title}>This week in the geek world</Text>
+              <View style={styles.encadrer}>
+                <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
+                  {articles.map((article, index) => (
+                    <View key={index} style={styles.articleItemHorizontal}>
+                      <View style={styles.articleTextContainer}>
+                        <Text style={styles.articleTitle}>{article.title}</Text>
+                        <Text style={styles.articleDescription}>{article.description}</Text>
+                      </View>
+                      <TouchableOpacity onPress={() => handlePress(article.url)}>
+                        <Image style={styles.articleImage} source={{ uri: article.urlToImage }} />
                       </TouchableOpacity>
-                    )}
-                    <Text style={styles.gameTitle}>{game.name}</Text>
-                  </View>
-                ))}
-              </ScrollView>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  </ImageBackground>
+                    </View>
+                  ))}
+                </ScrollView>
+              </View>
+            </View>
+
+            {/* Section Jeux */}
+            <View>
+              <Text style={styles.title}>Our recommendations</Text>
+              <View style={styles.encadrer}>
+                <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
+                  {games.map((game) => (
+                    <View key={game.id} style={styles.gameItemHorizontal}>
+                      {game.background_image && (
+                        <TouchableOpacity onPress={() => handlePressGame(game.name)}>
+                          <Image style={styles.jaquette} source={{ uri: game.background_image }} />
+                        </TouchableOpacity>
+                      )}
+                      <Text style={styles.gameTitle}>{game.name}</Text>
+                    </View>
+                  ))}
+                </ScrollView>
+              </View>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </ImageBackground>
+    );
   }
-  return (
-    <>
-    {pageContent}
-    </>
-  );
+
+  return <>{pageContent}</>;
 }
 
+// Styles pour la page
 const styles = StyleSheet.create({
+  // Pour eviter de deborder de l'ecran
   safeArea: {
     flex: 1,
   },
+
+  // Style de l'arriere plan
   image: {
     flex: 1,
     width: '100%',
     height: '100%',
   },
+
+  //Style pour le header
   headerContainer: {
     alignItems: 'center',
     marginVertical: 20,
   },
+
+  // Style du titre principal de la page + trait en dessous
   pageTitle: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -262,93 +248,77 @@ const styles = StyleSheet.create({
     backgroundColor: '#7A28CB',
     marginTop: 5,
   },
+
+  // Style pour les encadrés des articles et des jeux
   encadrer: {
     margin: 15,
     padding: 10,
     borderRadius: 15,
     backgroundColor: '#7A28CB',
   },
+
+  //Style contenu des listes
   listContent: {
     paddingVertical: 20,
-    paddingHorizontal: 0,
   },
 
+  /*ARTICLES*/
+  //Style pour un article avec titre, description courte et image
   articleItemHorizontal: {
     flexDirection: 'row',
-    alignItems: 'left',
+    alignItems: 'flex-start',
   },
+  //Style pour le texte d'un article
   articleTextContainer: {
     flex: 1,
-    alignItems: 'left',
     width: 190,
     height: 158,
   },
+  //Style pour le titre d'un article
   articleTitle: {
     fontSize: 15,
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
-    worldWrap: 'break-word',
-    flexWrap: 'wrap',
-    width: '100%',
   },
+  //Style pour la description d'un article
   articleDescription: {
     fontSize: 14,
     color: '#D6CBFD',
     textAlign: 'center',
-    worldWrap: 'break-word',
-    flexWrap: 'wrap',
-    width: '100%',
   },
+  //Style pour l'image d'un article
   articleImage: {
     width: 105,
     height: 158,
     borderRadius: 15,
   },
 
+  /*GAMES*/
+  //Style pour un jeu avec image et nom du jeu
   gameItemHorizontal: {
-    padding: 5,
     alignItems: 'center',
   },
+  //Style jaquette du jeu
   jaquette: {
     borderRadius: 15,
     width: 105,
     height: 158,
     marginBottom: 5,
   },
+  //Style titre du jeu
   gameTitle: {
     fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#D6CBFD',
   },
+
+  //Style titre des sections
   title: {
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'left',
     marginLeft: 20,
     color: '#7A28CB',
-  },
-  friendsAvatars: {
-    borderRadius: 50,
-    height: 50,
-    width: 50,
-    marginBottom: 5,
-  },
-  friendsPseudo: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#7A28CB',
-  },
-  friendItem: {
-    alignItems: 'center',
-    margin: 10,
-  },
-  addButton: {
-    marginTop: 5,
-    backgroundColor: '#D6CBFD',
-    borderRadius: 25,
-    padding: 5,
   },
 });
