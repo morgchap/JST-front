@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { clickedFriend } from '../reducers/friend';
 import { addListGames } from '../reducers/user';
+import { LinearGradient } from "expo-linear-gradient";
 
 
 
@@ -18,9 +19,10 @@ export default function FriendScreen({ navigation, route }) {
     const [game, setGame] = useState("")
     const { friendName } = route.params
     //const [showPrivateList, setShowPrivateList] = useState(false)
-    const [gotPP, setGotPP] = useState(false) 
+    const [gotPP, setGotPP] = useState(false)
     const [profilePicture, setProfilePicture] = useState(null);
     const [modal, setModal] = useState(false)
+    const [message, setmessage] = useState(false)
     const [isVisible, setVisibility] = useState(false)
     const [icon, setIcon]= useState('caret-down')
     const [addable, setAddable] = useState(false)
@@ -31,15 +33,13 @@ export default function FriendScreen({ navigation, route }) {
       dispatch(clickedFriend(friendUsername));
     };
 
- 
+
   
   useEffect(() => {
 
     if (user.username === friendName) {
       navigation.navigate("TabNavigator", { screen: "Profil" });
   }
-
-    //console.log("ça marche");
 
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`)
     .then(result => result.json())
@@ -145,9 +145,9 @@ if (addable) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ sender: userData.infos._id, receiver: friendData.infos._id }),
         });
-        /*const addFriendData = await addFriendResponse.json();
-        console.log("data du dernier fetch", addFriendData);*/
-
+        const addFriendData = await addFriendResponse.json();
+       // console.log("data du dernier fetch", addFriendData);
+        setmessage(true)
     } catch (error) {
         //console.error("Erreur dans addAFriend:", error.message);
     }
@@ -155,32 +155,31 @@ if (addable) {
 
 
   let pluralFriends = "";
-  if (numberOfFriends >1) {
-    pluralFriends = "s"
-  }
+if (numberOfFriends >1) {
+  pluralFriends = "s"
+}
 
-  let pluralGames = "";
-  if (numberOfGames >1) {
-    pluralGames = "x"
-  }
-
+let pluralGames = "";
+if (numberOfGames >1) {
+  pluralGames = "x"
+}
 
 const games = gameList.map((data, i) => {
 
   const stars = [];
-  for (let i = 0; i < 5; i++) {
-    let style = "star-o";
-    if (i < 4 - 1) {
-      style = "star";
-    }
-    stars.push(<FontAwesome key={i} name={style} color="yellow" />);
+for (let i = 0; i < 5; i++) {
+  let style = "star-o";
+  if (i < 4 - 1) {
+    style = "star";
   }
+  stars.push(<FontAwesome key={i} name={style} color="yellow" />);
+}
 
-  let name = data.name[0].toUpperCase() + data.name.slice(1);
+let name = data.name[0].toUpperCase() + data.name.slice(1);
 
-  if (name.length >= 15) {
-    name = name[0].toUpperCase() + name.slice(1, 10) + "..."
-  }
+if (name.length >= 15) {
+  name = name[0].toUpperCase() + name.slice(1, 10) + "..."
+}
 
   return (
     <View key={i} style={styles.gameContainer}>
@@ -195,77 +194,21 @@ const games = gameList.map((data, i) => {
   )
 })
 
-// print all list if the user is your friend
-// print only public list if the user is not your friend
-/*const printLists = async () => {
-console.log("DEBUT DES TESTS")
-  // get the friend list
-  let friendList = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getFriendList/${user.username}`)
-  friendList = await friendList.json()
-  // get the user's id of the current page
-  let profilData = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`);
-  profilData = await profilData.json();
-  let profilId = profilData.infos._id
-  // check if the user's id is in the friend list
-  for(let idOfFriendList of friendList.list.friendsList){
-console.log(idOfFriendList, profilId)
-console.log(idOfFriendList.equals(profilId))
-    if(idOfFriendList.equals(profilId)){
-      setShowPrivateList(true)
-      break
-    }
-  }
-
-  // if showPrivateList is true, then the profil user is your friend, then you are able to see all of his lists
-  // if showPrivateList is false, then the profil user is not your friend, then you are able to see only is public list
-  const tmpLists = showPrivateList ? allLists : allLists.filter((list) => list.isPublic !== showPrivateList) 
-  const lists = tmpLists.map((data, i) => {
-    let title = data.listName.length >= 13 ? data.listName.slice(0, 10) + "..." : data.listName
-    let plural = data.gameList.length < 2 ? "jeu" : "jeux"
-    return (
-      <View key={i} style={styles.boxOfLists}>
-        <Text style={styles.listName}>{title}</Text>
-        <TouchableOpacity onPress={() => handleSeeList(data.listName)} activeOpacity={0.8}>
-          <Image style={styles.jacket} source={require("../assets/mario.png")} />
-        </TouchableOpacity>
-        <View style={styles.textOfListBottom}>
-          <Text style={styles.listLength}>{data.gameList.length} {plural}</Text>
-        </View>
-      </View>
-    )
-  })
-//console.log("TEST : ", lists)
-console.log(lists)
-return lists
-}*/
-//console.log(printLists())
-//printLists()
-//const lists = printLists()
-
-
-  const lists = allLists.map((data, i) => {
-    let title = data.listName.length >= 13 ? data.listName.slice(0, 10) + "..." : data.listName
-    let plural = data.gameList.length < 2 ? "jeu" : "jeux"
-    return (
-      <View key={i} style={styles.boxOfLists}>
-        <Text style={styles.listName}>{title}</Text>
-        <TouchableOpacity onPress={() => handleSeeList(data.listName)} activeOpacity={0.8}>
-          <Image style={styles.jacket} source={require("../assets/mario.png")} />
-        </TouchableOpacity>
-        <View style={styles.textOfListBottom}>
-          <Text style={styles.listLength}>{data.gameList.length} {plural}</Text>
-        </View>
-      </View>
-    )
-  })
-
-/*fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getFriendList/${user.username}`)
-.then(res => res.json())
-.then((data) => {
-  console.log("user = ", user.username)
-  console.log("friendList = ", data.list.friendsList)
-  
-})*/
+    const lists = allLists.map((data, i) => {
+      let title = data.listName.length >= 13 ? data.listName.slice(0, 10) + "..." : data.listName
+        let plural = data.gameList.length < 2 ? "jeu" : "jeux"
+        return (
+          <View key={i} style={styles.boxOfLists}>
+            <Text style={styles.listName}>{title}</Text>
+            <TouchableOpacity onPress={() => handleSeeList(data.listName)} activeOpacity={0.8}>
+              <Image style={styles.jacket} source={require("../assets/mario.png")} />
+            </TouchableOpacity>
+            <View style={styles.textOfListBottom}>
+              <Text style={styles.listLength}>{data.gameList.length} {plural}</Text>
+            </View>
+          </View>
+        )
+      })
 
 
 
@@ -275,10 +218,10 @@ return lists
         .then(response => response.json())
         .then(data => {
           let gamesList
-          if(data.error === "Your list is empty."){
+          if(data.error === "their list is empty."){
             gamesList = [
               <View key={0}>
-                <Text>Votre List est vide</Text>
+                <Text>the list is empty</Text>
               </View>
             ]
           } else {
@@ -314,7 +257,7 @@ return lists
   return (
     <View style={styles.centered}>
       <View style={styles.headIcons}>
-      <FontAwesome name="chevron-left" color="green" size={25} onPress={() => {
+      <FontAwesome name="chevron-left" color="#00A877" size={25} onPress={() => {
         navigation.goBack();
         selectFriend("");
       }}/>
@@ -337,14 +280,10 @@ return lists
       </View>
       {addButton}
 
-      <TouchableOpacity onPress={toggleVisibility} style={styles.container2}>
-        <Text style = {styles.collapsedname}>Most liked reviews</Text>
-        <FontAwesome name={icon} color="black" size={20}/>
-      </TouchableOpacity>
       <ScrollView>
         <View style={styles.gameDiv}>
           <View style={styles.games}>
-              <Text style={styles.secondTitles}>Ses jeux préférés ({numberOfGames})</Text>
+              <Text style={styles.secondTitles}>their favorite gasme ({numberOfGames})</Text>
               <ScrollView horizontal={true} style={styles.listGame}> 
                 {games}
               </ScrollView>
@@ -360,24 +299,30 @@ return lists
           </View>
         </View>
 
-        <Collapsible isVisible={isVisible2}>
-          <View style = {styles.friendsReviews}>
-            <View style={styles.picAndUseAndReview}> 
-              <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
-              <View style={styles.useandreview}>
-                <Text style={styles.friendsPseudo}>@monami</Text>
-                <View style={styles.starsContainer2}>
-                  {stars2}
-                  <Text style ={styles.votecount2}>3,5</Text>
-                </View> 
-              </View>
-            </View>   
-            <View style={styles.comment}>
-              <Text>That is my favorite game i would 100% recommend it</Text>
-            </View>
-          </View>
-        </Collapsible>
+        <TouchableOpacity onPress={toggleVisibility} style={styles.container2}>
+          <Text style = {styles.collapsedname}>Most liked reviews</Text>
+          <FontAwesome name={icon} color="black" size={20}/>
+        </TouchableOpacity>
+        
       </ScrollView>
+      <Modal
+      transparent={true}
+      visible={message}
+    >
+      <View style={styles.modalBackground2}>
+        <View style={styles.modalContainer2}>
+        <View style={styles.backbutton}>
+        <FontAwesome 
+          name="times"
+          color="#7A28CB" 
+          size={25} 
+          onPress={() => setmessage(false)} 
+        />
+      </View> 
+         <Text>Your friend's request was sent</Text>
+        </View>
+    </View> 
+    </Modal>
 
       <Modal
         transparent={true}
@@ -450,14 +395,14 @@ const styles = StyleSheet.create({
       height: 100,
       width: 100,
       paddingBottom: 1,
-      borderColor: "green",
+      borderColor: "#8FBC8B",
       borderWidth: 3,
     },
 
     pseudo: {
       fontSize: 20,
       paddingTop: 10,
-      color: "green",
+      color: "#00A877",
       paddingBottom: 10,
       fontWeight: "bold",
 
@@ -485,7 +430,7 @@ const styles = StyleSheet.create({
     games: {
       width: "95%",
       height: "auto",
-      backgroundColor: "green",
+      backgroundColor: "#00A877",
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
@@ -570,7 +515,7 @@ const styles = StyleSheet.create({
     friendsPseudo: {
       paddingHorizontal: 10,
       fontSize: 16,
-      color: "green",
+      color: "#00A877",
     },
 
     friendsPseudoBis: {
@@ -588,7 +533,7 @@ const styles = StyleSheet.create({
       alignItems: "center",
       paddingVertical: 10,
       fontFamily:'OpenSans_600SemiBold',
-      color : 'green',
+      color : '#00A877',
     },
 
     friendsSent: {
@@ -623,7 +568,7 @@ const styles = StyleSheet.create({
     rightButton: {
       borderTopLeftRadius: 10,
       borderTopRightRadius: 10,
-      backgroundColor: 'green',
+      backgroundColor: '#00A877',
       justifyContent: "center",
       alignItems: "center",
       paddingHorizontal: 10,
@@ -641,21 +586,33 @@ const styles = StyleSheet.create({
     },
 
     statsText: {
-      color : 'green',
+      color : '#00A877',
     },
 
     friendStatsText: {
-      color : 'green',
+      color : '#00A877',
       textDecorationLine: "underline",
     },
-
-   
+    modalBackground: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    },
+    modalContainer: {
+      width: '80%',
+      padding: 20,
+      backgroundColor: 'white',
+      borderRadius: 10,
+      alignItems: 'flex-start',
+      justifyContent: 'center',
+    },
 
     scrollViewBis: {
       display: "flex",
       flex: 1,
       flexDirection: "column",
-      backgroundColor: "green",
+      backgroundColor: "#00A877",
       paddingHorizontal: 10,
       marginLeft: 8,
       marginRight: 8,
@@ -673,7 +630,16 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         height: 50,
         width: 100,
-        backgroundColor: 'green',
+        backgroundColor: '#00A877',
+        justifyContent: "center",
+        alignItems: "center",
+    
+      },
+      noButton: {
+        borderRadius: 10,
+        height: 60,
+        width: 150,
+        backgroundColor: 'gray',
         justifyContent: "center",
         alignItems: "center",
     
@@ -705,7 +671,7 @@ const styles = StyleSheet.create({
         margin: 10,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "green",
+        backgroundColor: "#00A877",
         marginHorizontal: 10,
         borderRadius: 10,
       },
@@ -767,6 +733,20 @@ const styles = StyleSheet.create({
     backbutton: {
       width: 20,
       alignItems: "flex-end",
+    },
+    modalBackground2: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    },
+    modalContainer2: {
+      width: '80%',
+      padding: 20,
+      backgroundColor: 'white',
+      borderRadius: 10,
+      alignItems: 'flex-start',
+      justifyContent: 'center',
     },
     
   });

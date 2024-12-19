@@ -206,7 +206,7 @@ const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
 const mySentFriendRequests = sentFriendRequestList.map((data, i) => {
   return (
     <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
-      navigation.navigate("Friend");
+      navigation.navigate("Friend", {friendName: data.receiver.username});
       selectFriend(data.receiver.username);
       //console.log(friend);
       
@@ -284,7 +284,7 @@ if (numberOfFriends >1) {
 
 let pluralGames = "";
 if (numberOfGames >1) {
-  pluralGames = "x"
+  pluralGames = "s"
 }
 
 // const isConnected = true;
@@ -320,7 +320,7 @@ if (numberOfGames >1) {
         <Text style={styles.pseudo}>@{user.username}</Text>
       </View>
       <View style={styles.stats}>
-          <Text style={styles.gameStatsText}>{numberOfGames} jeu{pluralGames}</Text>
+          <Text style={styles.gameStatsText}>{numberOfGames} game{pluralGames}</Text>
           <TouchableOpacity onPress={() => {
             navigation.navigate("FriendList", {userFriendList: user.username})
             selectFriend(user.username)
@@ -330,7 +330,7 @@ if (numberOfGames >1) {
       </View>
       <View style={styles.gameDiv}>
         <View style={styles.games}>
-            <Text style={styles.secondTitles}>Mes jeux préférés ({numberOfGames})</Text>
+            <Text style={styles.secondTitles}>My favorite games ({numberOfGames})</Text>
             <ScrollView horizontal={true} style={styles.listGame}> 
               {games}
             </ScrollView>
@@ -338,10 +338,10 @@ if (numberOfGames >1) {
       </View>
       <View style={styles.myFriendTitleDiv}>
           <TouchableOpacity style={styles.leftButton} onPress={() => receivedRequest()}>
-            <Text style={styles.friendsReceived}>Demandes reçues ({receivedFriendRequestList.length})</Text>               
+            <Text style={styles.friendsReceived}>Requests received ({receivedFriendRequestList.length})</Text>               
           </TouchableOpacity>
           <TouchableOpacity style={styles.rightButton} onPress={() => sendRequest()}>
-            <Text style={styles.friendsSent}>Demandes envoyées ({sentFriendRequestList.length})</Text>               
+            <Text style={styles.friendsSent}>Requests sent ({sentFriendRequestList.length})</Text>               
           </TouchableOpacity>
           </View>
           { defaultFriends ? (

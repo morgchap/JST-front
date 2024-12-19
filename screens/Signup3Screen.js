@@ -25,9 +25,9 @@ export default function Signup3({ navigation }) {
 
     fetch(`https://api.rawg.io/api/games/${searchedGame}?key=${process.env.EXPO_PUBLIC_API_KEY}`).then(response => response.json())
       .then(data => {
-        // if (data.detail = 'not found.'){
-        //     setError('game not found') 
-        //  } else {
+        if (data.detail = 'not found.'){
+            setError('game not found') 
+         } else {
         //console.log(`name : ${data.name} img : ${data.background_image} date : ${data.released}, descr : ${data.description_raw}, genres : ${data.genres[0]?.name}`)
         setGame('')
         setModalVisible(true)
@@ -39,7 +39,7 @@ export default function Signup3({ navigation }) {
         setGameGenre(data.genres.name)
 
       }
-        //}
+        }
       )
   }
 
