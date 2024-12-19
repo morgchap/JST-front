@@ -212,7 +212,7 @@ const handleCommentDisplay = async (reviewId) => {
       }
 
       const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
-//////////////////////////
+
 
 return (
   <View key={i}>
@@ -284,13 +284,31 @@ ratingsNewsFeed = publicRating.map((review, i)=> {
  // console.log("data", review)
   
   let likable;
-
+  let commentable
   if (user.token) {
     likable = (<View style={styles.heartAndlikeCounter}>
     <FontAwesome name={commentStyles[review._id] || 'comment'} style={styles.comIcon} size={20} onPress={() => handleCommentDisplay(review._id)} />
     <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
     <Text>({review.likesCounter.length})</Text>
 </View>)
+commentable = 
+
+<View style={styles.reviewinputcont}>
+<TextInput key={i} style={styles.reviewinput}
+  placeholder='Comment'
+  placeholderTextColor={'grey'}
+  maxLength={100}
+  multiline={true}
+  enterKeyHint='return'
+  onChangeText={(value) => handleCommentChange(review._id, value)}
+  value={comment[review._id] || ""}
+  onFocus={() => setActiveCommentReview(review._id)}
+  onBlur={() => setActiveCommentReview(null)}
+  //onSubmitEditing={()=> handlesubmit()}
+  >
+  </TextInput>
+  <FontAwesome name='paper-plane' style={styles.sendIcon} size={20} onPress={() => handleCommentSubmit(review._id)} />
+    </View>
   }
 
 
@@ -353,7 +371,6 @@ ratingsNewsFeed = publicRating.map((review, i)=> {
                     </View>
                     <ScrollView style={styles.reviewcont}>
                       {commentable}
-
                     </ScrollView>
                   </View>
                   {displayedCommentId === review._id && (

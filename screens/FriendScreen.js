@@ -26,6 +26,7 @@ export default function FriendScreen({ navigation, route }) {
     const [addable, setAddable] = useState(false)
 
 
+
     const dispatch = useDispatch();
     const selectFriend = (friendUsername) => {
       dispatch(clickedFriend(friendUsername));
@@ -675,6 +676,15 @@ const styles = StyleSheet.create({
         height: 50,
         width: 100,
         backgroundColor: '#00A877',
+        justifyContent: "center",
+        alignItems: "center",
+    
+      },
+      noButton: {
+        borderRadius: 10,
+        height: 60,
+        width: 150,
+        backgroundColor: 'gray',
         justifyContent: "center",
         alignItems: "center",
     

@@ -95,12 +95,12 @@ export default function DiscoveryScreen({ navigation }) {
   const handlePress = (url) => {
     Linking.openURL(url);
   };
- // Navigation vers l'écran des jeux avec le nom du jeu sélectionné
-  const handlePressGame = async (gameName) => {
-    //console.log(gameName);
-    navigation.navigate('Games', { gameName: gameName });
-  }
-  
+
+  // Navigation vers l'écran des jeux avec le nom du jeu sélectionné
+  const handlePressGame = (gameName) => {
+    console.log(gameName);
+    navigation.navigate('Games', { gameName });
+  };
 
   // Affichage de la page si l'utilisateur est connecte
   let pageContent;

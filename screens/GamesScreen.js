@@ -263,12 +263,14 @@ if(gamesinfo.summary=== undefined || summary === undefined){
   summaryToHTML = gamesinfo.summary
 }
 // console.log(gamesinfo.summary)
-    const stars = [];
-for (let i = 0; i < 5; i++) {
-  let style = "star-o";
-  if (i < 4 - 1) {
-    style = "star";
-  }}
+  const stars = [];
+  for (let i = 0; i < 5; i++) {
+    let style = "star-o";
+    if (i < 4 - 1) {
+      style = "star";
+    }
+    stars.push(<FontAwesome key={i} name={style} color="#f1c40f" size={20} />);
+  }
 
   const stars2 = [];
   for (let i = 0; i < 5; i++) {
