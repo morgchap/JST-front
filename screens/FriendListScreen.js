@@ -106,8 +106,9 @@ export default function FriendListScreen({ navigation, route }) {
             </View>
             <Text style={styles.titleFriendList}>Liste d'amis ({friendList.length})</Text>
             <View style={styles.friendListContainer}>
-                
-                {friendListContent}
+                <ScrollView>
+                  {friendListContent}
+                </ScrollView>
             </View>
         </View>
         
@@ -177,7 +178,7 @@ const styles = StyleSheet.create({
 
           display: "flex",
           width: "95%",
-          height: "auto",
+          height: "55%",
           backgroundColor: "#7A28CB",
           flexDirection: "column",
           justifyContent: "center",
