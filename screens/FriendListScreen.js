@@ -36,19 +36,19 @@ export default function FriendListScreen({ navigation, route }) {
 
     useEffect(() => {
 
-        console.log("ça marche");
+        //console.log("ça marche");
     
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${userFriendList}`)
         .then(result => result.json())
         .then(data => {
-          console.log("c'est le front de FriendListScreen", data.infos)
+          //console.log("c'est le front de FriendListScreen", data.infos)
     
           setNumberOfFriends(data.infos.friendsList.length);
     
-          console.log("number of friends ", numberOfFriends);
-          console.log("Id de list", data.infos.lists[0]);
+          //console.log("number of friends ", numberOfFriends);
+          //console.log("Id de list", data.infos.lists[0]);
 
-          console.log("last data", data);
+          //console.log("last data", data);
 
           setFriendList(data.infos.friendsList);
 
@@ -62,7 +62,7 @@ export default function FriendListScreen({ navigation, route }) {
         })
       }, [userFriendList])
 
-      console.log("state friendlist à exploiter", friendList);
+      //console.log("state friendlist à exploiter", friendList);
 
     //const friendListContent = "test";
 

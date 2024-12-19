@@ -160,6 +160,16 @@ if (name.length >= 15) {
   )
 })
 
+// print all list if the user is your friend
+// print only public list if the user is not your friend
+const printLists = async () => {
+  const friendList = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`)
+}
+const friendList = fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`)
+console.log("user = ", user.username)
+console.log("friendList = ", friendList)
+
+  //const tmpLists = allLists.filter((list) => console.log(list.listName, list.isPublic))
   const lists = allLists.map((data, i) => {
     let title = data.listName.length >= 13 ? data.listName.slice(0, 10) + "..." : data.listName
     let plural = data.gameList.length < 2 ? "jeu" : "jeux"
@@ -198,7 +208,7 @@ if (name.length >= 15) {
               } else {
                 title = data[0]
               }
-              console.log(data)
+              //console.log(data)
             return (
               <View key={i} style={styles.game}>
                 <TouchableOpacity onPress={() => handleNavigation(data[0]) }>
