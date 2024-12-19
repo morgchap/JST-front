@@ -39,12 +39,7 @@ export default function GamesScreen({navigation, route}) {
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/byuser/${user.username}`)
       .then(result => result.json())
       .then(data => {
-<<<<<<< HEAD
         //console.log("data de mes reviews", data.ratings.ratingsID)
-=======
-        //console.log("data de mes reviews", data.ratings)
-        //console.log("nombre de likes", data.ratings.likesNumber)
->>>>>>> d80f1f843216ecf9d2be8fe1fdb9f966605d292d
       
         const theGameReview = data.ratings.filter(((e) => e.game.name == gameName))
         
@@ -113,16 +108,12 @@ export default function GamesScreen({navigation, route}) {
 
   function likeOrDislikeAReview(reviewId) {
     setHeartLiked(!heartLiked);
-<<<<<<< HEAD
-    //console.log("changement de like")
-=======
 
     //console.log("changement de like")
     setLikedMyReviews(prevState => ({
       ...prevState,
       [reviewId]: !prevState[reviewId],
     }));
->>>>>>> d80f1f843216ecf9d2be8fe1fdb9f966605d292d
     
     
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/likeOrDislikeAReview`, {
