@@ -10,11 +10,16 @@ export default function HomeScreen({ navigation }) {
   const [refreshing, setRefreshing] = React.useState(false);
   const [search, setSearch] = useState('Friends')
   const [likedReviews, setLikedReviews] = useState({});
-  const [comment, setComment] = useState('')
-  const [modalVisible, setModaleVisible] = useState('false')
-  const [ratingsCom, setRatingsCom] = useState([])
+  const [comment, setComment] = useState({})
+  const [displayedCommentId, setDisplayedCommentId] = useState(null); // Tracks which rating's comments are displayed
+  const [ratingsCom, setRatingsCom] = useState({}); // Stores comments for each rating, keyed by review._id
+  const [activeCommentReview, setActiveCommentReview] = useState(null);
 
   //console.log(ratings);
+
+  const handleCommentChange = (reviewId, text) => {
+    setComment(prev => ({ ...prev, [reviewId]: text }));
+  };
 
   function likeOrDislikeAReview(reviewId) {
     console.log("changement de like");
@@ -83,6 +88,8 @@ export default function HomeScreen({ navigation }) {
       fetchFriendsReviews();
    }
    fetchAll()
+
+   fetch
      
 }}, [refreshing]);
 
@@ -104,18 +111,19 @@ export default function HomeScreen({ navigation }) {
   };
 //console.log('revew :',ratings);
 
-const sendComment = async (ratingsId) => {
+const handleCommentSubmit = async (ratingsId) => {
+  const commentContent = comment[ratingsId]
+  //console.log(ratingsId)
   //console.log('ok')
-  setModaleVisible(false)
   fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/comments/newCom`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: user.username, content: comment, ratingsId: ratingsId}),
+    body: JSON.stringify({ username: user.username, content: commentContent, ratings: ratingsId}),
   }).then(response => response.json()).then(data => {
     
     if (data.result){
       //console.log(data)
-      setComment('')
+      setComment(prev => ({ ...prev, [ratingsId]: '' }));
     }
   }
 
@@ -124,22 +132,76 @@ const sendComment = async (ratingsId) => {
 
 
 
+
+
+const handleCommentDisplay = async (reviewId) => {
+  if (displayedCommentId === reviewId) {
+    // Hide comments if already displayed
+    setDisplayedCommentId(null);
+    return;
+  }
+
+  // Show comments for the clicked rating
+  setDisplayedCommentId(reviewId);
+
+  // Fetch comments only if not already fetched
+  if (!ratingsCom[reviewId]) {
+    try {
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/comments/byratings/${reviewId}`
+      );
+      const data = await response.json();
+
+      if (data && data.comment) {
+        setRatingsCom((prev) => ({
+          ...prev,
+          [reviewId]: data.comment, // Store fetched comments for this rating
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  }
+};
+
+const renderComments = (reviewId) => {
+  const comments = ratingsCom[reviewId] || [];
+  return comments.map((e, index) => (
+    <View key={index} style={styles.commentContainer}>
+      <View style={styles.commentCont}>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("Friend", { friendName: e.username });
+        }}
+      >
+        <Image style={styles.avatar} source={{ uri: e.profilePic }} />
+      </TouchableOpacity>
+      <View>
+        <Text style={styles.userName}>@{e.username}</Text>
+        <Text>{e.content}</Text>
+      </View>
+      </View>
+    </View>
+  ));
+};
+
+
   let ratingsNewsFeed 
   
   if (search === 'Friends' && user.username) {
     ratingsNewsFeed = ratings.map((review, i) => {
-      console.log("counter likesCounter", review.likesCounter)
+     // console.log("counter likesCounter", review.likesCounter)
       
-      let fpp = <TouchableOpacity onPress={() => {
+      let fpp = (<TouchableOpacity onPress={() => {
         navigation.navigate("Friend", {friendName : review.username})}}>
         <Image style={styles.avatar} source={require("../assets/avatar.png")}/>
-        </TouchableOpacity>;
+        </TouchableOpacity>);
 
       if (review.profilePicture) {
-        fpp = <TouchableOpacity onPress={() => {
+        fpp = (<TouchableOpacity onPress={() => {
           navigation.navigate("Friend", {friendName : review.username})}}>
             <Image style={styles.avatar} source={{uri: review.profilePicture}}/>;
-        </TouchableOpacity>
+        </TouchableOpacity>)
       }
 
       const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
@@ -147,118 +209,89 @@ const sendComment = async (ratingsId) => {
     //console.log(review.game.cover)
     return (
       <View key={i}>
-       <View style={styles.ratingContainerPublic} >
-          <View style={styles.ratingContent}>
-            <View style={styles.userInfoContainer}>
+      <View style={styles.ratingContainerPublic}>
+         <View style={styles.ratingContent}>
+           <View style={styles.userInfoContainer}>
+            {fpp}
              
-             {fpp}
-              
-              <View style={styles.userInfo}>
-                <View style={styles.userandlike}>
-                  <Text style={styles.userName}>@{review.username}</Text>
-                  <View style={styles.heartAndlikeCounter}>
-                      <FontAwesome name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
-                      <Text>({review.likesCounter.length})</Text>
-                  </View>
+             <View style={styles.userInfo}>
+             <View style={styles.userandlike}>
+               <Text style={styles.userName}>@{review.username}</Text>
+               {likable}                 
                 </View>
-                <View style={styles.starsContainer}>
-                  {renderStars(review.note)} {/* Affichage des étoiles */}
-                  <Text style={styles.textNote}>{review.note}</Text>
-                </View>
+               <View style={styles.starsContainer}>
+                 <>
+                 {renderStars(review.note)} 
+                 </>
+                 <Text style={styles.textNote} >{review.note}</Text>
+               </View>
 
-              </View>
-            </View>
+             </View>
+           </View>
 
-            <View style={styles.gameReviewContainer}>
-            <TouchableOpacity onPress={() => {
-                navigation.navigate("Games", {gameName : review.gameName})}}>
-                <Image style={styles.gameCover} source={{ uri: review.gameCover }}/>
-                </TouchableOpacity>
-              <View style={styles.reviewContent} >
-                <Text style={styles.reviewGameTitle}>{review.gameName}</Text>
-                <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-        <Modal
-      transparent={true}
-      visible={modalVisible}
-      onRequestClose={() => {
-        Alert.alert('Modal has been closed.');
-        setModaleVisible(!modalVisible);
-      }}
-    >
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}  style={styles.modalBackground}>
-        <View style={styles.modalContainer3}>
-        <View style={styles.backbutton}>
-        <FontAwesome 
-          name="times"
-          color="#7A28CB" 
-          size={25} 
-          onPress={() => setModaleVisible(false)} 
-        />
-      </View> 
-        <View style ={styles.scrollcont}>
+           <View style={styles.gameReviewContainer}>
+           <TouchableOpacity onPress={() => {
+             navigation.navigate("Games", {gameName : review.gameName})}}>
+             <Image style={styles.gameCover} source={{ uri: review.gameCover }}/>
+           </TouchableOpacity>
+             <View style={styles.reviewContent} >
+               <Text style={styles.reviewGameTitle}>{review.gameName}</Text>
+               <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
+             </View>
+           </View>
+         </View>
          <ScrollView style={styles.reviewcont}>
-          <View style={styles.reviewinputcont}>
-          <TextInput style={styles.reviewinput}
-            placeholder='My comment'
-            placeholderTextColor={'grey'}
-            maxLength='100'
-            multiline={true}
-            enterKeyHint='return'
-            onChangeText={(value) => setComment(value)}
-            value={comment}
-            //onSubmitEditing={()=> handlesubmit()}   
-            >
-            </TextInput>
-          </View>
-         </ScrollView>
-         <View style ={styles.scrollcont}>
-            <TouchableOpacity style={styles.submitbutton} onPress={()=> handlesubmit()}>
-              <Text style={styles.buttontext2}>
-                Submit my review
-              </Text>
-            </TouchableOpacity>
-          </View>
-         </View>
-         <View>
-
-         </View>
-        </View>
-    </KeyboardAvoidingView> 
-    </Modal>
-    </View>
+       <View style={styles.reviewinputcont}>
+       <TextInput key={i} style={styles.reviewinput}
+         placeholder='Comment'
+         placeholderTextColor={'grey'}
+         maxLength='100'
+         multiline={true}
+         enterKeyHint='return'
+         onChangeText={(value) => handleCommentChange(review._id, value)}
+         value={comment[review._id] || ""}
+         onFocus={() => setActiveCommentReview(review._id)}
+         onBlur={() => setActiveCommentReview(null)}
+         //onSubmitEditing={()=> handlesubmit()}   
+         >
+         </TextInput>
+         <FontAwesome name='paper-plane' style={styles.sendIcon} size={20} onPress={() => handleCommentSubmit(review._id)} />
+       </View>
+      </ScrollView>
+       </View>
+   {displayedCommentId === review._id && (
+     <View style={styles.commentsSection}>{renderComments(review._id)}</View>
+   )}
+   </View>
     
     )
   })} else {
     //publicRating.reverse(),
     ratingsNewsFeed = publicRating.map((review, i)=> {
       const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
-      console.log("data", review)
-    
+     // console.log("data", review)
+      
       let likable;
 
       if (user.token) {
-        likable = <View style={styles.heartAndlikeCounter}>
-        <FontAwesome name='comment' style={styles.comIcon} size={20} onPress={() => setModaleVisible(true)} />
+        likable = (<View style={styles.heartAndlikeCounter}>
+        <FontAwesome name='comment' style={styles.comIcon} size={20} onPress={() => handleCommentDisplay(review._id)} />
         <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
         <Text>({review.likesCounter.length})</Text>
-    </View>
+    </View>)
       }
 
 
-      let fpp = <TouchableOpacity onPress={() => {
+      let fpp = (<TouchableOpacity onPress={() => {
         navigation.navigate("Friend", {friendName : review.username})}}>
         <Image style={styles.avatar} source={require("../assets/avatar.png")}/>
-        </TouchableOpacity>;
+        </TouchableOpacity>);
 
       if (review.profilePicture) {
-        fpp = <TouchableOpacity onPress={() => {
+        fpp = (<TouchableOpacity onPress={() => {
                 navigation.navigate("Friend", {friendName : review.username})}}>
                   <Image style={styles.avatar} source={{uri: review.profilePicture}}/>;
-              </TouchableOpacity>
+              </TouchableOpacity>)
 
         }
 
@@ -275,7 +308,9 @@ const sendComment = async (ratingsId) => {
                   {likable}                 
                    </View>
                   <View style={styles.starsContainer}>
-                    {renderStars(review.note)} {/* Affichage des étoiles */}
+                    <>
+                    {renderStars(review.note)} 
+                    </>
                     <Text style={styles.textNote} >{review.note}</Text>
                   </View>
   
@@ -301,16 +336,22 @@ const sendComment = async (ratingsId) => {
             maxLength='100'
             multiline={true}
             enterKeyHint='return'
-            onChangeText={(value) => setComment(value)}
-            value={comment}
+            onChangeText={(value) => handleCommentChange(review._id, value)}
+            value={comment[review._id] || ""}
+            onFocus={() => setActiveCommentReview(review._id)}
+            onBlur={() => setActiveCommentReview(null)}
             //onSubmitEditing={()=> handlesubmit()}   
             >
             </TextInput>
-            <FontAwesome name='paper-plane' style={styles.sendIcon} size={20} onPress={() => setModaleVisible(true)} />
+            <FontAwesome name='paper-plane' style={styles.sendIcon} size={20} onPress={() => handleCommentSubmit(review._id)} />
           </View>
          </ScrollView>
           </View>
-      </View>)
+      {displayedCommentId === review._id && (
+        <View style={styles.commentsSection}>{renderComments(review._id)}</View>
+      )}
+      </View>
+    )
     })
   }
 
@@ -528,4 +569,27 @@ modalBackground: {
   alignItems: 'center',
   backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
 },
+commentContainer:{
+  // borderWidth:1, 
+  // borderColor:'#33CA7F',
+  alignItems:'center',
+  marginBottom:5,
+  margintop:5
+  
+}, 
+commentCont:{
+  width:'90%',
+  // borderWidth:1, 
+  // borderColor:'red',
+  flexDirection:'row',
+  alignItems:'center',
+  borderBottomWidth:1, 
+  padding:3,
+  borderBottomColor:'#D4FDC6'
+}, 
+commentsSection:{
+  margin:5,
+  // borderWidth:1, 
+  // borderColor:'red',
+}
 });
