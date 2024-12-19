@@ -11,7 +11,6 @@ import SearchScreen from "./screens/SearchScreen";
 import DiscoveryScreen from "./screens/DiscoveryScreen"
 import ProfilScreen from "./screens/ProfilScreen"
 import ListsScreen from "./screens/ListsScreen"
-import AddListScreen from "./screens/AddListScreen"
 import SignupScreen from './screens/SignupScreen';
 import SigninScreen from './screens/SigninScreen';
 import Signup2Screen from './screens/Signup2Screen';
@@ -22,7 +21,7 @@ import GamesScreen from './screens/GamesScreen';
 import ProfilePicture from'./screens/ProfilePicture';
 import FriendListScreen from './screens/FriendListScreen';
 import ProfilePicture2 from "./screens/ProfilePicture2";
-//import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
 import { Provider } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import user from './reducers/user'
@@ -30,18 +29,10 @@ import friend from "./reducers/friend"
 import game from './reducers/game'
 import { persistStore, persistReducer } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
-import storage from "redux-persist/es/storage";
 import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
-
-// importer les differents reducers
-
-// GoogleSignin.configure({
-// 	webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-// 	scopes: ['profile', 'email'],
-// });
 
 const reducers = combineReducers({ user, friend, game });
 
@@ -68,18 +59,13 @@ const TabNavigator = () => {
 
   const [profileBadgeCount, setProfileBadgeCount] = useState()
   useEffect(() => {
-  
-    console.log("ça marche");
-  
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${username.username}`)
     .then(result => result.json())
     .then(data => {
-      //console.log("c'est le front!", data.infos)
   
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/receivedFriendRequests/${data.infos._id}`)
       .then(result => result.json())
       .then(databis => {
-        //console.log("fetch de la friendlist received", databis.data)
         setProfileBadgeCount(databis.data.length)
       })
   })
@@ -133,7 +119,6 @@ export default function App() {
                 <Stack.Navigator screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="Login" component={LoginScreen} />
                     <Stack.Screen name="TabNavigator" component={TabNavigator} />
-                    <Stack.Screen name="AddList" component={AddListScreen} />
                     <Stack.Screen name="Signup" component={SignupScreen} />
                     <Stack.Screen name="Signin" component={SigninScreen} />
                     <Stack.Screen name="Setup" component={SetupScreen} />
