@@ -34,6 +34,7 @@ export default function GamesScreen({navigation, route}) {
     const [myReviews, setMyReviews] = useState([]);
     const [likedMyReviews, setLikedMyReviews] = useState({});
     const [likedReviews, setLikedReviews] = useState({});
+    const [profilePic, setProfilePic]=useState('')
     //console.log(`game : ${gameName}`)
 
     function fetchMyReview() {
@@ -43,9 +44,11 @@ export default function GamesScreen({navigation, route}) {
       .then(data => {
         //console.log("data de mes reviews", data.ratings.ratingsID)
       
-        const theGameReview = data.ratings.filter(((e) => e.game.name == gameName))
+        const theGameReview = data.ratings.ratingsID.filter(((e) => e.game.name == gameName))
         
         setMyReviews(theGameReview);
+        setProfilePic(data.ratings.profilePicture)
+        
 
         const liked = {};
         data.ratings.forEach(review => {
@@ -65,7 +68,7 @@ export default function GamesScreen({navigation, route}) {
         body: JSON.stringify({ username: user.username, name: gameName }),
     }).then(response => response.json())
     .then(data => {
-      console.log("data du fetch des avis de mes amis", data)
+      //console.log("data du fetch des avis de mes amis", data)
       setFriendsGR(data.ratings)
       const liked = {};
       data.ratings.forEach(review => {
@@ -79,7 +82,7 @@ export default function GamesScreen({navigation, route}) {
         
       
     }
-    console.log(friendsGR)
+    //console.log(friendsGR)
 
     const toggleVisibility = () => {
       setVisibility((previous) => !previous);
@@ -178,7 +181,7 @@ for (let i = 0; i < 5; i++) {
     return(
       <View key={i} style = {styles.friendsReviews}>
       <View style={styles.picanduseandreview}> 
-      <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+      <Image source={{uri : profilePic}} style={styles.friendsAvatars} />
       <View style={styles.useandreview}>
         <View style={styles.userandlike}>
           <Text style={styles.friendsPseudo}>@{user.username}</Text>
@@ -201,7 +204,8 @@ for (let i = 0; i < 5; i++) {
    })
 
 
-   const myFriendsreviews = friendsGR.map((data, i)=> {
+   const slicedarr = friendsGR.slice(-2)
+   const myFriendsreviews = slicedarr.map((data, i)=> {
 
     const mynotestars = []; 
 
@@ -218,7 +222,7 @@ for (let i = 0; i < 5; i++) {
     return(
       <View key={i} style = {styles.friendsReviews}>
       <View style={styles.picanduseandreview}> 
-      <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+      <Image source={{ uri: data.profilePicture }} style={styles.friendsAvatars} />
       <View style={styles.useandreview}>
         <View style={styles.userandlike}>
           <Text style={styles.friendsPseudo}>@{data.username}</Text>
@@ -284,9 +288,16 @@ fetchMyFriendsReviews();
 }, []);
 
 //console.log("my review useStatées", myReviews)
-     
-    const summaryToHTML = gamesinfo.summary
-   // console.log(gamesinfo.summary)
+
+let summaryToHTML 
+
+if(gamesinfo.summary=== undefined || summary === undefined){
+  summaryToHTML= "there's no description yet for this game, try to come back later to learn more about it "
+  summaryToHTML=summaryToHTML.padEnd(1000,'')
+} else {
+  summaryToHTML = gamesinfo.summary
+}
+// console.log(gamesinfo.summary)
     const stars = [];
 for (let i = 0; i < 5; i++) {
   let style = "star-o";
@@ -398,7 +409,6 @@ for (let i = 0; i < 5; i++) {
 
 <Collapsible isVisible={isVisible}>
 {myFriendsreviews}
-  
 </Collapsible>
 
 
@@ -489,7 +499,7 @@ for (let i = 0; i < 5; i++) {
           onPress={() => setmessage(false)} 
         />
       </View> 
-         <Text>Votre jeux a bien été ajoutéé</Text>
+         <Text>your game has been added to the list</Text>
         </View>
     </View> 
     </Modal>
@@ -694,7 +704,8 @@ const styles = StyleSheet.create({
         // borderWidth:1,
         width:'100%',
         justifyContent:'center', 
-        alignItems:'center',
+        alignItems:'cefnter',
+        alignContent:'flex-start',
         zIndex:100,
         // backgroundColor:'white',
         height:'80%'
@@ -784,15 +795,16 @@ const styles = StyleSheet.create({
         borderColor:'#33CA7F', 
         borderRadius:10,
         borderWidth:3,
-        minHeight:'30%',
-        maxHeight:'30%'
+        height:70
       }, 
       icon:{
         position:'static'
       },
       downside:{
-        justifyContent:'center', 
-        alignItems:'center'
+        marginTop:10,
+        justifyContent:'flex-start', 
+        alignItems:'center',
+        Height:700
       }, 
       summary:{
         marginTop:10,
@@ -868,10 +880,7 @@ const styles = StyleSheet.create({
         marginBottom:1,
       }, 
       footer:{
-        position:'absolute',
-        height:400,
-        //backgroundColor:'red', 
-        width:'100%'
+        minHeight:300
       }, 
       modal: {
         backgroundColor: 'red',

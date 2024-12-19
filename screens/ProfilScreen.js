@@ -206,7 +206,7 @@ const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
 const mySentFriendRequests = sentFriendRequestList.map((data, i) => {
   return (
     <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
-      navigation.navigate("Friend");
+      navigation.navigate("Friend", {friendName: data.receiver.username});
       selectFriend(data.receiver.username);
       //console.log(friend);
       

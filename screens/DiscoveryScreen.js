@@ -6,11 +6,13 @@ import { useSelector } from 'react-redux';
 export default function DiscoveryScreen({navigation}) {
   const [articles, setArticles] = useState([]);
   const [games, setGames] = useState([]);
+  const [name, setName] = useState('')
   const [friends, setFriends] = useState([]);
  // const [pageContent, setPageContent]= useState('')
   const user = useSelector((state) => state.user.value);
-  const newsApiKey = 'da5844b63702429887c8a0b59db638d2';
 
+  const newsApiKey = process.env.EXPO_PUBLIC_NEWS_API_KEY
+//console.log(games)
   /* Pour les articles */
   useEffect(() => {
     const fetchArticles = async () => {
@@ -47,45 +49,50 @@ export default function DiscoveryScreen({navigation}) {
         const data = await response.json();
         // Mélange les jeux et sélectionne les 10 premiers
         const shuffledGames = data.results.sort(() => 0.5 - Math.random()).slice(0, 10);
-        setGames(shuffledGames.map(game => ({ ...game, name: game.name.slice(0, 15) + (game.name.length > 15 ? "..." : "") })));
+        setGames(shuffledGames)
+        //console.log(shuffledGames)
+        for(let game of shuffledGames){
+          
+          const gamesinDB = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/byname`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              name : game.name, 
+            })
+          })
+          const result = await gamesinDB.json();
+          
+          //console.log('is it in bdd ? ', result)
+          
+          if(!result.result) {
+            await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/newgames`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ 
+                img : game.background_image, 
+                description : game.description, 
+                release: game.released,
+                genre:game.genres.name, 
+                name:game.name,
+              }),
+            })
+          }
+          }
+
+         
       } catch (error) {
         console.error('Error fetching games:', error);
       }
+       
     };
-
     fetchGames();
   }, []);
 
 
   /* Pour I can know them (a continuer)*/
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getall`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch users');
-        }
-        const data = await response.json();
-
-        const shuffledFriends = (data.friends || [])
-          .sort(() => 0.5 - Math.random()) 
-          .slice(0, 10) 
-          .map(friend => ({
-            id: friend._id,
-            username: friend.username.slice(0, 15) + (friend.username.length > 15 ? "..." : ""),
-            profilPicture: friend.profilPicture || require('../assets/avatar.png'),
-          }));
-        setFriends(shuffledFriends);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
-
-    fetchFriends();
-  }, []);
-
+  
   const addFriend = (userId) => {
-    console.log(`Add friend with ID: ${userId}`);
+    //console.log(`Add friend with ID: ${userId}`);
     // Logique pour ajouter un ami
   };
 
@@ -93,8 +100,8 @@ export default function DiscoveryScreen({navigation}) {
     Linking.openURL(url);
   };
 
-  const handlePressGame = (gameName) => {
-    console.log(gameName);
+  const handlePressGame = async (gameName) => {
+    //console.log(gameName);
     navigation.navigate('Games', { gameName: gameName });
   }
   
@@ -134,16 +141,23 @@ export default function DiscoveryScreen({navigation}) {
           <Text style={styles.title}>Nos recommandations</Text>
           <View style={styles.encadrer}>
               <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
-                {games.map((game) => (
-                  <View key={game.id} style={styles.gameItemHorizontal}>
-                    {game.background_image && (
-                      <TouchableOpacity onPress={() => handlePressGame(game.name)}>
-                        <Image style={styles.jaquette} source={{ uri: game.background_image }} />
-                      </TouchableOpacity>
-                    )}
-                    <Text style={styles.gameTitle}>{game.name}</Text>
-                  </View>
-                ))}
+                  {games.map((game) => {
+                          let gamename = game.name;
+                          if (game.name.length > 15) {
+                            gamename = game.name.slice(0, 15) + "..."; 
+                          }
+        
+                  return ( 
+                    <View key={game.id} style={styles.gameItemHorizontal}>
+                      {game.background_image && (
+                        <TouchableOpacity onPress={() => handlePressGame(game.name)}>
+                          <Image style={styles.jaquette} source={{ uri: game.background_image }} />
+                        </TouchableOpacity>
+                      )}
+                      <Text style={styles.gameTitle}>{gamename}</Text>
+                    </View>
+                  );
+      })}
               </ScrollView>
           </View>
         </View>

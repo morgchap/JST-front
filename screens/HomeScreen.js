@@ -14,8 +14,10 @@ export default function HomeScreen({ navigation }) {
   const [displayedCommentId, setDisplayedCommentId] = useState(null); // Tracks which rating's comments are displayed
   const [ratingsCom, setRatingsCom] = useState({}); // Stores comments for each rating, keyed by review._id
   const [activeCommentReview, setActiveCommentReview] = useState(null);
+  const [commentStyles, setCommentStyle]=useState({})
 
   //console.log(ratings);
+
 
   const handleCommentChange = (reviewId, text) => {
     setComment(prev => ({ ...prev, [reviewId]: text }));
@@ -135,6 +137,10 @@ const handleCommentSubmit = async (ratingsId) => {
 
 
 const handleCommentDisplay = async (reviewId) => {
+  setCommentStyle((prevStyles) => ({
+    ...prevStyles,
+    [reviewId]: prevStyles[reviewId] === 'window-close' ? 'comment' : 'window-close',
+  }));
   if (displayedCommentId === reviewId) {
     // Hide comments if already displayed
     setDisplayedCommentId(null);
@@ -143,7 +149,6 @@ const handleCommentDisplay = async (reviewId) => {
 
   // Show comments for the clicked rating
   setDisplayedCommentId(reviewId);
-
   // Fetch comments only if not already fetched
   if (!ratingsCom[reviewId]) {
     try {
@@ -219,6 +224,7 @@ const renderComments = (reviewId) => {
                 <View style={styles.userandlike}>
                   <Text style={styles.userName}>@{review.username}</Text>
                   <View style={styles.heartAndlikeCounter}>
+                      <FontAwesome name={commentStyles[review._id] || 'comment'} style={styles.comIconPurple} size={20} onPress={() => handleCommentDisplay(review._id)} />
                       <FontAwesome name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
                       <Text>({review.likesCounter.length})</Text>
                   </View>
@@ -241,11 +247,32 @@ const renderComments = (reviewId) => {
               <View style={styles.reviewContent} >
                 <Text style={styles.reviewGameTitle}>{review.gameName}</Text>
                 <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
+                </View>
               </View>
             </View>
+            <ScrollView style={styles.reviewcont}>
+          <View style={styles.reviewinputcont}>
+          <TextInput key={i} style={styles.reviewinput}
+            placeholder='Comment'
+            placeholderTextColor={'grey'}
+            maxLength={100}
+            multiline={true}
+            enterKeyHint='return'
+            onChangeText={(value) => handleCommentChange(review._id, value)}
+            value={comment[review._id] || ""}
+            onFocus={() => setActiveCommentReview(review._id)}
+            onBlur={() => setActiveCommentReview(null)}
+            //onSubmitEditing={()=> handlesubmit()}   
+            >
+            </TextInput>
+            <FontAwesome name='paper-plane' style={styles.sendIcon} size={20} onPress={() => handleCommentSubmit(review._id)} />
           </View>
-        </View>
-    </View>
+         </ScrollView>
+          </View>
+      {displayedCommentId === review._id && (
+        <View style={styles.commentsSection}>{renderComments(review._id)}</View>
+      )}
+      </View>
     
     )
   })} else {
@@ -258,7 +285,7 @@ const renderComments = (reviewId) => {
 
       if (user.token) {
         likable = (<View style={styles.heartAndlikeCounter}>
-        <FontAwesome name='comment' style={styles.comIcon} size={20} onPress={() => handleCommentDisplay(review._id)} />
+        <FontAwesome name={commentStyles[review._id] || 'comment'} style={styles.comIcon} size={20} onPress={() => handleCommentDisplay(review._id)} />
         <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
         <Text>({review.likesCounter.length})</Text>
     </View>)
@@ -316,7 +343,7 @@ const renderComments = (reviewId) => {
           <TextInput key={i} style={styles.reviewinput}
             placeholder='Comment'
             placeholderTextColor={'grey'}
-            maxLength='100'
+            maxLength={100}
             multiline={true}
             enterKeyHint='return'
             onChangeText={(value) => handleCommentChange(review._id, value)}
@@ -463,6 +490,11 @@ const styles = StyleSheet.create({
   },
   comIcon: {
     color: "#33CA7F",
+    paddingRight: 6,
+    padding:3,
+  },
+  comIconPurple: {
+    color: "#7A28CB",
     paddingRight: 6,
     padding:3,
   },

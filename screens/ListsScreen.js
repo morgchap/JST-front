@@ -262,6 +262,7 @@ export default function ListsScreen({ navigation }) {
                                     ios_backgroundColor="#3e3e3e" 
                                     onValueChange={setIsPublic} 
                                     value={isPublic} 
+                                    style={styles.switch}
                                 />
                                 <Text style={styles.switchLabel}>Public</Text>
                             </View>
@@ -309,6 +310,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+        padding:5
     },
     modalBackgroundList: {
         flex: 1,
@@ -318,6 +320,7 @@ const styles = StyleSheet.create({
     },
     backgroundImage: {
         alignItems: "flex-end",
+        padding:10
     },
     backgroundImageList: {
         width: '100%',
@@ -349,7 +352,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     input: {
-        borderWidth: 1,
+        borderBottomWidth: 1,
         borderColor: '#7A28CB',
         borderRadius: 5,
         padding: 10,
@@ -365,11 +368,15 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: 'center',
         marginBottom: 15,
+        // borderWidth:1, 
+        // borderColor:'black',
+        width:'70%'
     },
     switchLabel: {
         marginRight: 10,
         color: '#7A28CB',
         fontWeight: 'bold',
+        
     },
     
     /* Pour la page de base */
