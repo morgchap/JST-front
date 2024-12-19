@@ -21,6 +21,7 @@ export default function FriendScreen({ navigation, route }) {
     const [gotPP, setGotPP] = useState(false) 
     const [profilePicture, setProfilePicture] = useState(null);
     const [modal, setModal] = useState(false)
+    const [addable, setAddable] = useState(false)
 
 
     const dispatch = useDispatch();
@@ -28,9 +29,15 @@ export default function FriendScreen({ navigation, route }) {
       dispatch(clickedFriend(friendUsername));
     };
 
-
+ 
   
   useEffect(() => {
+
+    if (user.username === friendName) {
+      navigation.navigate("TabNavigator", { screen: "Profil" });
+  }
+
+    //console.log("ça marche");
 
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`)
     .then(result => result.json())
@@ -40,6 +47,20 @@ export default function FriendScreen({ navigation, route }) {
         setProfilePicture(data.infos.profilePicture);
         setGotPP(true)
         } 
+
+        const fl = data.infos.friendsList;
+
+        for (let obj of fl) {
+          
+            console.log(obj.username)
+            if (obj.username == user.username) {
+              setAddable(true)
+            
+          }
+        }
+
+        console.log("friendList du pote", data.infos.friendsList)
+    
 
       return data
      
@@ -61,9 +82,11 @@ export default function FriendScreen({ navigation, route }) {
       setAllLists(data.lists)
   });
 
-  setShowPrivateList(false)
+  //setShowPrivateList(false)
 
-}, [friendName]);
+}, [friendName, user.username, navigation]);
+
+//console.log("addable?", addable)
 
 
 
@@ -76,6 +99,19 @@ for (let i = 0; i < 5; i++) {
   stars.push(<FontAwesome key={i} name={style} color="yellow" />);
 }
 
+let addButton = <View style={styles.logoutView}>
+<TouchableOpacity style={styles.logoutButton} onPress={() => addAFriend()}>
+    <Text style={styles.logoutText}>Ask as a friend</Text>
+</TouchableOpacity>
+</View>;
+
+if (addable) {
+ addButton = <View style={styles.logoutView}>
+ <TouchableOpacity style={styles.noButton}>
+     <Text style={styles.logoutText}>You are already friends</Text>
+ </TouchableOpacity>
+ </View>;
+}
 
   //fonction pour ajouter un ami - pas terminée - je dois générer des vrais demandes d'ami avant (et des vraies page profil d'ami).
   // je dois donc revenir sur la partie ProfilScreen avant pour mapper la liste des demandes d'amis (envoyées et reçues)
@@ -118,7 +154,8 @@ for (let i = 0; i < 5; i++) {
     pluralGames = "x"
   }
 
-  const games = gameList.map((data, i) => {
+
+const games = gameList.map((data, i) => {
 
   const stars = [];
   for (let i = 0; i < 5; i++) {
@@ -288,11 +325,7 @@ return lists
                       <Text style={styles.friendStatsText}>{numberOfFriends} ami{pluralFriends}</Text>
                     </TouchableOpacity>
       </View>
-      <View style={styles.logoutView}>
-            <TouchableOpacity style={styles.logoutButton} onPress={() => addAFriend()}>
-                <Text style={styles.logoutText}>Ask as a friend</Text>
-            </TouchableOpacity>
-      </View>
+      {addButton}
       <View style={styles.gameDiv}>
         <View style={styles.games}>
             <Text style={styles.secondTitles}>Ses jeux préférés ({numberOfGames})</Text>
@@ -606,6 +639,15 @@ const styles = StyleSheet.create({
         height: 50,
         width: 100,
         backgroundColor: 'green',
+        justifyContent: "center",
+        alignItems: "center",
+    
+      },
+      noButton: {
+        borderRadius: 10,
+        height: 60,
+        width: 150,
+        backgroundColor: 'gray',
         justifyContent: "center",
         alignItems: "center",
     
