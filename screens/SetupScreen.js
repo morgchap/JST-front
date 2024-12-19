@@ -158,7 +158,7 @@ export default function SetupScreen({ navigation }) {
     </View>
     <View style={styles.logoutView}>
                     <TouchableOpacity style={styles.logoutButton} onPress={() => {
-                        updateUser("");
+                        updateUser({username: "", token: ""});
                         navigation.navigate("Profil");
                         
                         }} >

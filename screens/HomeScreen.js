@@ -163,7 +163,7 @@ const sendComment = async (ratingsId) => {
                 </View>
                 <View style={styles.starsContainer}>
                   {renderStars(review.note)} {/* Affichage des étoiles */}
-                  <Text style={styles.textNote} >{review.note}</Text>
+                  <Text style={styles.textNote}>{review.note}</Text>
                 </View>
 
               </View>
@@ -237,7 +237,7 @@ const sendComment = async (ratingsId) => {
     ratingsNewsFeed = publicRating.map((review, i)=> {
       const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
       console.log("data", review)
-      
+    
       let likable;
 
       if (user.token) {
