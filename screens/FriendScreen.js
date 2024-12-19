@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image, Modal, ScrollView, TouchableOpacity, ImageBackground } from "react-native";
+import { Text, View, StyleSheet, Image, Modal, ScrollView, TouchableOpacity, ImageBackground, Collapsible } from "react-native";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
@@ -21,6 +21,8 @@ export default function FriendScreen({ navigation, route }) {
     const [gotPP, setGotPP] = useState(false) 
     const [profilePicture, setProfilePicture] = useState(null);
     const [modal, setModal] = useState(false)
+    const [isVisible, setVisibility] = useState(false)
+    const [icon, setIcon]= useState('caret-down')
     const [addable, setAddable] = useState(false)
 
 
@@ -89,6 +91,14 @@ export default function FriendScreen({ navigation, route }) {
 //console.log("addable?", addable)
 
 
+const toggleVisibility = () => {
+  setVisibility((previous) => !previous);
+  if(isVisible){
+    setIcon('caret-down')
+  }else {
+    setIcon('caret-right')
+  }
+};
 
 const stars = [];
 for (let i = 0; i < 5; i++) {
@@ -326,23 +336,48 @@ return lists
                     </TouchableOpacity>
       </View>
       {addButton}
-      <View style={styles.gameDiv}>
-        <View style={styles.games}>
-            <Text style={styles.secondTitles}>Ses jeux préférés ({numberOfGames})</Text>
-            <ScrollView horizontal={true} style={styles.listGame}> 
-              {games}
-            </ScrollView>
-        </View>
-      </View>
 
-      <View style={styles.listDiv}>
-        <View style={styles.lists}>
-          <Text style={styles.secondTitles}>Ses Listes ({numberOfList})</Text>
-            <ScrollView horizontal={true} style={styles.listLists}> 
-              {lists}
-            </ScrollView>
+      <TouchableOpacity onPress={toggleVisibility} style={styles.container2}>
+        <Text style = {styles.collapsedname}>Most liked reviews</Text>
+        <FontAwesome name={icon} color="black" size={20}/>
+      </TouchableOpacity>
+      <ScrollView>
+        <View style={styles.gameDiv}>
+          <View style={styles.games}>
+              <Text style={styles.secondTitles}>Ses jeux préférés ({numberOfGames})</Text>
+              <ScrollView horizontal={true} style={styles.listGame}> 
+                {games}
+              </ScrollView>
+          </View>
         </View>
-      </View>
+
+        <View style={styles.listDiv}>
+          <View style={styles.lists}>
+            <Text style={styles.secondTitles}>Ses Listes ({numberOfList})</Text>
+              <ScrollView horizontal={true} style={styles.listLists}> 
+                {lists}
+              </ScrollView>
+          </View>
+        </View>
+
+        <Collapsible isVisible={isVisible2}>
+          <View style = {styles.friendsReviews}>
+            <View style={styles.picAndUseAndReview}> 
+              <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+              <View style={styles.useandreview}>
+                <Text style={styles.friendsPseudo}>@monami</Text>
+                <View style={styles.starsContainer2}>
+                  {stars2}
+                  <Text style ={styles.votecount2}>3,5</Text>
+                </View> 
+              </View>
+            </View>   
+            <View style={styles.comment}>
+              <Text>That is my favorite game i would 100% recommend it</Text>
+            </View>
+          </View>
+        </Collapsible>
+      </ScrollView>
 
       <Modal
         transparent={true}

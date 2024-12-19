@@ -178,8 +178,8 @@ function acceptFriendRequest(senderId, senderUsername) {
 
 const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
   return (
-    <View style={styles.headScrollView}>
-    <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
+    <View key={i} style={styles.headScrollView}>
+    <TouchableOpacity style={styles.friendsContainer} onPress={() => {
       navigation.navigate("Friend", {friendName: data.sender.username});
       //{ gameName: gameName }('Games',{ gameName: gameName })
       selectFriend(data.sender.username);

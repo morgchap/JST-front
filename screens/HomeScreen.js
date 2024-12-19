@@ -249,7 +249,7 @@ const renderComments = (reviewId) => {
        <TextInput key={i} style={styles.reviewinput}
          placeholder='Comment'
          placeholderTextColor={'grey'}
-         maxLength='100'
+         maxLength={100}
          multiline={true}
          enterKeyHint='return'
          onChangeText={(value) => handleCommentChange(review._id, value)}
@@ -289,7 +289,7 @@ const renderComments = (reviewId) => {
     <TextInput key={i} style={styles.reviewinput}
       placeholder='Comment'
       placeholderTextColor={'grey'}
-      maxLength='100'
+      maxLength={100}
       multiline={true}
       enterKeyHint='return'
       onChangeText={(value) => handleCommentChange(review._id, value)}
