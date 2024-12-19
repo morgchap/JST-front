@@ -209,60 +209,43 @@ const renderComments = (reviewId) => {
     //console.log(review.game.cover)
     return (
       <View key={i}>
-      <View style={styles.ratingContainerPublic}>
-         <View style={styles.ratingContent}>
-           <View style={styles.userInfoContainer}>
-            {fpp}
-             
-             <View style={styles.userInfo}>
-             <View style={styles.userandlike}>
-               <Text style={styles.userName}>@{review.username}</Text>
-               {likable}                 
+       <View style={styles.ratingContainerPublic} >
+          <View style={styles.ratingContent}>
+            <View style={styles.userInfoContainer}>
+             <>
+             {fpp}
+             </>    
+              <View style={styles.userInfo}>
+                <View style={styles.userandlike}>
+                  <Text style={styles.userName}>@{review.username}</Text>
+                  <View style={styles.heartAndlikeCounter}>
+                      <FontAwesome name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
+                      <Text>({review.likesCounter.length})</Text>
+                  </View>
                 </View>
-               <View style={styles.starsContainer}>
-                 <>
-                 {renderStars(review.note)} 
-                 </>
-                 <Text style={styles.textNote} >{review.note}</Text>
-               </View>
+                <View style={styles.starsContainer}>
+                  <>
+                  {renderStars(review.note)}
+                  </>
+                  <Text style={styles.textNote} >{review.note}</Text>
+                </View>
 
-             </View>
-           </View>
+              </View>
+            </View>
 
-           <View style={styles.gameReviewContainer}>
-           <TouchableOpacity onPress={() => {
-             navigation.navigate("Games", {gameName : review.gameName})}}>
-             <Image style={styles.gameCover} source={{ uri: review.gameCover }}/>
-           </TouchableOpacity>
-             <View style={styles.reviewContent} >
-               <Text style={styles.reviewGameTitle}>{review.gameName}</Text>
-               <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
-             </View>
-           </View>
-         </View>
-         <ScrollView style={styles.reviewcont}>
-       <View style={styles.reviewinputcont}>
-       <TextInput key={i} style={styles.reviewinput}
-         placeholder='Comment'
-         placeholderTextColor={'grey'}
-         maxLength='100'
-         multiline={true}
-         enterKeyHint='return'
-         onChangeText={(value) => handleCommentChange(review._id, value)}
-         value={comment[review._id] || ""}
-         onFocus={() => setActiveCommentReview(review._id)}
-         onBlur={() => setActiveCommentReview(null)}
-         //onSubmitEditing={()=> handlesubmit()}   
-         >
-         </TextInput>
-         <FontAwesome name='paper-plane' style={styles.sendIcon} size={20} onPress={() => handleCommentSubmit(review._id)} />
-       </View>
-      </ScrollView>
-       </View>
-   {displayedCommentId === review._id && (
-     <View style={styles.commentsSection}>{renderComments(review._id)}</View>
-   )}
-   </View>
+            <View style={styles.gameReviewContainer}>
+            <TouchableOpacity onPress={() => {
+                navigation.navigate("Games", {gameName : review.gameName})}}>
+                <Image style={styles.gameCover} source={{ uri: review.gameCover }}/>
+                </TouchableOpacity>
+              <View style={styles.reviewContent} >
+                <Text style={styles.reviewGameTitle}>{review.gameName}</Text>
+                <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+    </View>
     
     )
   })} else {
