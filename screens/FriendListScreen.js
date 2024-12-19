@@ -45,11 +45,43 @@ export default function FriendListScreen({ navigation, route }) {
 
         console.log("last data", data);
 
-        setFriendList(data.infos.friendsList);
+        //console.log("ça marche");
+    
+        fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${userFriendList}`)
+        .then(result => result.json())
+        .then(data => {
+          //console.log("c'est le front de FriendListScreen", data.infos)
+    
+          setNumberOfFriends(data.infos.friendsList.length);
+    
+          //console.log("number of friends ", numberOfFriends);
+          //console.log("Id de list", data.infos.lists[0]);
 
-        if (data.infos.profilePicture) {
-          setProfilePicture(data.infos.profilePicture);
-          setGotPP(true)
+          //console.log("last data", data);
+
+          setFriendList(data.infos.friendsList);
+
+          if (data.infos.profilePicture) {
+            setProfilePicture(data.infos.profilePicture);
+            setGotPP(true)
+            } 
+    
+
+          return data
+        })
+      }, [userFriendList])
+
+      //console.log("state friendlist à exploiter", friendList);
+
+    //const friendListContent = "test";
+
+    
+    const friendListContent = friendList.map((data, i) => {
+
+      let fpp = <Image style={styles.friendsAvatars} source={require("../assets/avatar.png")} />;
+
+      if (data.profilePicture) {
+         fpp = <Image style={styles.friendsAvatars} source={{uri: data.profilePicture}}/>
         }
 
 
@@ -71,15 +103,24 @@ export default function FriendListScreen({ navigation, route }) {
     }
 
     return (
-      <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
-        navigation.navigate("Friend", { friendName: data.username });
-
-
-
-      }}>
-        {fpp}
-        <Text style={styles.friendsPseudoBis}>@{data.username}</Text>
-        <View style={styles.iconContainer}>
+      <TouchableOpacity>
+        <View style={styles.centered}>
+            <View style={styles.headIcons}>
+                <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
+            </View>
+            <View style={styles.me}>
+                 { gotPP ? (
+                                <Image style={styles.avatar} source={{uri: profilePicture}}/>) : (
+                                  <Image style={styles.avatar} source={require("../assets/avatar.png")} />
+                                )}
+                <Text style={styles.pseudo}>@{userFriendList}</Text>
+            </View>
+            <Text style={styles.titleFriendList}>Friends List({friendList.length})</Text>
+            <View style={styles.friendListContainer}>
+                <ScrollView>
+                  {friendListContent}
+                </ScrollView>
+            </View>
         </View>
       </TouchableOpacity>
     );
@@ -154,6 +195,19 @@ const styles = StyleSheet.create({
     color: "#7A28CB",
     paddingBottom: 10,
     fontWeight: "bold",
+          display: "flex",
+          width: "95%",
+          height: "55%",
+          backgroundColor: "#7A28CB",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "start",
+          borderBottomWidth: 2,
+          borderBottomColor: '#7A28CB',
+          paddingBottom: 10,
+          borderRadius: 10,
+          marginLeft: 10,
+  
 
   },
 

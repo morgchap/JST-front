@@ -50,7 +50,7 @@ export default function HomeScreen({ navigation }) {
     }, 2000);
   }, []);
 
-   // Fonction pour récupérer les avis des amis
+  // Fonction pour récupérer les avis des amis
   function fetchFriendsReviews() {
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/friendsreview`, {
       method: 'POST',
@@ -120,12 +120,12 @@ export default function HomeScreen({ navigation }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: user.username, content: commentContent, ratings: ratingsId }),
     })
-    .then(response => response.json())
-    .then(data => {
-      if (data.result) {
-        setComment(prev => ({ ...prev, [ratingsId]: '' }));
-      }
-    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.result) {
+          setComment(prev => ({ ...prev, [ratingsId]: '' }));
+        }
+      })
   }
 
   // Fonction pour afficher/masquer les commentaires d'un avis
@@ -203,78 +203,8 @@ export default function HomeScreen({ navigation }) {
       }
 
       const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
-      return (
-        <View key={i}>
-          <View style={styles.ratingContainerFriends} >
-            <View style={styles.ratingContent}>
-              <View style={styles.userInfoContainer}>
-                <>
-                  {fpp}
-                </>
-                <View style={styles.userInfo}>
-                  <View style={styles.userandlike}>
-                    <Text style={styles.userName}>@{review.username}</Text>
-                    <View style={styles.heartAndlikeCounter}>
-                      <FontAwesome name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
-                      <Text>({review.likesCounter.length})</Text>
-                    </View>
-                  </View>
-                  <View style={styles.starsContainer}>
-                    <>
-                      {renderStars(review.note)}
-                    </>
-                    <Text style={styles.textNote} >{review.note}</Text>
-                  </View>
-                </View>
-              </View>
 
-              <View style={styles.gameReviewContainer}>
-                <TouchableOpacity onPress={() => {
-                  navigation.navigate("Games", { gameName: review.gameName })
-                }}>
-                  <Image style={styles.gameCover} source={{ uri: review.gameCover }} />
-                </TouchableOpacity>
-                <View style={styles.reviewContent} >
-                  <Text style={styles.reviewGameTitle}>{review.gameName}</Text>
-                  <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        </View>
-
-      )
-    })
-  } else {
-    // Affichage des avis publics
-    ratingsNewsFeed = publicRating.map((review, i) => {
-      const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
-
-      let likable;
-
-      if (user.token) {
-        likable = (<View style={styles.heartAndlikeCounter}>
-          <FontAwesome name='comment' style={styles.comIcon} size={20} onPress={() => handleCommentDisplay(review._id)} />
-          <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
-          <Text>({review.likesCounter.length})</Text>
-        </View>)
-      }
-      
-      let fpp = (<TouchableOpacity onPress={() => {
-        navigation.navigate("Friend", { friendName: review.username })
-      }}>
-        <Image style={styles.avatar} source={require("../assets/avatar.png")} />
-      </TouchableOpacity>);
-
-      if (review.profilePicture) {
-        fpp = (<TouchableOpacity onPress={() => {
-          navigation.navigate("Friend", { friendName: review.username })
-        }}>
-          <Image style={styles.avatar} source={{ uri: review.profilePicture }} />;
-        </TouchableOpacity>)
-
-      }
-
+      //console.log(review.game.cover)
       return (
         <View key={i}>
           <View style={styles.ratingContainerPublic}>
@@ -285,318 +215,409 @@ export default function HomeScreen({ navigation }) {
                 <View style={styles.userInfo}>
                   <View style={styles.userandlike}>
                     <Text style={styles.userName}>@{review.username}</Text>
-                    {likable}
+                    <View style={styles.heartAndlikeCounter}>
+                      <FontAwesome name='comment' style={styles.comIcon} size={20} onPress={() => handleCommentDisplay(review._id)} />
+                      <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
+                      <Text>({review.likesCounter.length})</Text>
+                    </View>
                   </View>
-                  <View style={styles.starsContainer}>
-                    <>
-                      {renderStars(review.note)}
-                    </>
-                    <Text style={styles.textNote} >{review.note}</Text>
-                  </View>
+                </View>
 
+                <View style={styles.gameReviewContainer}>
+                  <TouchableOpacity onPress={() => {
+                    navigation.navigate("Games", { gameName: review.gameName })
+                  }}>
+                    <Image style={styles.gameCover} source={{ uri: review.gameCover }} />
+                  </TouchableOpacity>
+                  <View style={styles.reviewContent} >
+                    <Text style={styles.reviewGameTitle}>{review.gameName}</Text>
+                    <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
+                  </View>
                 </View>
               </View>
-
-              <View style={styles.gameReviewContainer}>
-                <TouchableOpacity onPress={() => {
-                  navigation.navigate("Games", { gameName: review.gameName })
-                }}>
-                  <Image style={styles.gameCover} source={{ uri: review.gameCover }} />
-                </TouchableOpacity>
-                <View style={styles.reviewContent} >
-                  <Text style={styles.reviewGameTitle}>{review.gameName}</Text>
-                  <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
+              <ScrollView style={styles.reviewcont}>
+                <View style={styles.reviewinputcont}>
+                  <TextInput key={i} style={styles.reviewinput}
+                    placeholder='Comment'
+                    placeholderTextColor={'grey'}
+                    maxLength='100'
+                    multiline={true}
+                    enterKeyHint='return'
+                    onChangeText={(value) => handleCommentChange(review._id, value)}
+                    value={comment[review._id] || ""}
+                    onFocus={() => setActiveCommentReview(review._id)}
+                    onBlur={() => setActiveCommentReview(null)}
+                  //onSubmitEditing={()=> handlesubmit()}   
+                  >
+                  </TextInput>
+                  <FontAwesome name='paper-plane' style={styles.sendIcon} size={20} onPress={() => handleCommentSubmit(review._id)} />
                 </View>
-              </View>
+              </ScrollView>
             </View>
-            <ScrollView style={styles.reviewcont}>
-              <View style={styles.reviewinputcont}>
-                <TextInput key={i} style={styles.reviewinput}
-                  placeholder='Comment'
-                  placeholderTextColor={'grey'}
-                  maxLength= {100}
-                  multiline={true}
-                  enterKeyHint='return'
-                  onChangeText={(value) => handleCommentChange(review._id, value)}
-                  value={comment[review._id] || ""}
-                  onFocus={() => setActiveCommentReview(review._id)}
-                  onBlur={() => setActiveCommentReview(null)}
-                >
-                </TextInput>
-                <FontAwesome name='paper-plane' style={styles.sendIcon} size={20} onPress={() => handleCommentSubmit(review._id)} />
-              </View>
-            </ScrollView>
+            {displayedCommentId === review._id && (
+              <View style={styles.commentsSection}>{renderComments(review._id)}</View>
+            )}
           </View>
-          {displayedCommentId === review._id && (
-            <View style={styles.commentsSection}>{renderComments(review._id)}</View>
-          )}
         </View>
-      )
-    })
-  }
+
+          )
+  })} else {
+            //publicRating.reverse(),
+            ratingsNewsFeed = publicRating.map((review, i) => {
+              const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
+
+              let likable;
+              let commentable;
+
+              if (user.token) {
+                likable = <View style={styles.heartAndlikeCounter}>
+                  <FontAwesome name='comment' style={styles.comIcon} size={20} onPress={() => handleCommentDisplay(review._id)} />
+                  <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
+                  <Text>({review.likesCounter.length})</Text>
+                </View>;
+
+                commentable = <View style={styles.reviewinputcont}>
+                  <TextInput key={i} style={styles.reviewinput}
+                    placeholder='Comment'
+                    placeholderTextColor={'grey'}
+                    maxLength='100'
+                    multiline={true}
+                    enterKeyHint='return'
+                    onChangeText={(value) => handleCommentChange(review._id, value)}
+                    value={comment[review._id] || ""}
+                    onFocus={() => setActiveCommentReview(review._id)}
+                    onBlur={() => setActiveCommentReview(null)}
+                  //onSubmitEditing={()=> handlesubmit()}   
+                  >
+                  </TextInput>
+                  <FontAwesome name='paper-plane' style={styles.sendIcon} size={20} onPress={() => handleCommentSubmit(review._id)} />
+                </View>
+              }
+
+              let fpp = (<TouchableOpacity onPress={() => {
+                navigation.navigate("Friend", { friendName: review.username })
+              }}>
+                <Image style={styles.avatar} source={require("../assets/avatar.png")} />
+              </TouchableOpacity>);
+
+              if (review.profilePicture) {
+                fpp = (<TouchableOpacity onPress={() => {
+                  navigation.navigate("Friend", { friendName: review.username })
+                }}>
+                  <Image style={styles.avatar} source={{ uri: review.profilePicture }} />;
+                </TouchableOpacity>)
+
+              }
+
+              return (
+                <View key={i}>
+                  <View style={styles.ratingContainerPublic}>
+                    <View style={styles.ratingContent}>
+                      <View style={styles.userInfoContainer}>
+                        {fpp}
+
+                        <View style={styles.userInfo}>
+                          <View style={styles.userandlike}>
+                            <Text style={styles.userName}>@{review.username}</Text>
+                            {likable}
+                          </View>
+                          <View style={styles.starsContainer}>
+                            <>
+                              {renderStars(review.note)}
+                            </>
+                            <Text style={styles.textNote} >{review.note}</Text>
+                          </View>
+
+                        </View>
+                      </View>
+
+                      <View style={styles.gameReviewContainer}>
+                        <TouchableOpacity onPress={() => {
+                          navigation.navigate("Games", { gameName: review.gameName })
+                        }}>
+                          <Image style={styles.gameCover} source={{ uri: review.gameCover }} />
+                        </TouchableOpacity>
+                        <View style={styles.reviewContent} >
+                          <Text style={styles.reviewGameTitle}>{review.gameName}</Text>
+                          <Text style={styles.reviewText}>{review.writtenOpinion}</Text>
+                        </View>
+                      </View>
+                    </View>
+                    <ScrollView style={styles.reviewcont}>
+                      {commentable}
+
+                    </ScrollView>
+                  </View>
+                  {displayedCommentId === review._id && (
+                    <View style={styles.commentsSection}>{renderComments(review._id)}</View>
+                  )}
+                </View>
+              )
+            })
+          }
 
   // Affichage du filtre de recherche
-  let newsfeed;
-  let bgcolor;
+          let newsfeed;
+          let bgcolor;
 
-  if (search === 'Friends' && user.username) {
-    bgcolor = styles.bg2
+          if (search === 'Friends' && user.username) {
+            bgcolor = styles.bg2
 
     newsfeed = (
-      <View style={styles.searchcont}>
-        <TouchableOpacity style={styles.searchOff} onPress={() => setSearch('Public')}>
-          <Text>Public</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.searchOn} onPress={() => setSearch('Friends')}>
-          <Text>Friends</Text>
-        </TouchableOpacity>
-      </View>
-    );
+          <View style={styles.searchcont}>
+            <TouchableOpacity style={styles.searchOff} onPress={() => setSearch('Public')}>
+              <Text>Public</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.searchOn} onPress={() => setSearch('Friends')}>
+              <Text>Friends</Text>
+            </TouchableOpacity>
+          </View>
+          );
 
   } else if (search === 'Public' && user.username) {
-    bgcolor = styles.bg
+            bgcolor = styles.bg
     newsfeed = (
-      <View style={styles.searchcont}>
-        <TouchableOpacity style={styles.searchOnPublic} onPress={() => setSearch('Public')}>
-          <Text>Public</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.searchOff} onPress={() => setSearch('Friends')}>
-          <Text>Friends</Text>
-        </TouchableOpacity>
-      </View>
-    );
+          <View style={styles.searchcont}>
+            <TouchableOpacity style={styles.searchOnPublic} onPress={() => setSearch('Public')}>
+              <Text>Public</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.searchOff} onPress={() => setSearch('Friends')}>
+              <Text>Friends</Text>
+            </TouchableOpacity>
+          </View>
+          );
 
   } else {
-    bgcolor = styles.bg
+            bgcolor = styles.bg
 
-  }
+          }
 
-  return (
-    <View style={bgcolor}>
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView
-          Style={styles.ratingsContainer}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }>
-          <>
-            {newsfeed}
-          </>
-          <>
-            {ratingsNewsFeed.reverse()}
-          </>
-        </ScrollView>
-      </SafeAreaView>
-    </View>
-  );
+          return (
+          <View style={bgcolor}>
+            <SafeAreaView style={styles.safeArea}>
+              <ScrollView
+                Style={styles.ratingsContainer}
+                refreshControl={
+                  <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }>
+                <>
+                  {newsfeed}
+                </>
+                <>
+                  {ratingsNewsFeed.reverse()}
+                </>
+              </ScrollView>
+            </SafeAreaView>
+          </View>
+          );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { 
-    flex: 1, 
-    marginTop: 30,
-  }, 
- 
-  // Style pour le conteneur d'un avis public
-  ratingContainerPublic: { 
-    backgroundColor: '#D4FDC6', 
-    borderRadius: 15, 
-    padding: 10, 
-    margin: 10,
-  }, 
-  // Style pour le conteneur d'un avis amis
-  ratingContainerFriends: { 
-    backgroundColor: '#D6CBFD', 
-    borderRadius: 15, 
-    padding: 10, 
-    margin: 10,
-  }, 
-  // Style pour le contenu d'un avis
-  ratingContent: { 
-    flexDirection: 'column',
-  }, 
-  // Style pour le conteneur des informations utilisateur
-  userInfoContainer: { 
-    flexDirection: 'row',
-    marginBottom: 10,
-  }, 
-  // Style pour l'avatar de l'utilisateur
-  avatar: { 
-    width: 60, 
-    height: 60, 
-    borderRadius: 25, 
-    marginRight: 10,
-  }, 
-  // Style pour les informations de l'utilisateur 
-  userInfo: { 
-    flex: 1, 
-    justifyContent: 'center', 
-  }, 
-  // Style pour le nom de l'utilisateur
-  userName: { 
-    fontWeight: 'bold', 
-  }, 
-  // Style pour les étoiles de notation
-  starsContainer: { 
-    flexDirection: 'row', 
-    marginTop: 5,
-  }, 
-  // Style pour la note
-  textNote: { 
-    marginLeft: 10, 
-    fontWeight: 'bold', 
-  },
-  // Style pour le conteneur de l'avis sur le jeu
-  gameReviewContainer: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginTop: 10,
-  }, 
-  // Style pour la couverture du jeu
-  gameCover: { 
-    width: 60, 
-    height: 90, 
-    borderRadius: 5, 
-    marginRight: 10, 
-    marginBottom: 10, 
-  }, 
-  // Style pour le titre du jeu
-  reviewGameTitle: { 
-    fontSize: 15, 
-    color: 'black', 
-    fontWeight: 'bold', 
-  }, 
-  // Style pour le texte de l'avis
-  reviewText: { 
-    flex: 1, 
-    fontSize: 13, 
-    color: 'black', 
-    marginRight: 20, 
-  }, 
-  // Style pour le conteneur du texte de l'avis
-  reviewContent: { 
-    width: '80%', 
-  }, 
-  // Styles pour les boutons de recherche
-  searchOn: {
-    backgroundColor: '#D6CBFD',
-    padding: 10,
-    margin: 5,
-    borderRadius: 15,
-    width: '40%',
-    borderWidth: 1,
-    borderColor: '#7A28CB',
-    alignItems: 'center',
-  },
-  searchOff: {
-    backgroundColor: '#F0F0F0',
-    padding: 10,
-    margin: 5,
-    borderRadius: 15,
-    width: '40%',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'grey',
-    opacity: 0.5
-  },
-  searchcont: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-around',
-  },
-  searchOnPublic: {
-    backgroundColor: '#D4FDC6',
-    padding: 10,
-    margin: 5,
-    borderRadius: 15,
-    width: '40%',
-    borderWidth: 1,
-    borderColor: '#33CA7F',
-    alignItems: 'center',
-  },
-  // Styles pour les icônes
-  heartIcon: {
-    color: "red",
-    paddingRight: 5,
-    padding: 3,
-  },
-  comIcon: {
-    color: "#33CA7F",
-    paddingRight: 5,
-    padding: 3,
-  },
-  sendIcon: {
-    color: "black",
-    paddingRight: 5,
-    padding: 3,
-  },
-  // Styles pour l'affichage des informations utilisateur
-  userandlike: {
-    width: 250,
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  heartAndlikeCounter: {
-    display: "flex",
-    flexDirection: "row",
-    alignContent: "center",
-    justifyContent: "center",
-    marginRight: 20,
-  },
-  counter: {
-    padding: 3
+          const styles = StyleSheet.create({
+            safeArea: {
+            flex: 1,
+          marginTop: 30,
   },
 
-  // Styles pour les couleurs d'arrière-plan
-  bg: {
-    flex: 1,
-    backgroundColor: 'rgba(51, 202, 127, 0.5)', 
+          // Style pour le conteneur d'un avis public
+          ratingContainerPublic: {
+            backgroundColor: '#D4FDC6',
+          borderRadius: 15,
+          padding: 10,
+          margin: 10,
   },
-  bg2: {
-    flex: 1,
-    backgroundColor: 'rgba(122, 40, 203, 0.5)',
+          // Style pour le conteneur d'un avis amis
+          ratingContainerFriends: {
+            backgroundColor: '#D6CBFD',
+          borderRadius: 15,
+          padding: 10,
+          margin: 10,
+  },
+          // Style pour le contenu d'un avis
+          ratingContent: {
+            flexDirection: 'column',
+  },
+          // Style pour le conteneur des informations utilisateur
+          userInfoContainer: {
+            flexDirection: 'row',
+          marginBottom: 10,
+  },
+          // Style pour l'avatar de l'utilisateur
+          avatar: {
+            width: 60,
+          height: 60,
+          borderRadius: 25,
+          marginRight: 10,
+  },
+          // Style pour les informations de l'utilisateur 
+          userInfo: {
+            flex: 1,
+          justifyContent: 'center', 
+  },
+          // Style pour le nom de l'utilisateur
+          userName: {
+            fontWeight: 'bold', 
+  },
+          // Style pour les étoiles de notation
+          starsContainer: {
+            flexDirection: 'row',
+          marginTop: 5,
+  },
+          // Style pour la note
+          textNote: {
+            marginLeft: 10,
+          fontWeight: 'bold', 
+  },
+          // Style pour le conteneur de l'avis sur le jeu
+          gameReviewContainer: {
+            flexDirection: 'row',
+          alignItems: 'center',
+          marginTop: 10,
+  },
+          // Style pour la couverture du jeu
+          gameCover: {
+            width: 60,
+          height: 90,
+          borderRadius: 5,
+          marginRight: 10,
+          marginBottom: 10, 
+  },
+          // Style pour le titre du jeu
+          reviewGameTitle: {
+            fontSize: 15,
+          color: 'black',
+          fontWeight: 'bold', 
+  },
+          // Style pour le texte de l'avis
+          reviewText: {
+            flex: 1,
+          fontSize: 13,
+          color: 'black',
+          marginRight: 20, 
+  },
+          // Style pour le conteneur du texte de l'avis
+          reviewContent: {
+            width: '80%', 
+  },
+          // Styles pour les boutons de recherche
+          searchOn: {
+            backgroundColor: '#D6CBFD',
+          padding: 10,
+          margin: 5,
+          borderRadius: 15,
+          width: '40%',
+          borderWidth: 1,
+          borderColor: '#7A28CB',
+          alignItems: 'center',
+  },
+          searchOff: {
+            backgroundColor: '#F0F0F0',
+          padding: 10,
+          margin: 5,
+          borderRadius: 15,
+          width: '40%',
+          alignItems: 'center',
+          borderWidth: 1,
+          borderColor: 'grey',
+          opacity: 0.5
+  },
+          searchcont: {
+            flexDirection: 'row',
+          width: '100%',
+          justifyContent: 'space-around',
+  },
+          searchOnPublic: {
+            backgroundColor: '#D4FDC6',
+          padding: 10,
+          margin: 5,
+          borderRadius: 15,
+          width: '40%',
+          borderWidth: 1,
+          borderColor: '#33CA7F',
+          alignItems: 'center',
+  },
+          // Styles pour les icônes
+          heartIcon: {
+            color: "red",
+          paddingRight: 5,
+          padding: 3,
+  },
+          comIcon: {
+            color: "#33CA7F",
+          paddingRight: 5,
+          padding: 3,
+  },
+          sendIcon: {
+            color: "black",
+          paddingRight: 5,
+          padding: 3,
+  },
+          // Styles pour l'affichage des informations utilisateur
+          userandlike: {
+            width: 250,
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+  },
+          heartAndlikeCounter: {
+            display: "flex",
+          flexDirection: "row",
+          alignContent: "center",
+          justifyContent: "center",
+          marginRight: 20,
+  },
+          counter: {
+            padding: 3
   },
 
-  // Styles pour les modales (si utilisées)
-  reviewcont: {
-    width: '100%',
-    padding: 4
+          // Styles pour les couleurs d'arrière-plan
+          bg: {
+            flex: 1,
+          backgroundColor: 'rgba(51, 202, 127, 0.5)', 
   },
-  reviewinputcont: {
-    marginHorizontal: 5,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between'
-  },
-  reviewinput: {
-    backgroundColor: '#F0F0F0',
-    height: 30,
-    padding: 5,
-    margintop: 10,
-    width: '80%'
+          bg2: {
+            flex: 1,
+          backgroundColor: 'rgba(122, 40, 203, 0.5)',
   },
 
-  // Style pour le conteneur des commentaires
-  commentContainer: {
-    alignItems: 'center',
-    marginBottom: 5,
-    margintop: 5
+          // Styles pour les modales (si utilisées)
+          reviewcont: {
+            width: '100%',
+          padding: 4
+  },
+          reviewinputcont: {
+            marginHorizontal: 5,
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between'
+  },
+          reviewinput: {
+            backgroundColor: '#F0F0F0',
+          height: 30,
+          padding: 5,
+          margintop: 10,
+          width: '80%'
   },
 
-  // Style pour le conteneur d'un commentaire
-  commentCont: {
-    width: '90%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    padding: 3,
-    borderBottomColor: '#D4FDC6'
+          // Style pour le conteneur des commentaires
+          commentContainer: {
+            alignItems: 'center',
+          marginBottom: 5,
+          margintop: 5
   },
 
-  // Style pour la section des commentaires
-  commentsSection: {
-    margin: 5,
+          // Style pour le conteneur d'un commentaire
+          commentCont: {
+            width: '90%',
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderBottomWidth: 1,
+          padding: 3,
+          borderBottomColor: '#D4FDC6'
+  },
+
+          // Style pour la section des commentaires
+          commentsSection: {
+            margin: 5,
   }
 });

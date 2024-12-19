@@ -17,9 +17,11 @@ export default function FriendScreen({ navigation, route }) {
     const [allLists, setAllLists] = useState([])
     const [game, setGame] = useState("")
     const { friendName } = route.params
+    //const [showPrivateList, setShowPrivateList] = useState(false)
     const [gotPP, setGotPP] = useState(false) 
     const [profilePicture, setProfilePicture] = useState(null);
     const [modal, setModal] = useState(false)
+    const [addable, setAddable] = useState(false)
 
 
     const dispatch = useDispatch();
@@ -27,39 +29,47 @@ export default function FriendScreen({ navigation, route }) {
       dispatch(clickedFriend(friendUsername));
     };
 
-
+ 
   
   useEffect(() => {
+
+    if (user.username === friendName) {
+      navigation.navigate("TabNavigator", { screen: "Profil" });
+  }
 
     //console.log("ça marche");
 
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`)
     .then(result => result.json())
     .then(data => {
-      //console.log("c'est le front de FriendScreen", data.infos.profilePicture)
-
       setNumberOfFriends(data.infos.friendsList.length)
-
-      //console.log("number of friends ", numberOfFriends);
-      //console.log("Id de list", data.infos.lists[0])
-
       if (data.infos.profilePicture) {
         setProfilePicture(data.infos.profilePicture);
         setGotPP(true)
         } 
 
+        const fl = data.infos.friendsList;
+
+        for (let obj of fl) {
+          
+            console.log(obj.username)
+            if (obj.username == user.username) {
+              setAddable(true)
+            
+          }
+        }
+
+        console.log("friendList du pote", data.infos.friendsList)
+    
+
       return data
      
   })
   .then(data => {
-    //console.log("deuxième data", data);
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`)
     .then(result => result.json())
     .then(data => {
-      //console.log("data du fetch des listes de jeux", data);
       setNumberOfGames(data.data.gameList.length)
-      //console.log("le fetch qui sert à setter le nombre de jeu :", data.data.gameList.length)
-      //console.log("number of games", numberOfGames);
       setGameList(data.data.gameList)
     })
   })
@@ -72,10 +82,12 @@ export default function FriendScreen({ navigation, route }) {
       setAllLists(data.lists)
   });
 
-}, [friendName]);
+  //setShowPrivateList(false)
 
-//console.log("number of games in all my games list :", gameList.length)
-//console.log(profilePicture)
+}, [friendName, user.username, navigation]);
+
+//console.log("addable?", addable)
+
 
 
 const stars = [];
@@ -87,7 +99,19 @@ for (let i = 0; i < 5; i++) {
   stars.push(<FontAwesome key={i} name={style} color="yellow" />);
 }
 
+let addButton = <View style={styles.logoutView}>
+<TouchableOpacity style={styles.logoutButton} onPress={() => addAFriend()}>
+    <Text style={styles.logoutText}>Ask as a friend</Text>
+</TouchableOpacity>
+</View>;
 
+if (addable) {
+ addButton = <View style={styles.logoutView}>
+ <TouchableOpacity style={styles.noButton}>
+     <Text style={styles.logoutText}>You are already friends</Text>
+ </TouchableOpacity>
+ </View>;
+}
 
   //fonction pour ajouter un ami - pas terminée - je dois générer des vrais demandes d'ami avant (et des vraies page profil d'ami).
   // je dois donc revenir sur la partie ProfilScreen avant pour mapper la liste des demandes d'amis (envoyées et reçues)
@@ -97,13 +121,13 @@ for (let i = 0; i < 5; i++) {
         // Récupérer l'ID de l'utilisateur courant
         const userResponse = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`);
         const userData = await userResponse.json();
-        console.log("fetch myId", userData.infos._id);
+        //console.log("fetch myId", userData.infos._id);
 
 
         // Récupérer l'ID de l'ami
         const friendResponse = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`);
         const friendData = await friendResponse.json();
-        console.log("fetch myFriendId", friendData.infos._id);
+        //console.log("fetch myFriendId", friendData.infos._id);
 
         // Ajouter un nouvel ami
         const addFriendResponse = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/addFriend`, {
@@ -111,41 +135,42 @@ for (let i = 0; i < 5; i++) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ sender: userData.infos._id, receiver: friendData.infos._id }),
         });
-        const addFriendData = await addFriendResponse.json();
-        console.log("data du dernier fetch", addFriendData);
+        /*const addFriendData = await addFriendResponse.json();
+        console.log("data du dernier fetch", addFriendData);*/
 
     } catch (error) {
-        console.error("Erreur dans addAFriend:", error.message);
+        //console.error("Erreur dans addAFriend:", error.message);
     }
 }
 
 
   let pluralFriends = "";
-if (numberOfFriends >1) {
-  pluralFriends = "s"
-}
+  if (numberOfFriends >1) {
+    pluralFriends = "s"
+  }
 
-let pluralGames = "";
-if (numberOfGames >1) {
-  pluralGames = "x"
-}
+  let pluralGames = "";
+  if (numberOfGames >1) {
+    pluralGames = "x"
+  }
+
 
 const games = gameList.map((data, i) => {
 
   const stars = [];
-for (let i = 0; i < 5; i++) {
-  let style = "star-o";
-  if (i < 4 - 1) {
-    style = "star";
+  for (let i = 0; i < 5; i++) {
+    let style = "star-o";
+    if (i < 4 - 1) {
+      style = "star";
+    }
+    stars.push(<FontAwesome key={i} name={style} color="yellow" />);
   }
-  stars.push(<FontAwesome key={i} name={style} color="yellow" />);
-}
 
-let name = data.name[0].toUpperCase() + data.name.slice(1);
+  let name = data.name[0].toUpperCase() + data.name.slice(1);
 
-if (name.length >= 15) {
-  name = name[0].toUpperCase() + name.slice(1, 10) + "..."
-}
+  if (name.length >= 15) {
+    name = name[0].toUpperCase() + name.slice(1, 10) + "..."
+  }
 
   return (
     <View key={i} style={styles.gameContainer}>
@@ -159,6 +184,54 @@ if (name.length >= 15) {
     </View>
   )
 })
+
+// print all list if the user is your friend
+// print only public list if the user is not your friend
+/*const printLists = async () => {
+console.log("DEBUT DES TESTS")
+  // get the friend list
+  let friendList = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getFriendList/${user.username}`)
+  friendList = await friendList.json()
+  // get the user's id of the current page
+  let profilData = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`);
+  profilData = await profilData.json();
+  let profilId = profilData.infos._id
+  // check if the user's id is in the friend list
+  for(let idOfFriendList of friendList.list.friendsList){
+console.log(idOfFriendList, profilId)
+console.log(idOfFriendList.equals(profilId))
+    if(idOfFriendList.equals(profilId)){
+      setShowPrivateList(true)
+      break
+    }
+  }
+
+  // if showPrivateList is true, then the profil user is your friend, then you are able to see all of his lists
+  // if showPrivateList is false, then the profil user is not your friend, then you are able to see only is public list
+  const tmpLists = showPrivateList ? allLists : allLists.filter((list) => list.isPublic !== showPrivateList) 
+  const lists = tmpLists.map((data, i) => {
+    let title = data.listName.length >= 13 ? data.listName.slice(0, 10) + "..." : data.listName
+    let plural = data.gameList.length < 2 ? "jeu" : "jeux"
+    return (
+      <View key={i} style={styles.boxOfLists}>
+        <Text style={styles.listName}>{title}</Text>
+        <TouchableOpacity onPress={() => handleSeeList(data.listName)} activeOpacity={0.8}>
+          <Image style={styles.jacket} source={require("../assets/mario.png")} />
+        </TouchableOpacity>
+        <View style={styles.textOfListBottom}>
+          <Text style={styles.listLength}>{data.gameList.length} {plural}</Text>
+        </View>
+      </View>
+    )
+  })
+//console.log("TEST : ", lists)
+console.log(lists)
+return lists
+}*/
+//console.log(printLists())
+//printLists()
+//const lists = printLists()
+
 
   const lists = allLists.map((data, i) => {
     let title = data.listName.length >= 13 ? data.listName.slice(0, 10) + "..." : data.listName
@@ -175,6 +248,15 @@ if (name.length >= 15) {
       </View>
     )
   })
+
+/*fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getFriendList/${user.username}`)
+.then(res => res.json())
+.then((data) => {
+  console.log("user = ", user.username)
+  console.log("friendList = ", data.list.friendsList)
+  
+})*/
+
 
 
   const handleSeeList = (listName) => {
@@ -198,7 +280,7 @@ if (name.length >= 15) {
               } else {
                 title = data[0]
               }
-              console.log(data)
+              //console.log(data)
             return (
               <View key={i} style={styles.game}>
                 <TouchableOpacity onPress={() => handleNavigation(data[0]) }>
@@ -243,11 +325,7 @@ if (name.length >= 15) {
                       <Text style={styles.friendStatsText}>{numberOfFriends} ami{pluralFriends}</Text>
                     </TouchableOpacity>
       </View>
-      <View style={styles.logoutView}>
-            <TouchableOpacity style={styles.logoutButton} onPress={() => addAFriend()}>
-                <Text style={styles.logoutText}>Ask as a friend</Text>
-            </TouchableOpacity>
-      </View>
+      {addButton}
       <View style={styles.gameDiv}>
         <View style={styles.games}>
             <Text style={styles.secondTitles}>Ses jeux préférés ({numberOfGames})</Text>
@@ -561,6 +639,15 @@ const styles = StyleSheet.create({
         height: 50,
         width: 100,
         backgroundColor: 'green',
+        justifyContent: "center",
+        alignItems: "center",
+    
+      },
+      noButton: {
+        borderRadius: 10,
+        height: 60,
+        width: 150,
+        backgroundColor: 'gray',
         justifyContent: "center",
         alignItems: "center",
     
