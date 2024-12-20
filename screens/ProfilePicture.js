@@ -14,10 +14,7 @@ import ImageViewer from '../components/imageViewer';
 export default function SnapScreen({navigation}) {
 	const dispatch = useDispatch();
 	const isFocused = useIsFocused();
-	//const user = useSelector((state: { user: UserState }) => state.user.value);
-	//console.log("pic:", user.photos)
     const user = useSelector((state) => state.user.value.username)
-	console.log(user);
 	
     const pickImageAsync = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -27,21 +24,15 @@ export default function SnapScreen({navigation}) {
         });
     
         if (!result.canceled) {
-          console.log(result);
 		  const formData = new FormData();
 			const photo = result.assets[0]
 		  	if (photo) {
-		  		console.log('photo:', photo.uri);
-	  
 		  		formData.append('photoFromFront', {
 		  			uri: photo?.uri,
 		  			name: 'snapped.jpg',
 		  			type: 'image/jpeg',
 		  		});
-		  		console.log('je rentre dans la route')
 		  		formData.append('username', user); // Append username separately
-		  
-		  		console.log('formData:', formData);
 		  
 		  		fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateAvatar`, {
 		  			method: 'POST',
@@ -49,7 +40,6 @@ export default function SnapScreen({navigation}) {
 		  		})
 		  			.then((response) => response.json())
 		  			.then((data) => {
-		  				console.log('data:', data);
 						navigation.navigate('Signup3')  
 		  			})
 		  			.catch((err) => console.error('Error:', err));
@@ -94,17 +84,13 @@ export default function SnapScreen({navigation}) {
 		const formData = new FormData();
 		const photo = await cameraRef?.current?.takePictureAsync({ quality: 0.3 });
 		if (photo) {
-			console.log('photo:', photo.uri);
 
 			formData.append('photoFromFront', {
 				uri: photo?.uri,
 				name: 'snapped.jpg',
 				type: 'image/jpeg',
 			});
-			console.log('je rentre dans la route')
 			formData.append('username', user); // Append username separately
-	
-			console.log('formData:', formData);
 	
 			fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateAvatar`, {
 				method: 'POST',
@@ -112,7 +98,6 @@ export default function SnapScreen({navigation}) {
 			})
 				.then((response) => response.json())
 				.then((data) => {
-					console.log('data:', data);
 					navigation.navigate('Signup3')
 				})
 				.catch((err) => console.error('Error:', err));

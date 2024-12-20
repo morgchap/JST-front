@@ -27,9 +27,6 @@ export default function SearchScreen({navigation}) {
   const [searchedUser, setSearchedUser] = useState('')
   
   const gamedata = useSelector((state) => state.game.value);
-  //console.log(`reducer : ${gamedata}`)
-
-  //console.log(`user : ${suggestionUser}`)
 
 const fetchgames = async (query) => {
     if (!query) {
@@ -44,7 +41,6 @@ const fetchgames = async (query) => {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const data = await response.json();
-      //console.log(data);
       if (data && Array.isArray(data.data)) {
         setSuggestionGame(data.data);
       } else {
@@ -71,7 +67,6 @@ const fetchgames = async (query) => {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
           const data = await response.json();
-          //console.log(data);
           if (data && Array.isArray(data.data)) {
             setSuggestionUser(data.data);
           } else {
@@ -84,9 +79,7 @@ const fetchgames = async (query) => {
           setLoadingRace(false);
         }
           };
-    
-          //console.log(suggestionUser)
-
+  
      const handleinput = (value) => {
       setGameName(value)
       fetchgames(value)
@@ -100,23 +93,15 @@ const fetchgames = async (query) => {
 
      const handleSuggestionGame=(game) => {
       setModalVisible(true)
-      //console.log(game)
       let searchedgame = suggestionGame.filter((e)=> e.name === game)
-      //console.log(searchedgame)
       if(searchedgame[0].cover){
         setGameImg(searchedgame[0].cover);
-       //console.log(gameImg)
         setGameName(searchedgame[0].name);
-        //console.log(gameName)
         setGamedate(searchedgame[0].releaseDate);
-        //console.log(gameDate)
       }else{
         setGameImg(searchedgame[0].background_image);
-        //console.log(gameImg)
         setGameName(searchedgame[0].name);
-        //console.log(gameName)
         setGamedate(searchedgame[0].released);
-        //console.log(gameDate)
         setGameDescription(searchedgame[0].description)
         setGameGenre(searchedgame[0].genres.name)
       }
@@ -187,7 +172,6 @@ const fetchgames = async (query) => {
           value={searchedUser}
           placeholder='Search for a User'
           returnKeyType='search'
-          // onSubmitEditing={(gameName) => handlesubmit(gameName)}
           placeholderTextColor="black"
         />
         <View style={styles.suggestiontcontainer}>
@@ -258,8 +242,6 @@ const fetchgames = async (query) => {
       }),
     }).then(response => response.json()).then(data => {
       if (data){
-        //console.log(`result : ${data.gameid}`)
-        
         dispatch(searchedgamevalue(gameName))
       } else {
         dispatch(searchedgamevalue(gameName))
@@ -274,17 +256,13 @@ const fetchgames = async (query) => {
 
 
   const handlesubmit = ()=> {
-    //setGame(value)
-   // console.log(suggestionGame.filter((e) => {e = gameName}))
    //search if the game is not already in the db 
    let numberOfSuggestion = suggestionGame.length
     if(numberOfSuggestion === 0){
       let searchedGame = gameName.trim()
       searchedGame = searchedGame.replaceAll(" ", '-');
-      //console.log(searchedGame)
       fetch(`https://api.rawg.io/api/games/${searchedGame}?key=${process.env.EXPO_PUBLIC_API_KEY}`).then(response => response.json())
       .then(data => {
-        //console.log(`name : ${data.name} img : ${data.background_image} date : ${data.released}, descr : ${data.description}, genres : ${data.genres[0]?.name}`);
         setGame('');
         setGameImg(data.background_image);
         setGameName(data.name);
@@ -292,9 +270,7 @@ const fetchgames = async (query) => {
         setError('');
         setGameDescription(data.description);
         setGameGenre(data.genres.name);
-        //console.log('true')
         setSuggestionGame(suggestionGame => [...suggestionGame, data])
-        //console.log(`suggestion ${suggestionGame}`)
       })
       .catch((err) => setError('Game not found'));
     }else{
@@ -303,7 +279,6 @@ const fetchgames = async (query) => {
   };
 
 const handleList = ()=> {
-  //console.log('ok')
   fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/allgames`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -318,9 +293,7 @@ const handleList = ()=> {
   })
   .then(response => response.json())
   .then(data => {
-    //console.log(data)
     if (data.result) {
-      //console.log(`${data} added`);
       setModalVisible(false);
     } else {
       setError(data.error);
@@ -328,7 +301,6 @@ const handleList = ()=> {
   });
 }
 
- /* Modification */
 
  const fetchGamesByConsole = (consoleId) => {
   fetch(`https://api.rawg.io/api/games?key=${process.env.EXPO_PUBLIC_API_KEY}&platforms=${consoleId}`)
@@ -347,7 +319,6 @@ const consoles = [
   { name: 'Android/iOS', id: 21 },
   { name: 'Other', id: 14 },
 ];
-/* Fin des modifs */
 
 return (
   <ImageBackground style={styles.image} source={require('../assets/background-blur.png')}> 
@@ -365,7 +336,7 @@ return (
           {searchBar}
           {searchButton}
         <Text style={styles.subtitle}>
-            Explore le top des jeux par console
+           Search games by game console
           </Text>
         <View style={styles.buttonsContainer}>
           {consoles.map((console, index) => (
@@ -487,7 +458,7 @@ const styles = StyleSheet.create({
       width: '90%',
       marginBottom: 10, // Petit espace entre la barre et le texte
       paddingHorizontal: 10,
-      borderRadius: 10,
+      borderRadius: 5,
   },
   subtitle: {
       fontSize: 16,
@@ -519,7 +490,7 @@ const styles = StyleSheet.create({
     width: '80%',
     padding: 20,
     backgroundColor: 'white',
-    borderRadius: 10,
+    borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -539,7 +510,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderColor: "white",
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 5,
     backgroundColor: '#7A28CB',
     height: '7%',
     width: '80%',
@@ -565,7 +536,7 @@ const styles = StyleSheet.create({
     borderBottomWidth:1, 
     width:'100%',
     padding:'5%', 
-    borderRadius:2
+    borderRadius:5
   },
   suggestiontcontainer:{
     width:'90%'

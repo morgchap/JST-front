@@ -10,13 +10,8 @@ export default function SigninScreen({navigation}) {
   const [username, setUsername]= useState('')
   const [password, setpassword]= useState('')
   const [error, setError]=useState('')
-  //let backend = process.env.BACKEND_URL
-
-
   const dispatch = useDispatch();
   const CurrentUsername = useSelector((state) => state.user.value.username);
-  //console.log(`username:${username} and reducers:${CurrentUsername}`)
-  console.log(CurrentUsername)
 
 const handlesignin = () => {
   console.log('ok')
@@ -26,13 +21,10 @@ const handlesignin = () => {
     body: JSON.stringify({ username: username, password: password}),
 }).then(response => response.json())
 .then(data => {
-    //console.log(data)
     if (data.result) {
-        //console.log(data);
         setUsername('')
         setpassword('')
         dispatch(updateUsername({username: username, token:data.token, userId: data.userId}));
-        //console.log(`username:${username} and reducers:${CurrentUsername}`)
         navigation.navigate('TabNavigator')
     } else {
       setError(data.error)
@@ -52,25 +44,6 @@ const handlesignin = () => {
         <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
         </SafeAreaView>
         <View style={styles.container}>
-        <Pressable
-              style={styles.button}
-            title="Google"
-            //onPress={() => navigation.navigate('Signin')}
-            >
-              <Text style={styles.buttonText}>Sign in with google</Text>
-          </Pressable>  
-          <Pressable
-            style={styles.button}
-            title="steam"
-          // onPress={() => navigation.navigate('Signin')}
-            >
-              <Text style={styles.buttonText}>Sign in with steam</Text>
-          </Pressable>  
-        <View style={styles.middlepart}>
-          <View style={styles.line}></View>
-          <Text style={styles.text}>OU</Text>
-          <View style={styles.line}></View>
-        </View> 
           <TextInput style={styles.input} 
           placeholder='Username' 
           autoCapitalize='none'
@@ -90,12 +63,6 @@ const handlesignin = () => {
             onPress={() => handlesignin()}>
               <Text style={styles.buttonText}>Sign in</Text>
           </TouchableOpacity>  
-          <Pressable
-          style={styles.button2}
-          title="sign in"
-        >
-          <Text style={styles.buttonText2}>I forgot my password</Text>
-      </Pressable>
       </View>  
         </KeyboardAvoidingView>
     </ImageBackground>
@@ -122,7 +89,7 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       borderColor: "#7A28CB",
       borderWidth:1, 
-      borderRadius:10,
+      borderRadius:5,
       backgroundColor: 'white',
       height:'7%',
       width:'80%',
@@ -159,7 +126,7 @@ const styles = StyleSheet.create({
       width:'80%',
       margin:'2%',
       paddingLeft:10,
-      borderRadius:10
+      borderRadius:5
     },
     buttonText2:{
       fontFamily:'OpenSans_600SemiBold',

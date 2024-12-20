@@ -11,7 +11,6 @@ import { addListGames } from '../reducers/user';
 export default function GamesScreen({navigation, route}) {
 
     //const gamedata = useSelector((state) => state.game.value);
-    //console.log(`reducer : ${gamedata}`)a
     const dispatch = useDispatch();
     const {gameName} = route.params;
     const user = useSelector((state) => state.user.value)
@@ -35,21 +34,18 @@ export default function GamesScreen({navigation, route}) {
     const [likedMyReviews, setLikedMyReviews] = useState({});
     const [likedReviews, setLikedReviews] = useState({});
     const [profilePic, setProfilePic]=useState('')
-    //console.log(`game : ${gameName}`)
 
     function fetchMyReview() {
 
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/byuser/${user.username}`)
       .then(result => result.json())
       .then(data => {
-        //console.log("data de mes reviews", data.ratings.ratingsID)
       
         const theGameReview = data.ratings.ratingsID.filter(((e) => e.game.name == gameName))
         
         setMyReviews(theGameReview);
         setProfilePic(data.ratings.profilePicture)
         
-
         const liked = {};
         data.ratings.forEach(review => {
         liked[review._id] = review.likesNumber.includes(user.userId);
@@ -68,7 +64,6 @@ export default function GamesScreen({navigation, route}) {
         body: JSON.stringify({ username: user.username, name: gameName }),
     }).then(response => response.json())
     .then(data => {
-      //console.log("data du fetch des avis de mes amis", data)
       setFriendsGR(data.ratings)
       const liked = {};
       data.ratings.forEach(review => {
@@ -76,13 +71,8 @@ export default function GamesScreen({navigation, route}) {
       });
       setLikedReviews(liked);
     })
-        //console.log("data de mes reviews", data.ratings)
-        //console.log("nombre de likes", data.ratings.likesNumber)
-      
-        
       
     }
-    //console.log(friendsGR)
 
     const toggleVisibility = () => {
       setVisibility((previous) => !previous);
@@ -110,18 +100,15 @@ export default function GamesScreen({navigation, route}) {
               body: JSON.stringify({ username: user.username, listName, gameName }),
           }).then(response => response.json())
             .then(data => {
-//console.log("test", data)
-              if(!data.result){
-                console.log(data.error)
-              } else {
-                //console.log(data.message)
+
+              if(data.result){
                 dispatch(updateChange())
               }
             });
     }
       
    const  handlesubmit = () => {
-    console.log('ok')
+
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/newreview`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -130,7 +117,6 @@ export default function GamesScreen({navigation, route}) {
       })
   }).then(response => response.json()).then(doc=> {
     if(doc.result){
-      //console.log(doc.ratings)
       setGameReview( [... gamereview, doc.ratings] );
       setReview(false)
       fetchMyReview();
@@ -162,7 +148,6 @@ export default function GamesScreen({navigation, route}) {
 
   }
 
-  //console.log("log du gamereview", gamereview)
 
    const myreview = myReviews.map((data, i)=> {
 
@@ -266,7 +251,6 @@ useEffect(() => {
         })
           .then(response => response.json())
           .then(data => {
-            //console.log(data)
             setGamesInfo(data.game);
             if (summary.length > 100){
             setsummary(summary.slice(100))}
@@ -277,9 +261,6 @@ useEffect(() => {
 
 fetchMyReview();
 
-
-
-
 // fetch les reviews de mes amis
 
 fetchMyFriendsReviews();
@@ -287,7 +268,6 @@ fetchMyFriendsReviews();
 
 }, []);
 
-//console.log("my review useStatées", myReviews)
 
 let summaryToHTML 
 
@@ -297,7 +277,6 @@ if(gamesinfo.summary=== undefined || summary === undefined){
 } else {
   summaryToHTML = gamesinfo.summary
 }
-// console.log(gamesinfo.summary)
     const stars = [];
 for (let i = 0; i < 5; i++) {
   let style = "star-o";
@@ -687,7 +666,7 @@ const styles = StyleSheet.create({
     jaquette:{
         height:'95%', 
         width:'40%', 
-        borderRadius: 10,
+        borderRadius: 5,
     }, 
     Imgview: {
         width:'100%',
@@ -762,7 +741,7 @@ const styles = StyleSheet.create({
         height:'100%',
         alignItems:'center',
         justifyContent:'center',
-        borderRadius:25, 
+        borderRadius:5, 
         shadowColor: "#000",
         shadowOffset: {
 	        width: 0,
@@ -793,7 +772,7 @@ const styles = StyleSheet.create({
       resumebox:{
         width:'85%',
         borderColor:'#33CA7F', 
-        borderRadius:10,
+        borderRadius:5,
         borderWidth:3,
         height:70
       }, 
@@ -837,7 +816,7 @@ const styles = StyleSheet.create({
         height:'20%',
         alignItems:'center', 
         //justifyContent:'center',
-        borderRadius:10, 
+        borderRadius:5, 
         margin:'3%',
         minHeight:'7%'
       }, 
@@ -845,7 +824,7 @@ const styles = StyleSheet.create({
         backgroundColor:'#EEEEEE',
         padding:'2%',
         margin:'2%', 
-        borderRadius:10
+        borderRadius:5,
 
       }, 
       friendsAvatars: {
@@ -906,7 +885,7 @@ const styles = StyleSheet.create({
         width: '80%',
         padding: 20,
         backgroundColor: 'white',
-        borderRadius: 10,
+        borderRadius: 5,
         alignItems: 'flex-start',
         justifyContent: 'center',
       },
@@ -935,7 +914,7 @@ const styles = StyleSheet.create({
         width: '80%',
         padding: 20,
         backgroundColor: 'white',
-        borderRadius: 10,
+        borderRadius: 5,
         alignItems: 'flex-start',
         justifyContent: 'space-between',
         maxHeight:300
@@ -959,7 +938,7 @@ const styles = StyleSheet.create({
         height:50,
         alignItems:'center',
         justifyContent:'center',
-        borderRadius:25, 
+        borderRadius:5, 
         shadowColor: "#000",
         shadowOffset: {
 	        width: 0,

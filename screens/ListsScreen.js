@@ -65,7 +65,7 @@ export default function ListsScreen({ navigation }) {
                 if(data.error === "Your list is empty."){
                     gamesList = [
                         <View key={0}>
-                            <Text>Votre List est vide</Text>
+                            <Text>Your list is empty</Text>
                         </View>
                     ]
                 } else {
@@ -105,7 +105,6 @@ export default function ListsScreen({ navigation }) {
             method: 'DELETE',
         })
         .then((res) => res.json())
-        .then((data) => console.log(data))
         .then(() => fetchGameLists())
         .then(() => setModal(false))
     }
@@ -246,7 +245,7 @@ export default function ListsScreen({ navigation }) {
                         <View style={styles.modalContainer}>
                             <TextInput 
                                 placeholder="List Name" 
-                                placeholderTextColor="#7A28CB" 
+                                placeholderTextColor="grey" 
                                 autoCapitalize="none" 
                                 onChangeText={setListName} 
                                 value={listName} 
@@ -327,13 +326,13 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         padding: 20,
-        borderRadius: 10,
+        borderRadius: 5,
         alignItems: "center",
         justifyContent: 'center',
     },
     modalContainerList: {
         padding: 20,
-        borderRadius: 10,
+        borderRadius: 5,
         alignItems: "flex-end",
         justifyContent: 'center',
     },
@@ -343,7 +342,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#7A28CB",
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 10,
+        borderRadius: 5,
     },
     modalButtonText: {
         color: "white",
@@ -424,12 +423,12 @@ const styles = StyleSheet.create({
         justifyContent: "space-around",
         backgroundColor: "#7A28CB",
         opacity: 0.8,
-        borderRadius: 10,
+        borderRadius: 5,
     },
     jaquetteOfList: {
         height: 100,
         width: 75,
-        borderRadius: 10,
+        borderRadius: 5,
     },
     textOfList: {
         width: "75%",
@@ -463,7 +462,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#D6CBFD",
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 10,
+        borderRadius: 5,
     },
     textButtonOfList: {
         color: '#7A28CB',
@@ -476,7 +475,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#7A28CB",
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 10,
+        borderRadius: 5,
     },
     textButton: {
         color: "white",

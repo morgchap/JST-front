@@ -57,7 +57,6 @@ export default function ProfilScreen({ navigation }) {
 
   useEffect(() => {
     if (!refreshing) {
-      //console.log("ça marche");
 
       fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`)
       .then(result => result.json())
@@ -66,47 +65,32 @@ export default function ProfilScreen({ navigation }) {
         setNumberOfFriends(data.infos.friendsList.length);
         setMyId(data.infos._id)
 
-      //console.log("adresse de la PP", data.infos.profilePicture)
-
       if (data.infos.profilePicture) {
       setProfilePicture(data.infos.profilePicture);
       setGotPP(true)
       } 
 
-  
-        // console.log("number of friends ", numberOfFriends);
-        // console.log("Id de list", data.infos.lists[0]);
-  
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/receivedFriendRequests/${data.infos._id}`)
         .then(result => result.json())
         .then(databis => {
-          // console.log("fetch de la friendlist received", databis.data)
           setReceivedFriendRequestList(databis.data);
         })
   
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/sentFriendRequests/${data.infos._id}`)
         .then(result => result.json())
         .then(dataTer => {
-          // console.log("fetch de la friend list sent", dataTer.data)
           setSentFriendRequestList(dataTer.data)
   
         })
-  
-        
-      
-    
   
         return data
        
       })
       .then(data => {
-        //console.log("deuxième data", data);
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`)
         .then(result => result.json())
         .then(data => {
-          //console.log("data du fetch des liste de jeux", data);
           setNumberOfGames(data.data.gameList.length)
-          //console.log("number of Games", numberOfGames);
           setGameList(data.data.gameList)
           
         })
@@ -120,11 +104,6 @@ export default function ProfilScreen({ navigation }) {
 
 }, [actionOnFriends, refreshing, isFocused]);
 
-//fonctionne mais tourne en boucle... -> à voir comment éviter ça
-
-//console.log(gameList);
-//console.log("reducer", user)
-
 
 function acceptFriendRequest(senderId, senderUsername) {
   //fetch 1 pour changer le statut pending en accepted dans la collection friend
@@ -136,11 +115,7 @@ function acceptFriendRequest(senderId, senderUsername) {
 })
     .then(result => result.json())
     .then(data => {
-      //console.log("data de l'ajout d'ami", data);
       setActionOnFriends(!actionOnFriends);
-  
-   
-      
     })
   
 
@@ -153,10 +128,7 @@ function acceptFriendRequest(senderId, senderUsername) {
     body: JSON.stringify({ username: user.username, id: senderId })
 })
     .then(result => result.json())
-    .then(data => {
-      //console.log("data de l'ajout d'ami", data);
-      
-    })
+    
 
     //fetch 3 pour push mon ID dans la friendList du friend
 
@@ -166,25 +138,17 @@ function acceptFriendRequest(senderId, senderUsername) {
       body: JSON.stringify({ username: senderUsername, id: myId })
   })
       .then(result => result.json())
-      .then(data => {
-        //console.log("data de l'ajout d'ami2", data);
-    
-     
-        
-      })
 }
 
 
 
 const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
   return (
-    <View style={styles.headScrollView}>
-    <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
+    <View style={styles.headScrollView} key={i}>
+    <TouchableOpacity style={styles.friendsContainer} onPress={() => {
       navigation.navigate("Friend", {friendName: data.sender.username});
       //{ gameName: gameName }('Games',{ gameName: gameName })
       selectFriend(data.sender.username);
-      //console.log(friend);
-      
       }}>
       <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
       <Text style={styles.friendsPseudo}>@{data.sender.username}</Text>
@@ -193,7 +157,6 @@ const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
     <View style={styles.icons}>
     <FontAwesome name="plus-circle" color="green" size={25} style={styles.iconStyle} onPress={() => {
       selectFriend(data.sender.username);
-      //console.log(friend);
       acceptFriendRequest(data.sender._id, data.sender.username);
 
       }}/>
@@ -204,14 +167,17 @@ const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
 })
 
 const mySentFriendRequests = sentFriendRequestList.map((data, i) => {
+
+// ajouter le if pour la pp de l'amis
   return (
     <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
       navigation.navigate("Friend", {friendName: data.receiver.username});
-      selectFriend(data.receiver.username);
-      //console.log(friend);
-      
+      selectFriend(data.receiver.username);      
       }}>
-      <Image source={require("../assets/avatar.png")} style={styles.friendsAvatars} />
+       { gotPP ? (
+        <Image style={styles.avatar} source={{uri: data.profilePicture}}/>) : (
+          <Image style={styles.avatar} source={require("../assets/avatar.png")} />
+        )}
       <Text style={styles.friendsPseudoBis}>@{data.receiver.username}</Text>
       <View style={styles.iconContainer}>
       </View>
@@ -257,13 +223,10 @@ if (name.length >= 15) {
 
   function sendRequest() {
     setDefaultFriends(false);
-    //console.log(defaultFriends);
-
   };
 
   function receivedRequest() {
     setDefaultFriends(true);
-    //console.log(defaultFriends);
   }
 
 
@@ -330,7 +293,7 @@ if (numberOfGames >1) {
       </View>
       <View style={styles.gameDiv}>
         <View style={styles.games}>
-            <Text style={styles.secondTitles}>Mes jeux préférés ({numberOfGames})</Text>
+            <Text style={styles.secondTitles}>My favorite games ({numberOfGames})</Text>
             <ScrollView horizontal={true} style={styles.listGame}> 
               {games}
             </ScrollView>
@@ -338,10 +301,10 @@ if (numberOfGames >1) {
       </View>
       <View style={styles.myFriendTitleDiv}>
           <TouchableOpacity style={styles.leftButton} onPress={() => receivedRequest()}>
-            <Text style={styles.friendsReceived}>Demandes reçues ({receivedFriendRequestList.length})</Text>               
+            <Text style={styles.friendsReceived}>Request ({receivedFriendRequestList.length})</Text>               
           </TouchableOpacity>
           <TouchableOpacity style={styles.rightButton} onPress={() => sendRequest()}>
-            <Text style={styles.friendsSent}>Demandes envoyées ({sentFriendRequestList.length})</Text>               
+            <Text style={styles.friendsSent}>Received ({sentFriendRequestList.length})</Text>               
           </TouchableOpacity>
           </View>
           { defaultFriends ? (
@@ -466,7 +429,7 @@ const styles = StyleSheet.create({
       borderBottomWidth: 2,
       borderBottomColor: '#7A28CB',
       paddingBottom: 10,
-      borderRadius: 10,
+      borderRadius: 5,
 
     
     },
@@ -522,12 +485,12 @@ const styles = StyleSheet.create({
 
     friendsView: {
       display: "flex",
-      flex: 1,
       flexDirection: "row",
       backgroundColor: "white",
       paddingHorizontal: 10,
-      marginLeft: 13,
-      marginRight: 13,
+      marginLeft:30,
+      marginright:30,
+      width:'85%'
 
     },
 
@@ -599,7 +562,7 @@ const styles = StyleSheet.create({
       backgroundColor: 'white',
       justifyContent: "center",
       alignItems: "center",
-      paddingHorizontal: 10,
+      paddingHorizontal: 30,
     },
     rightButton: {
       borderTopLeftRadius: 10,
@@ -607,7 +570,7 @@ const styles = StyleSheet.create({
       backgroundColor: '#33CA7F',
       justifyContent: "center",
       alignItems: "center",
-      paddingHorizontal: 10,
+      paddingHorizontal: 30,
       
     },
 
@@ -637,8 +600,9 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       backgroundColor: "#33CA7F",
       paddingHorizontal: 10,
-      marginLeft: 13,
-      marginRight: 13,
+      marginLeft:30,
+      marginright:30,
+      width:'85%'
     },
     icons: {
       display: "flex",

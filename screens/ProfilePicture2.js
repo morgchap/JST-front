@@ -15,7 +15,6 @@ export default function SnapScreen2({navigation}) {
     const isFocused = useIsFocused();
   
     const user = useSelector((state) => state.user.value)
-    console.log("reducer de la page profilePic2", user)
 
     const pickImageAsync = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -25,21 +24,15 @@ export default function SnapScreen2({navigation}) {
         });
     
         if (!result.canceled) {
-          console.log(result);
           const formData = new FormData();
             const photo = result.assets[0]
             if (photo) {
-                console.log('photo:', photo.uri);
-      
                 formData.append('photoFromFront', {
                     uri: photo?.uri,
                     name: 'snapped.jpg',
                     type: 'image/jpeg',
                 });
-                console.log('je rentre dans la route')
                 formData.append('username', user.username); // Append username separately
-          
-                console.log('formData:', formData);
           
                 fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateAvatar`, {
                     method: 'POST',
@@ -47,7 +40,6 @@ export default function SnapScreen2({navigation}) {
                 })
                     .then((response) => response.json())
                     .then((data) => {
-                        console.log('data:', data);
                         navigation.navigate('Profil')  
                     })
                     .catch((err) => console.error('Error:', err));
@@ -92,25 +84,18 @@ export default function SnapScreen2({navigation}) {
         const formData = new FormData();
         const photo = await cameraRef?.current?.takePictureAsync({ quality: 0.3 });
         if (photo) {
-            console.log('photo:', photo.uri);
-
             formData.append('photoFromFront', {
                 uri: photo?.uri,
                 name: 'snapped.jpg',
                 type: 'image/jpeg',
             });
-            console.log('je rentre dans la route')
             formData.append('username', user.username); // Append username separately
-    
-            console.log('formData:', formData);
-    
             fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateAvatar`, {
                 method: 'POST',
                 body: formData,
             })
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log('data:', data);
                     navigation.navigate('Profil')
                 })
                 .catch((err) => console.error('Error:', err));

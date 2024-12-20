@@ -16,32 +16,6 @@ export default function Signup2Screen({navigation}) {
     <Text style={styles.title}>Welcome to JST, now time to import your games</Text>
             <TouchableOpacity
                 style={styles.button}
-                title="Google"
-                //onPress={() => navigation.navigate('Signin')}
-                >
-                <Text style={styles.buttonText}>import from Google</Text>
-            </TouchableOpacity>  
-            <TouchableOpacity
-                style={styles.button}
-                title="steam"
-            // onPress={() => navigation.navigate('Signin')}
-                >
-                <Text style={styles.buttonText}>import from Steam</Text>
-            </TouchableOpacity>  
-            <TouchableOpacity
-                style={styles.button}
-                title="steam"
-            // onPress={() => navigation.navigate('Signin')}
-                >
-                <Text style={styles.buttonText}>import from Nintendo</Text>
-            </TouchableOpacity>  
-            <View style={styles.middlepart}>
-                <View style={styles.line}></View>
-                <Text style={styles.text}>OU</Text>
-                <View style={styles.line}></View>
-            </View> 
-            <TouchableOpacity
-                style={styles.button}
                 title="import"
                 onPress={()=> navigation.navigate('Signup3')}
                 >
@@ -74,7 +48,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderColor: "#7A28CB",
         borderWidth:1, 
-        borderRadius:10,
+        borderRadius:5,
         backgroundColor: 'white',
         height:'7%',
         width:'80%',

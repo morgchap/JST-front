@@ -12,7 +12,6 @@ export default function DiscoveryScreen({navigation}) {
   const user = useSelector((state) => state.user.value);
 
   const newsApiKey = process.env.EXPO_PUBLIC_NEWS_API_KEY
-//console.log(games)
   /* Pour les articles */
   useEffect(() => {
     const fetchArticles = async () => {
@@ -50,7 +49,6 @@ export default function DiscoveryScreen({navigation}) {
         // Mélange les jeux et sélectionne les 10 premiers
         const shuffledGames = data.results.sort(() => 0.5 - Math.random()).slice(0, 10);
         setGames(shuffledGames)
-        //console.log(shuffledGames)
         for(let game of shuffledGames){
           
           const gamesinDB = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/byname`, {
@@ -61,8 +59,6 @@ export default function DiscoveryScreen({navigation}) {
             })
           })
           const result = await gamesinDB.json();
-          
-          //console.log('is it in bdd ? ', result)
           
           if(!result.result) {
             await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/newgames`, {
@@ -92,7 +88,7 @@ export default function DiscoveryScreen({navigation}) {
   /* Pour I can know them (a continuer)*/
   
   const addFriend = (userId) => {
-    //console.log(`Add friend with ID: ${userId}`);
+    
     // Logique pour ajouter un ami
   };
 
@@ -101,7 +97,6 @@ export default function DiscoveryScreen({navigation}) {
   };
 
   const handlePressGame = async (gameName) => {
-    //console.log(gameName);
     navigation.navigate('Games', { gameName: gameName });
   }
   
@@ -118,7 +113,7 @@ export default function DiscoveryScreen({navigation}) {
 
         {/* Section Articles */}
         <View>
-          <Text style={styles.title}>Cette semaine chez les geek</Text>
+          <Text style={styles.title}>This week's news</Text>
           <View style={styles.encadrer}>
               <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
                 {articles.map((article, index) => (
@@ -138,7 +133,7 @@ export default function DiscoveryScreen({navigation}) {
 
         {/* Section Jeux */}
         <View>
-          <Text style={styles.title}>Nos recommandations</Text>
+          <Text style={styles.title}>Our recommandations</Text>
           <View style={styles.encadrer}>
               <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
                   {games.map((game) => {
@@ -161,22 +156,6 @@ export default function DiscoveryScreen({navigation}) {
               </ScrollView>
           </View>
         </View>
-
-        {/* Section I can know them*/}
-        <View>
-          <Text style={styles.title}>Je pourrais connaitre</Text>
-          <View style={styles.encadrer}>
-            {friends.map((friend) => (
-              <View key={friend.id} style={styles.friendItem}>
-                <Image style={styles.friendsAvatars} source={{ uri: friend.profilPicture }} defaultSource={require('../assets/avatar.png')}/>
-                <Text style={styles.friendsPseudo}>{friend.username}</Text>
-                <TouchableOpacity onPress={() => addFriend(friend.id)} style={styles.addButton}>
-                  <FontAwesome name="plus" size={20} color="#7A28CB" />
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-        </View>
       </ScrollView>
     </SafeAreaView>
   </ImageBackground>
@@ -191,7 +170,7 @@ export default function DiscoveryScreen({navigation}) {
 
         {/* Section Articles */}
         <View>
-          <Text style={styles.title}>Cette semaine chez les geek</Text>
+          <Text style={styles.title}>This week's news</Text>
           <View style={styles.encadrer}>
               <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
                 {articles.map((article, index) => (
@@ -211,7 +190,7 @@ export default function DiscoveryScreen({navigation}) {
 
         {/* Section Jeux */}
         <View>
-          <Text style={styles.title}>Nos recommandations</Text>
+          <Text style={styles.title}>Our recommandations</Text>
           <View style={styles.encadrer}>
               <ScrollView horizontal contentContainerStyle={styles.listContent} showsHorizontalScrollIndicator={false}>
                 {games.map((game) => (
@@ -265,7 +244,7 @@ const styles = StyleSheet.create({
   encadrer: {
     margin: 15,
     padding: 10,
-    borderRadius: 15,
+    borderRadius: 5,
     backgroundColor: '#7A28CB',
   },
   listContent: {
@@ -303,7 +282,7 @@ const styles = StyleSheet.create({
   articleImage: {
     width: 105,
     height: 158,
-    borderRadius: 15,
+    borderRadius: 5,
   },
 
   gameItemHorizontal: {
@@ -311,7 +290,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   jaquette: {
-    borderRadius: 15,
+    borderRadius: 5,
     width: 105,
     height: 158,
     marginBottom: 5,
@@ -348,7 +327,7 @@ const styles = StyleSheet.create({
   addButton: {
     marginTop: 5,
     backgroundColor: '#D6CBFD',
-    borderRadius: 25,
+    borderRadius: 5,
     padding: 5,
   },
 });

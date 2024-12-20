@@ -35,38 +35,22 @@ export default function FriendListScreen({ navigation, route }) {
 
 
     useEffect(() => {
-
-        console.log("ça marche");
-    
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${userFriendList}`)
         .then(result => result.json())
         .then(data => {
-          console.log("c'est le front de FriendListScreen", data.infos)
     
           setNumberOfFriends(data.infos.friendsList.length);
-    
-          console.log("number of friends ", numberOfFriends);
-          console.log("Id de list", data.infos.lists[0]);
-
-          console.log("last data", data);
-
           setFriendList(data.infos.friendsList);
 
           if (data.infos.profilePicture) {
             setProfilePicture(data.infos.profilePicture);
             setGotPP(true)
             } 
-    
-
           return data
         })
       }, [userFriendList])
 
-      console.log("state friendlist à exploiter", friendList);
 
-    //const friendListContent = "test";
-
-    
     const friendListContent = friendList.map((data, i) => {
 
       let fpp = <Image style={styles.friendsAvatars} source={require("../assets/avatar.png")} />;
@@ -78,8 +62,6 @@ export default function FriendListScreen({ navigation, route }) {
         return (
           <TouchableOpacity key={i} style={styles.friendsContainer} onPress={() => {
             navigation.navigate("Friend", {friendName : data.username});
-            
-            
             
             }}>
             {fpp}
@@ -104,10 +86,11 @@ export default function FriendListScreen({ navigation, route }) {
                                 )}
                 <Text style={styles.pseudo}>@{userFriendList}</Text>
             </View>
-            <Text style={styles.titleFriendList}>Liste d'amis ({friendList.length})</Text>
+            <Text style={styles.titleFriendList}>friend's list ({friendList.length})</Text>
             <View style={styles.friendListContainer}>
-                
-                {friendListContent}
+            <ScrollView>
+                  {friendListContent}
+                </ScrollView>
             </View>
         </View>
         
@@ -177,7 +160,7 @@ const styles = StyleSheet.create({
 
           display: "flex",
           width: "95%",
-          height: "auto",
+          height: "55%",
           backgroundColor: "#7A28CB",
           flexDirection: "column",
           justifyContent: "center",
@@ -185,7 +168,7 @@ const styles = StyleSheet.create({
           borderBottomWidth: 2,
           borderBottomColor: '#7A28CB',
           paddingBottom: 10,
-          borderRadius: 10,
+          borderRadius: 5,
           marginLeft: 10,
   
 

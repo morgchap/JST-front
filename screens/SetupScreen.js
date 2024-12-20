@@ -4,22 +4,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUsername } from '../reducers/user';
 
-import {
-  useFonts,
-  OpenSans_300Light,
-  OpenSans_400Regular,
-  OpenSans_500Medium,
-  OpenSans_600SemiBold,
-  OpenSans_700Bold,
-  OpenSans_800ExtraBold,
-  OpenSans_300Light_Italic,
-  OpenSans_400Regular_Italic,
-  OpenSans_500Medium_Italic,
-  OpenSans_600SemiBold_Italic,
-  OpenSans_700Bold_Italic,
-  OpenSans_800ExtraBold_Italic,
-} from '@expo-google-fonts/open-sans';
-
 
 const stars = [];
 for (let i = 0; i < 5; i++) {
@@ -58,9 +42,7 @@ export default function SetupScreen({ navigation }) {
         })
         .then(result => result.json())
         .then(data => {
-            console.log(data);
             if (data.result) {
-                console.log("new username: ", data.updatedProfile.username)
                 setChangedUsername(data.updatedProfile.username)
                 updateUser(data.updatedProfile.username)
 
@@ -79,12 +61,8 @@ export default function SetupScreen({ navigation }) {
         })
         .then(result => result.json())
         .then(data => {
-            console.log(data);
             if (data.result) {
-                console.log("new email: ", data.updatedProfile.email)
                 setEmail(data.updatedProfile.email)
-
-
             } else {
                     setError(data.error)
             }
@@ -100,48 +78,26 @@ export default function SetupScreen({ navigation }) {
         })
         .then(result => result.json())
         .then(data => {
-            console.log(data);
-            if (data.result) {
-                console.log("new passWord updated", data.updatedProfile.password)
-
-
-            } else {
-                    setError(data.error)
+            if (!data.result) {     
+               setError(data.error)
             }
         })
 
   };
 
-
-  console.log("reducer", user.username);
-
-  useEffect(() => {
-
-        console.log("ça marche");
-    
+  useEffect(() => {    
         fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`)
         .then(result => result.json())
         .then(data => {
-          console.log("c'est le front!", data.infos)
-
           setEmail(data.infos.email)
-
-          console.log("email: ", email);
-
           if (data.infos.profilePicture) {
             setProfilePicture(data.infos.profilePicture);
             setGotPP(true)
             } 
-    
-        
-      
-    
           return data
-         
       })
   }, [])
 
-  console.log("reducer de la page setup", user)
 
   return (
     <View style={styles.centered}>
@@ -168,17 +124,17 @@ export default function SetupScreen({ navigation }) {
                         navigation.navigate("ProfilePicture2");
                         
                         }} >
-                        <Text style={styles.logoutText}>Modify my profile picture</Text>
+                        <Text style={styles.logoutText}>Update my profile picture</Text>
                     </TouchableOpacity>
                 </View>
     
     <View style={styles.infoDiv}>
       <View style={styles.myInformations}>
       
-          <Text style={styles.secondTitles}>Mes informations</Text>
+          <Text style={styles.secondTitles}>My personal information</Text>
             <View style={styles.randomView}> 
                 <View style={styles.inputView}>
-                    <Text style={styles.infoText}>Your pseudo : @{changedUsername}</Text>
+                    <Text style={styles.infoText}> Username : @{changedUsername}</Text>
                     <View style={styles.inputSaved}>
                         <TextInput style={styles.inputStyle} placeholder='Type your new pseudo here' onChangeText={text => setNewPseudo(text)} value={newPseudo}/>
                         <TouchableOpacity style={styles.button} onPress={() => updateMyUsername(newPseudo)}>
@@ -187,7 +143,7 @@ export default function SetupScreen({ navigation }) {
                     </View>
                 </View>
                 <View style={styles.inputView}>
-                    <Text style={styles.infoText}>Your email : {email}</Text>
+                    <Text style={styles.infoText}> Email : {email}</Text>
                     <View style={styles.inputSaved}>
                         <TextInput style={styles.inputStyle} placeholder='Type your new email here' onChangeText={text => setNewEmail(text)} value={newEmail}/>
                         <TouchableOpacity style={styles.button} onPress={() => updateMyEmail(newEmail)}>
@@ -196,7 +152,7 @@ export default function SetupScreen({ navigation }) {
                     </View>
                 </View>
                 <View style={styles.inputView}>
-                    <Text style={styles.infoText}>You want to change your password?</Text>
+                    <Text style={styles.infoText}>Change my password</Text>
                     <View style={styles.inputSaved}>
                         <TextInput style={styles.inputStyle} placeholder='Type your new password here' onChangeText={text => setNewPassword(text)} value={newPassword}/>
                         <TouchableOpacity style={styles.button} onPress={() => updateMyPassword(newPassword)}>
@@ -279,7 +235,7 @@ centered: {
     justifyContent: "center",
     alignItems: "center",
     paddingBottom: 10,
-    borderRadius: 10,
+    borderRadius: 5,
     marginBottom: 200,
 
   
@@ -339,7 +295,7 @@ centered: {
   },
   
   button: {
-    borderRadius: 10,
+    borderRadius: 5,
     height: 35,
     width: 55,
     backgroundColor: 'white',
@@ -366,7 +322,7 @@ centered: {
       justifyContent: "center",
       alignItems: "center",
       padding: 20,
-      borderRadius: 10,
+      borderRadius: 5,
       margin: 10,
 
   },
@@ -386,7 +342,7 @@ centered: {
   },
 
   logoutButton: {
-    borderRadius: 10,
+    borderRadius: 5,
     height: 50,
     width: 150,
     backgroundColor: '#7A28CB',

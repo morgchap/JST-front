@@ -25,10 +25,9 @@ export default function Signup3({ navigation }) {
 
     fetch(`https://api.rawg.io/api/games/${searchedGame}?key=${process.env.EXPO_PUBLIC_API_KEY}`).then(response => response.json())
       .then(data => {
-        if (data.detail = 'not found.'){
+        if (!data.id){
             setError('game not found') 
          } else {
-        //console.log(`name : ${data.name} img : ${data.background_image} date : ${data.released}, descr : ${data.description_raw}, genres : ${data.genres[0]?.name}`)
         setGame('')
         setModalVisible(true)
         setGameImg(data.background_image)
@@ -44,16 +43,13 @@ export default function Signup3({ navigation }) {
   }
 
   const handleList = () => {
-    console.log('ok')
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/allgames`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ img: gameImg, username: CurrentUsername, summary: gameDescription, release: gameDate, genre: gameGenre, name: gameName}),
     }).then(response => response.json())
       .then(data => {
-        console.log(data)
         if (data.result) {
-          console.log(`${data} added`)
           setModalVisible(false)
         } else {
           setError(data.error)
@@ -138,7 +134,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderColor: "#7A28CB",
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 5,
     backgroundColor: 'white',
     height: '7%',
     width: '80%',
@@ -157,7 +153,7 @@ const styles = StyleSheet.create({
     width: '80%',
     margin: '2%',
     paddingLeft: 10,
-    borderRadius: 10
+    borderRadius: 5
   },
   camera: {
     height: '40%',
@@ -196,7 +192,7 @@ const styles = StyleSheet.create({
     width: '80%',
     padding: 20,
     backgroundColor: 'white',
-    borderRadius: 10,
+    borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
   },

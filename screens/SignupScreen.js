@@ -10,7 +10,6 @@ export default function SignupScreen({navigation}) {
   const [password, setpassword]= useState('')
   const [error, setError]=useState('')
   const [email, setEmail]=useState('')
-  //let backend = process.env.BACKEND_URL
 
 // Grabbed from emailregex.com
 const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -18,11 +17,8 @@ const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"
 
   const dispatch = useDispatch();
   const CurrentUsername = useSelector((state) => state.user.value.username);
-  //console.log(`username:${username} and reducers:${CurrentUsername}`)
-  console.log(CurrentUsername)
 
   const handlesignup = () => {
-    console.log('ok')
     if (EMAIL_REGEX.test(email)){
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/signup`, {
       method: "POST",
@@ -30,15 +26,11 @@ const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"
       body: JSON.stringify({ username: username, password: password, email:email}),
   }).then(response => response.json())
   .then(data => {
-      console.log(data)
       if (data.result) {
-          console.log(data);
           setUsername('')
           setpassword('')
           setEmail('')
           dispatch(updateUsername({username: username, token:data.token}));
-          console.log(`username:${username} and reducers:${CurrentUsername}`)
-          // navigation.navigate('Signup2')
           navigation.navigate('ProfilePicture')
       } else {
         setError(data.error)
@@ -59,25 +51,6 @@ const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"
         <FontAwesome name="chevron-left" color="#7A28CB" size={25} onPress={() => navigation.goBack()}/>
         </SafeAreaView>
         <View style={styles.container}>
-        <Pressable
-              style={styles.button}
-            title="Google"
-            //onPress={() => navigation.navigate('Signin')}
-            >
-              <Text style={styles.buttonText}>Sign up with google</Text>
-          </Pressable>  
-          <Pressable
-            style={styles.button}
-            title="steam"
-          // onPress={() => navigation.navigate('Signin')}
-            >
-              <Text style={styles.buttonText}>Sign up with steam</Text>
-          </Pressable>  
-        <View style={styles.middlepart}>
-          <View style={styles.line}></View>
-          <Text style={styles.text}>OU</Text>
-          <View style={styles.line}></View>
-        </View> 
           <TextInput style={styles.input} 
           placeholder='Username' 
           autoCapitalize='none' 
@@ -133,7 +106,7 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       borderColor: "#7A28CB",
       borderWidth:1, 
-      borderRadius:10,
+      borderRadius:5,
       backgroundColor: 'white',
       height:'7%',
       width:'80%',
@@ -170,7 +143,7 @@ const styles = StyleSheet.create({
       width:'80%',
       margin:'2%',
       paddingLeft:10,
-      borderRadius:10
+      borderRadius:5
     },
     buttonText2:{
       fontFamily:'OpenSans_600SemiBold',

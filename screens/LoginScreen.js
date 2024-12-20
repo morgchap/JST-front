@@ -22,7 +22,6 @@ import {
   export default function LoginScreen({ navigation }) {
 
     const user = useSelector((state) => state.user.value);
-    console.log(user)
     
     useEffect(() => {
       user.token && navigation.navigate("TabNavigator", { screen: "Home" })
@@ -97,7 +96,7 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       borderColor: "#7A28CB",
       borderWidth:1, 
-      borderRadius:10,
+      borderRadius:5,
       backgroundColor: 'white',
       height:'7%',
       width:'80%',

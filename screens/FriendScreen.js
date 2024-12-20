@@ -22,6 +22,7 @@ export default function FriendScreen({ navigation, route }) {
     const [profilePicture, setProfilePicture] = useState(null);
     const [modal, setModal] = useState(false)
     const [message, setmessage] = useState(false)
+    const [addable, setAddable] = useState(false)
 
 
     const dispatch = useDispatch();
@@ -32,36 +33,33 @@ export default function FriendScreen({ navigation, route }) {
 
   
   useEffect(() => {
-
-    //console.log("ça marche");
-
+    if (user.username === friendName) {
+      navigation.navigate("TabNavigator", { screen: "Profil" });
+  }
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`)
     .then(result => result.json())
     .then(data => {
-      //console.log("c'est le front de FriendScreen", data.infos.profilePicture)
-
       setNumberOfFriends(data.infos.friendsList.length)
-
-      //console.log("number of friends ", numberOfFriends);
-      //console.log("Id de list", data.infos.lists[0])
-
       if (data.infos.profilePicture) {
         setProfilePicture(data.infos.profilePicture);
         setGotPP(true)
         } 
+        const fl = data.infos.friendsList;
+        for (let obj of fl) {
+            if (obj.username == user.username) {
+              setAddable(true)
+            
+          }
+        }
 
       return data
      
   })
   .then(data => {
-    //console.log("deuxième data", data);
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`)
     .then(result => result.json())
     .then(data => {
-      //console.log("data du fetch des listes de jeux", data);
       setNumberOfGames(data.data.gameList.length)
-      //console.log("le fetch qui sert à setter le nombre de jeu :", data.data.gameList.length)
-      //console.log("number of games", numberOfGames);
       setGameList(data.data.gameList)
     })
   })
@@ -74,11 +72,7 @@ export default function FriendScreen({ navigation, route }) {
       setAllLists(data.lists)
   });
 
-}, [friendName]);
-
-//console.log("number of games in all my games list :", gameList.length)
-//console.log(profilePicture)
-
+}, [friendName, user.username, navigation]);
 
 const stars = [];
 for (let i = 0; i < 5; i++) {
@@ -89,23 +83,28 @@ for (let i = 0; i < 5; i++) {
   stars.push(<FontAwesome key={i} name={style} color="yellow" />);
 }
 
-
-
-  //fonction pour ajouter un ami - pas terminée - je dois générer des vrais demandes d'ami avant (et des vraies page profil d'ami).
-  // je dois donc revenir sur la partie ProfilScreen avant pour mapper la liste des demandes d'amis (envoyées et reçues)
+let addButton = <View style={styles.logoutView}>
+<TouchableOpacity style={styles.logoutButton} onPress={() => addAFriend()}>
+    <Text style={styles.logoutText}>Ask as a friend</Text>
+</TouchableOpacity>
+</View>;
+if (addable) {
+ addButton = <View style={styles.logoutView}>
+ <TouchableOpacity style={styles.noButton}>
+     <Text style={styles.logoutText}>You are already friends</Text>
+ </TouchableOpacity>
+ </View>;
+}
 
   async function addAFriend() {
     try {
         // Récupérer l'ID de l'utilisateur courant
         const userResponse = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`);
         const userData = await userResponse.json();
-        console.log("fetch myId", userData.infos._id);
-
-
+    
         // Récupérer l'ID de l'ami
         const friendResponse = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`);
         const friendData = await friendResponse.json();
-        console.log("fetch myFriendId", friendData.infos._id);
 
         // Ajouter un nouvel ami
         const addFriendResponse = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/addFriend`, {
@@ -114,7 +113,6 @@ for (let i = 0; i < 5; i++) {
             body: JSON.stringify({ sender: userData.infos._id, receiver: friendData.infos._id }),
         });
         const addFriendData = await addFriendResponse.json();
-       // console.log("data du dernier fetch", addFriendData);
         setmessage(true)
     } catch (error) {
         console.error("Erreur dans addAFriend:", error.message);
@@ -129,7 +127,7 @@ if (numberOfFriends >1) {
 
 let pluralGames = "";
 if (numberOfGames >1) {
-  pluralGames = "x"
+  pluralGames = "s"
 }
 
 const games = gameList.map((data, i) => {
@@ -188,7 +186,7 @@ if (name.length >= 15) {
           if(data.error === "their list is empty."){
             gamesList = [
               <View key={0}>
-                <Text>the list is empty</Text>
+                <Text>their list is empty</Text>
               </View>
             ]
           } else {
@@ -200,7 +198,6 @@ if (name.length >= 15) {
               } else {
                 title = data[0]
               }
-              console.log(data)
             return (
               <View key={i} style={styles.game}>
                 <TouchableOpacity onPress={() => handleNavigation(data[0]) }>
@@ -238,7 +235,7 @@ if (name.length >= 15) {
         <Text style={styles.pseudo}>@{friendName}</Text>
       </View>
       <View style={styles.stats}>
-        <Text style={styles.statsText}>{numberOfGames} jeu{pluralGames}</Text>
+        <Text style={styles.statsText}>{numberOfGames} Game{pluralGames}</Text>
           <TouchableOpacity onPress={() => {
                       navigation.navigate("FriendList", {userFriendList: friendName})
                       //selectFriend(user.username)
@@ -246,15 +243,11 @@ if (name.length >= 15) {
                       <Text style={styles.friendStatsText}>{numberOfFriends} ami{pluralFriends}</Text>
                     </TouchableOpacity>
       </View>
-      <View style={styles.logoutView}>
-            <TouchableOpacity style={styles.logoutButton} onPress={() => addAFriend()}>
-                <Text style={styles.logoutText}>Ask as a friend</Text>
-            </TouchableOpacity>
-      </View>
+            {addButton}
       <ScrollView>
       <View style={styles.gameDiv}>
         <View style={styles.games}>
-            <Text style={styles.secondTitles}>their favorite gasme ({numberOfGames})</Text>
+            <Text style={styles.secondTitles}>Their favorite games ({numberOfGames})</Text>
             <ScrollView horizontal={true} style={styles.listGame}> 
               {games}
             </ScrollView>
@@ -263,7 +256,7 @@ if (name.length >= 15) {
 
       <View style={styles.listDiv}>
         <View style={styles.lists}>
-          <Text style={styles.secondTitles}>Ses Listes ({numberOfList})</Text>
+          <Text style={styles.secondTitles}>Their lists ({numberOfList})</Text>
             <ScrollView horizontal={true} style={styles.listLists}> 
               {lists}
             </ScrollView>
@@ -401,7 +394,7 @@ const styles = StyleSheet.create({
       justifyContent: "center",
       alignItems: "center",
       paddingBottom: 10,
-      borderRadius: 10,
+      borderRadius: 5,
     },
 
     secondTitles: {
@@ -569,7 +562,7 @@ const styles = StyleSheet.create({
       width: '80%',
       padding: 20,
       backgroundColor: 'white',
-      borderRadius: 10,
+      borderRadius: 5,
       alignItems: 'flex-start',
       justifyContent: 'center',
     },
@@ -593,7 +586,7 @@ const styles = StyleSheet.create({
       },
 
     logoutButton: {
-        borderRadius: 10,
+        borderRadius: 5,
         height: 50,
         width: 100,
         backgroundColor: '#00A877',
@@ -621,7 +614,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#00A877",
         marginHorizontal: 10,
-        borderRadius: 10,
+        borderRadius: 5,
       },
       
       listLists: {
@@ -649,6 +642,14 @@ const styles = StyleSheet.create({
       listLength:{
         color: "white"
       },
+      noButton: {
+        borderRadius:5,
+        height: 60,
+        width: 150,
+        backgroundColor: 'gray',
+        justifyContent: "center",
+        alignItems: "center"
+      },
 
       modalBackground: {
         flex: 1,
@@ -661,7 +662,7 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
       padding: 20,
-      borderRadius: 10,
+      borderRadius: 5,
       alignItems: "center",
       justifyContent: 'center',
     },
@@ -692,7 +693,7 @@ const styles = StyleSheet.create({
       width: '80%',
       padding: 20,
       backgroundColor: 'white',
-      borderRadius: 10,
+      borderRadius: 5,
       alignItems: 'flex-start',
       justifyContent: 'center',
     },

@@ -15,16 +15,27 @@ export default function HomeScreen({ navigation }) {
   const [ratingsCom, setRatingsCom] = useState({}); // Stores comments for each rating, keyed by review._id
   const [activeCommentReview, setActiveCommentReview] = useState(null);
   const [commentStyles, setCommentStyle]=useState({})
+  const [displayedComments, setDisplayedComments] = useState({});
 
-  //console.log(ratings);
 
 
   const handleCommentChange = (reviewId, text) => {
     setComment(prev => ({ ...prev, [reviewId]: text }));
   };
 
+  const toggleCommentIcon = (reviewId) => {
+    setCommentStyle((prevStyles) => ({
+      ...prevStyles,
+      [reviewId]: prevStyles[reviewId] === 'window-close' ? 'comment' : 'window-close',
+    }));
+
+    setDisplayedComments((prev) => ({
+      ...prev,
+      [reviewId]: !prev[reviewId], // Toggle visibility of comments
+    }));
+  };
+
   function likeOrDislikeAReview(reviewId) {
-    console.log("changement de like");
   
     setLikedReviews(prevState => ({
       ...prevState,
@@ -111,12 +122,9 @@ export default function HomeScreen({ navigation }) {
     }
     return stars;
   };
-//console.log('revew :',ratings);
 
 const handleCommentSubmit = async (ratingsId) => {
   const commentContent = comment[ratingsId]
-  //console.log(ratingsId)
-  //console.log('ok')
   fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/comments/newCom`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -124,16 +132,12 @@ const handleCommentSubmit = async (ratingsId) => {
   }).then(response => response.json()).then(data => {
     
     if (data.result){
-      //console.log(data)
       setComment(prev => ({ ...prev, [ratingsId]: '' }));
     }
   }
 
   )
 }
-
-
-
 
 
 const handleCommentDisplay = async (reviewId) => {
@@ -195,7 +199,6 @@ const renderComments = (reviewId) => {
   
   if (search === 'Friends' && user.username) {
     ratingsNewsFeed = ratings.map((review, i) => {
-     // console.log("counter likesCounter", review.likesCounter)
       
       let fpp = (<TouchableOpacity onPress={() => {
         navigation.navigate("Friend", {friendName : review.username})}}>
@@ -211,7 +214,6 @@ const renderComments = (reviewId) => {
 
       const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
 
-    //console.log(review.game.cover)
     return (
       <View key={i}>
        <View style={styles.ratingContainerPublic} >
@@ -224,8 +226,11 @@ const renderComments = (reviewId) => {
                 <View style={styles.userandlike}>
                   <Text style={styles.userName}>@{review.username}</Text>
                   <View style={styles.heartAndlikeCounter}>
-                      <FontAwesome name={commentStyles[review._id] || 'comment'} style={styles.comIconPurple} size={20} onPress={() => handleCommentDisplay(review._id)} />
-                      <FontAwesome name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
+                      <FontAwesome name={commentStyles[review._id] || 'comment'} style={styles.comIconPurple} size={20} onPress={() => {
+                        toggleCommentIcon(review._id);
+                        handleCommentDisplay(review._id);
+                      }} />
+                        <FontAwesome name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
                       <Text>({review.likesCounter.length})</Text>
                   </View>
                 </View>
@@ -261,8 +266,7 @@ const renderComments = (reviewId) => {
             onChangeText={(value) => handleCommentChange(review._id, value)}
             value={comment[review._id] || ""}
             onFocus={() => setActiveCommentReview(review._id)}
-            onBlur={() => setActiveCommentReview(null)}
-            //onSubmitEditing={()=> handlesubmit()}   
+            onBlur={() => setActiveCommentReview(null)} 
             >
             </TextInput>
             <FontAwesome name='paper-plane' style={styles.sendIcon} size={20} onPress={() => handleCommentSubmit(review._id)} />
@@ -276,19 +280,39 @@ const renderComments = (reviewId) => {
     
     )
   })} else {
-    //publicRating.reverse(),
     ratingsNewsFeed = publicRating.map((review, i)=> {
-      const isLiked = likedReviews[review._id] ? "heart" : "heart-o";
-     // console.log("data", review)
+      const isLiked = likedReviews[review._id] ? "heart" : "heart-o";     
       
       let likable;
+      let commentable;
 
       if (user.token) {
-        likable = (<View style={styles.heartAndlikeCounter}>
-        <FontAwesome name={commentStyles[review._id] || 'comment'} style={styles.comIcon} size={20} onPress={() => handleCommentDisplay(review._id)} />
+        likable = <View style={styles.heartAndlikeCounter}>
+        <FontAwesome name={commentStyles[review._id] || 'comment'} style={styles.comIcon} size={20} 
+        onPress={() => {
+          toggleCommentIcon(review._id);
+          handleCommentDisplay(review._id);
+        }} />
         <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
         <Text>({review.likesCounter.length})</Text>
-    </View>)
+    </View>
+
+      commentable = <View style={styles.reviewinputcont}>
+      <TextInput key={i} style={styles.reviewinput}
+        placeholder='Comment'
+        placeholderTextColor={'grey'}
+        maxLength='100'
+        multiline={true}
+        enterKeyHint='return'
+        onChangeText={(value) => handleCommentChange(review._id, value)}
+        value={comment[review._id] || ""}
+        onFocus={() => setActiveCommentReview(review._id)}
+        onBlur={() => setActiveCommentReview(null)}
+        //onSubmitEditing={()=> handlesubmit()}   
+        >
+        </TextInput>
+        <FontAwesome name='paper-plane' style={styles.sendIcon} size={20} onPress={() => handleCommentSubmit(review._id)} />
+      </View>
       }
 
 
@@ -315,7 +339,15 @@ const renderComments = (reviewId) => {
                 <View style={styles.userInfo}>
                 <View style={styles.userandlike}>
                   <Text style={styles.userName}>@{review.username}</Text>
-                  {likable}                 
+                  <View style={styles.heartAndlikeCounter}>
+                  <FontAwesome name={commentStyles[review._id] || 'comment'}  style={styles.comIcon} size={20} 
+                  onPress={() => {
+                    toggleCommentIcon(review._id);
+                    handleCommentDisplay(review._id);
+                  }} />
+                  <FontAwesome key={i} name={isLiked} style={styles.heartIcon} size={20} onPress={() => likeOrDislikeAReview(review._id)} />
+                  <Text>({review.likesCounter.length})</Text>
+               </View>                              
                    </View>
                   <View style={styles.starsContainer}>
                     <>
@@ -339,22 +371,7 @@ const renderComments = (reviewId) => {
               </View>
             </View>
             <ScrollView style={styles.reviewcont}>
-          <View style={styles.reviewinputcont}>
-          <TextInput key={i} style={styles.reviewinput}
-            placeholder='Comment'
-            placeholderTextColor={'grey'}
-            maxLength={100}
-            multiline={true}
-            enterKeyHint='return'
-            onChangeText={(value) => handleCommentChange(review._id, value)}
-            value={comment[review._id] || ""}
-            onFocus={() => setActiveCommentReview(review._id)}
-            onBlur={() => setActiveCommentReview(null)}
-            //onSubmitEditing={()=> handlesubmit()}   
-            >
-            </TextInput>
-            <FontAwesome name='paper-plane' style={styles.sendIcon} size={20} onPress={() => handleCommentSubmit(review._id)} />
-          </View>
+            {commentable}
          </ScrollView>
           </View>
       {displayedCommentId === review._id && (
@@ -431,19 +448,19 @@ const styles = StyleSheet.create({
   pageTitle: { fontSize: 24, fontWeight: 'bold', color: '#7A28CB' },
   titleUnderline: { width: '50%', height: 2, backgroundColor: '#7A28CB', marginTop: 5 },
   ratingsContainer: { paddingHorizontal: 20, paddingBottom: 20 },
-  ratingContainer: { backgroundColor: '#D6CBFD', borderRadius: 10, padding: 20, margin: 20 },
+  ratingContainer: { backgroundColor: '#D6CBFD', borderRadius: 5, padding: 20, margin: 20 },
   timestamp: { fontSize: 12, color: '#888', marginBottom: 10 }, 
-  ratingContainerPublic: { backgroundColor: 'rgba(255,255,255,0.5) ', borderRadius: 10, padding: 20, marginHorizontal: 20, marginTop:10,},
+  ratingContainerPublic: { backgroundColor: 'rgba(255,255,255,0.5) ', borderRadius: 5, padding: 20, marginHorizontal: 20, marginTop:10,},
   ratingContent: { flexDirection: 'column' },
   userInfoContainer: { flexDirection: 'row', marginBottom: 10 },
-  avatar: { width: 60, height: 60, borderRadius: 25, marginRight: 10 },
+  avatar: { width: 60, height: 60, borderRadius: 50, marginRight: 10 },
   userInfo: { flex: 1, justifyContent: 'center' },
   userName: { fontWeight: 'bold' },
   starsContainer: { flexDirection: 'row', marginTop: 5 },
   textNote: { marginLeft: 10, fontWeight: 'bold' },
 
   gameReviewContainer: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
-  gameCover: { width: 60, height: 90, borderRadius: 8, marginRight: 10, marginBottom:10},
+  gameCover: { width: 60, height: 90, borderRadius: 5, marginRight: 10, marginBottom:10},
   reviewGameTitle: {fontSize: 15, color: 'black', fontWeight: 'bold'},
   reviewText: { flex: 1, fontSize: 13, color: 'black', marginRight:20 },
   reviewContent:{width: '80%'}, 
@@ -532,7 +549,7 @@ modalContainer3:{
   width: '80%',
   padding: 20,
   backgroundColor: 'white',
-  borderRadius: 10,
+  borderRadius: 5,
   alignItems: 'flex-start',
   justifyContent: 'space-between',
   maxHeight:300
