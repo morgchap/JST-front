@@ -1,13 +1,15 @@
 import { Text, View, StyleSheet, Pressable, KeyboardAvoidingView, FlatList, Modal, ImageBackground, TextInput, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
  import { useSelector } from 'react-redux'; 
  import { useDispatch } from 'react-redux';
 import ModalGames from '../components/ModalGames';
 import {searchedgamevalue} from '../reducers/game'
+import { useIsFocused } from '@react-navigation/native'
 
 export default function SearchScreen({navigation}) {
+  const isFocused = useIsFocused()
   const dispatch = useDispatch();
 
   const [game, setGame]=useState('');
@@ -27,6 +29,13 @@ export default function SearchScreen({navigation}) {
   const [searchedUser, setSearchedUser] = useState('')
   
   const gamedata = useSelector((state) => state.game.value);
+
+  useEffect(() => {
+    if(!isFocused) {
+      setSuggestionUser("")
+      setSearchedUser("")
+    } 
+  }, [isFocused])
 
 const fetchgames = async (query) => {
     if (!query) {
@@ -183,7 +192,10 @@ const fetchgames = async (query) => {
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.suggestionItem}
-                onPress={() => navigation.navigate('Friend', { friendName : item.username})}
+                onPress={() => {
+                  setSearchedUser('')
+                
+                  navigation.navigate('Friend', { friendName : item.username})}}
               >
                 <Text style={styles.suggestionText}>@{item.username}</Text>
               </TouchableOpacity>
@@ -257,6 +269,9 @@ const fetchgames = async (query) => {
 
   const handlesubmit = ()=> {
    //search if the game is not already in the db 
+   setGame('')
+    setGameName('')
+    setSuggestionGame([])
    let numberOfSuggestion = suggestionGame.length
     if(numberOfSuggestion === 0){
       let searchedGame = gameName.trim()

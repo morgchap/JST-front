@@ -24,6 +24,8 @@ const handlesignin = () => {
     if (data.result) {
         setUsername('')
         setpassword('')
+        console.log("data 1 =>", data);
+        
         dispatch(updateUsername({username: username, token:data.token, userId: data.userId}));
         navigation.navigate('TabNavigator')
     } else {

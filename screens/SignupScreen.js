@@ -30,7 +30,8 @@ const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"
           setUsername('')
           setpassword('')
           setEmail('')
-          dispatch(updateUsername({username: username, token:data.token}));
+          console.log("data 1 =>", data);
+          dispatch(updateUsername({ username: username, token:data.token, userId: data.userId }));
           navigation.navigate('ProfilePicture')
       } else {
         setError(data.error)
