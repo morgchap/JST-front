@@ -1,6 +1,6 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 import { Image } from "expo-image";
-
+// components called in the profile picture screen
 export default function ImageViewer({ imgSource, selectedImage }) {
   const imageSource = selectedImage ? { uri: selectedImage } : imgSource;
 

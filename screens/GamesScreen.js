@@ -14,21 +14,17 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import {
-  OpenSans_300Light_Italic,
-  OpenSans_600SemiBold,
-} from "@expo-google-fonts/open-sans";
 import { Collapsible } from "react-native-fast-collapsible";
 import { useDispatch, useSelector } from "react-redux";
 import HTMLView from "react-native-htmlview";
 import { addListGames } from "../reducers/user";
 
 export default function GamesScreen({ navigation, route }) {
-  //const gamedata = useSelector((state) => state.game.value);
   const dispatch = useDispatch();
+  // get the name of the game that was sent in the parameters of the route
   const { gameName } = route.params;
+  // get username from reducer
   const user = useSelector((state) => state.user.value);
-  //const currentUser = user.username
 
   const [isVisible, setVisibility] = useState(false);
   const [icon, setIcon] = useState("caret-down");
@@ -49,12 +45,50 @@ export default function GamesScreen({ navigation, route }) {
   const [likedReviews, setLikedReviews] = useState({});
   const [profilePic, setProfilePic] = useState("");
 
+  // at initial loading of the screen
+  useEffect(() => {
+    // fetch the lists if it isn't already done elswhere
+    if (user.lists.length === 0) {
+      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/${user.username}`)
+        .then((response) => response.json())
+        .then((data) => {
+          dispatch(addListGames(data.lists));
+        });
+    }
+    //fetch le jeu
+    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/byname`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: gameName,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setGamesInfo(data.game);
+        if (summary.length > 100) {
+          setsummary(summary.slice(100));
+        }
+      });
+
+    //fetch mes reviews
+
+    fetchMyReview();
+
+    // fetch les reviews de mes amis
+
+    fetchMyFriendsReviews();
+  }, []);
+
+  //fetch ratings by user
+
   function fetchMyReview() {
     fetch(
       `${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/byuser/${user.username}`
     )
       .then((result) => result.json())
       .then((data) => {
+        // only get the review that match the game name
         const theGameReview = data.ratings.ratingsID.filter(
           (e) => e.game.name == gameName
         );
@@ -70,7 +104,7 @@ export default function GamesScreen({ navigation, route }) {
         setLikedMyReviews(liked);
       });
   }
-
+  // fetch ratings from friends for the game
   function fetchMyFriendsReviews() {
     fetch(
       `${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/friendsreview/bygame`,
@@ -90,7 +124,7 @@ export default function GamesScreen({ navigation, route }) {
         setLikedReviews(liked);
       });
   }
-
+  // change icon of collapsible depending on if it's opened or closed
   const toggleVisibility = () => {
     setVisibility((previous) => !previous);
     if (isVisible) {
@@ -123,7 +157,7 @@ export default function GamesScreen({ navigation, route }) {
         }
       });
   };
-
+  // create a new review
   const handlesubmit = () => {
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/newreview`, {
       method: "POST",
@@ -183,7 +217,7 @@ export default function GamesScreen({ navigation, route }) {
         <FontAwesome key={i} name={style} color="#f1c40f" size={15} />
       );
     }
-
+    // review of the user that is logged in
     return (
       <View key={i} style={styles.friendsReviews}>
         <View style={styles.picanduseandreview}>
@@ -214,8 +248,9 @@ export default function GamesScreen({ navigation, route }) {
       </View>
     );
   });
-
+  // only get first two reviews of friends
   const slicedarr = friendsGR.slice(-2);
+
   const myFriendsreviews = slicedarr.map((data, i) => {
     const mynotestars = [];
 
@@ -265,49 +300,18 @@ export default function GamesScreen({ navigation, route }) {
     );
   });
 
-  useEffect(() => {
-    // fetch the lists if it isn't already done elswhere
-    if (user.lists.length === 0) {
-      fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/${user.username}`)
-        .then((response) => response.json())
-        .then((data) => {
-          dispatch(addListGames(data.lists));
-        });
-    }
-    //fetch le jeu
-    fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/games/byname`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: gameName,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setGamesInfo(data.game);
-        if (summary.length > 100) {
-          setsummary(summary.slice(100));
-        }
-      });
-
-    //fetch mes reviews
-
-    fetchMyReview();
-
-    // fetch les reviews de mes amis
-
-    fetchMyFriendsReviews();
-  }, []);
-
+  // if summary is undefined, or empty
   let summaryToHTML;
 
   if (gamesinfo.summary === undefined || summary === undefined) {
     summaryToHTML =
       "there's no description yet for this game, try to come back later to learn more about it ";
+    //adding empty spaces for for design purposes
     summaryToHTML = summaryToHTML.padEnd(1000, "");
   } else {
     summaryToHTML = gamesinfo.summary;
   }
+
   const stars = [];
   for (let i = 0; i < 5; i++) {
     let style = "star-o";
@@ -364,7 +368,7 @@ export default function GamesScreen({ navigation, route }) {
       <FontAwesome key={i} name={style} color="#f1c40f" size={40} />
     );
   }
-
+  // styling the page depending on if the user is logged in
   let pageContent = (
     <View style={styles.centered}>
       <View style={styles.bgpicture}>

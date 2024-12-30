@@ -19,30 +19,38 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function HomeScreen({ navigation }) {
   const [ratings, setRatings] = useState([]); // Pour stocker les avis des amis
-  const [publicRating, setPublicRatings] = useState([]);
+  const [publicRating, setPublicRatings] = useState([]); // pour stocker tous les avis
   const user = useSelector((state) => state.user.value); // Récupérer l'utilisateur actuel depuis Redux
-  const [refreshing, setRefreshing] = React.useState(false);
-  const [search, setSearch] = useState("Friends");
-  const [comment, setComment] = useState({});
-  const [displayedCommentId, setDisplayedCommentId] = useState(null); // Tracks which rating's comments are displayed
-  const [ratingsCom, setRatingsCom] = useState({}); // Stores comments for each rating, keyed by review._id
-  const [commentStyles, setCommentStyle] = useState({});
+  const [refreshing, setRefreshing] = React.useState(false); // rafraichir la page au scroll vers le bas 
+  const [search, setSearch] = useState("Friends"); // style conditionnel des boutons
+  const [comment, setComment] = useState({}); // 
+  const [displayedCommentId, setDisplayedCommentId] = useState(null); // track les commentaires qui sont affichés
+  const [ratingsCom, setRatingsCom] = useState({}); // stock les commentaires de chaques ratings avec un key 
+  const [commentStyles, setCommentStyle] = useState({}); // style conditionnels de l'icon commentaire
 
+  // fetch everytime the screen is being refreshed
+  useEffect(() => {
+    if (!refreshing) {
+      if (user.username) {
+        fetchFriendsReviews();
+      }
+      fetchAll();
+
+      fetch;
+    }
+  }, [refreshing]);
+
+  // store comments and what ratings they are linked to
   const handleCommentChange = (reviewId, text) => {
     setComment((prev) => ({ ...prev, [reviewId]: text }));
   };
-
+  // changing the icon depending on if the comment are being displayed or not
   const toggleCommentIcon = (reviewId) => {
     setCommentStyle((prevStyles) => ({
       ...prevStyles,
       [reviewId]:
         prevStyles[reviewId] === "window-close" ? "comment" : "window-close",
     }));
-
-    // setDisplayedCommentsI((prev) => ({
-    //   ...prev,
-    //   [reviewId]: !prev[reviewId], // Toggle visibility of comments
-    // }));
   };
 
   function likeOrDislikeAReview(reviewId) {
@@ -71,7 +79,7 @@ export default function HomeScreen({ navigation }) {
       setRefreshing(false);
     }, 2000);
   }, []);
-
+  // fetch friends review for the friends newsfeed
   function fetchFriendsReviews() {
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/friendsreview`, {
       method: "POST",
@@ -81,30 +89,14 @@ export default function HomeScreen({ navigation }) {
       .then((response) => response.json())
       .then((data) => setRatings(data.ratings));
   }
-
+  // fetch all reviews for the public newsfeed
   function fetchAll() {
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/ratings/all`)
       .then((response) => response.json())
       .then((data) => setPublicRatings(data.ratings));
   }
 
-  useEffect(() => {
-    if (!refreshing) {
-      if (user.username) {
-        fetchFriendsReviews();
-      }
-      fetchAll();
-
-      fetch;
-    }
-  }, [refreshing]);
-
-  // Fonction pour formater la date
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-  };
-
+  
   // Fonction pour afficher les étoiles en fonction de la note
   const renderStars = (rating) => {
     const stars = [];
@@ -120,7 +112,7 @@ export default function HomeScreen({ navigation }) {
     }
     return stars;
   };
-
+// function called when writing a comment
   const handleCommentSubmit = async (ratingsId) => {
     const commentContent = comment[ratingsId];
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/comments/newCom`, {
@@ -196,7 +188,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   let ratingsNewsFeed;
-
+// handling button's style
   if (search === "Friends" && user.username) {
     ratingsNewsFeed = ratings.map((review, i) => {
       let fpp = (

@@ -6,8 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  SafeAreaProvider,
-  SafeAreaView,
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useState, useEffect } from "react";
@@ -17,31 +15,13 @@ import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useIsFocused } from "@react-navigation/native";
 
-import {
-  useFonts,
-  OpenSans_300Light,
-  OpenSans_400Regular,
-  OpenSans_500Medium,
-  OpenSans_600SemiBold,
-  OpenSans_700Bold,
-  OpenSans_800ExtraBold,
-  OpenSans_300Light_Italic,
-  OpenSans_400Regular_Italic,
-  OpenSans_500Medium_Italic,
-  OpenSans_600SemiBold_Italic,
-  OpenSans_700Bold_Italic,
-  OpenSans_800ExtraBold_Italic,
-} from "@expo-google-fonts/open-sans";
-
 export default function ProfilScreen({ navigation }) {
   const user = useSelector((state) => state.user.value);
   const friend = useSelector((state) => state.friend.value);
   const [defaultFriends, setDefaultFriends] = useState(true);
   const [numberOfFriends, setNumberOfFriends] = useState(123);
   const [numberOfGames, setNumberOfGames] = useState(123);
-  const [receivedFriendRequestList, setReceivedFriendRequestList] = useState(
-    []
-  );
+  const [receivedFriendRequestList, setReceivedFriendRequestList] = useState([]);
   const [sentFriendRequestList, setSentFriendRequestList] = useState([]);
   const [gameList, setGameList] = useState([]);
   const [myId, setMyId] = useState("");
