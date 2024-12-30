@@ -21,6 +21,9 @@ for (let i = 0; i < 5; i++) {
   stars.push(<FontAwesome key={i} name={style} color="yellow" />);
 }
 
+// page qui permet de consulter et modifier les informations liées à son profil
+
+
 export default function SetupScreen({ navigation }) {
   const dispatch = useDispatch();
   const updateUser = (newUsername) => {
@@ -36,6 +39,10 @@ export default function SetupScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [gotPP, setGotPP] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
+
+  // fonction qui permet de modifier son username en appelant une route qui vient modifier l'information en BDD 
+    // et en appelant une fonction qui le modifie également dans le reducer
+
 
   function updateMyUsername(myNewUsername) {
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateUsername`, {
@@ -57,6 +64,7 @@ export default function SetupScreen({ navigation }) {
       });
   }
 
+   // même principe pour l'email à part qu'il n'est pas stocké dans le reducer
   function updateMyEmail(myNewEmail) {
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updateEmail`, {
       method: "POST",
@@ -73,6 +81,8 @@ export default function SetupScreen({ navigation }) {
       });
   }
 
+
+  // même principe avec le password, en réutilisant la mécanique de cryptage
   function updateMyPassword(myNewPassword) {
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/updatePassword`, {
       method: "POST",
@@ -89,6 +99,8 @@ export default function SetupScreen({ navigation }) {
         }
       });
   }
+
+   //dans le useEffect on va récupérer les quelques infos mofifiables qu'on n'a pas déjà dans le reducer : photo de profil & email
 
   useEffect(() => {
     fetch(

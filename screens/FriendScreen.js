@@ -15,6 +15,8 @@ import { clickedFriend } from "../reducers/friend";
 import { addListGames } from "../reducers/user";
 import { LinearGradient } from "expo-linear-gradient";
 
+// page où l'on retrouve les informations du profil d'un ami
+
 export default function FriendScreen({ navigation, route }) {
   const user = useSelector((state) => state.user.value);
   const [numberOfFriends, setNumberOfFriends] = useState(123);
@@ -30,15 +32,20 @@ export default function FriendScreen({ navigation, route }) {
   const [message, setmessage] = useState(false);
   const [addable, setAddable] = useState(false);
 
+
+
   const dispatch = useDispatch();
   const selectFriend = (friendUsername) => {
     dispatch(clickedFriend(friendUsername));
   };
 
   useEffect(() => {
+    // redirection automatique si l'on clique sur son nom dans une liste d'ami
+
     if (user.username === friendName) {
       navigation.navigate("TabNavigator", { screen: "Profil" });
     }
+    // fetch des informations de l'ami en question
     fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`)
       .then((result) => result.json())
       .then((data) => {
@@ -57,6 +64,7 @@ export default function FriendScreen({ navigation, route }) {
         return data;
       })
       .then((data) => {
+        //fetch de ses collections
         fetch(
           `${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`
         )
@@ -85,6 +93,9 @@ export default function FriendScreen({ navigation, route }) {
     stars.push(<FontAwesome key={i} name={style} color="yellow" />);
   }
 
+  // variable permettant de gérer l'ajout de l'utilisateur en ami :
+  //  s'il est déjà ami, le bouton sera grisé et indiquera "You are already friends"
+
   let addButton = (
     <View style={styles.logoutView}>
       <TouchableOpacity
@@ -105,21 +116,22 @@ export default function FriendScreen({ navigation, route }) {
     );
   }
 
+  // fonction asyncrhone permettant de gérer l'ajout en ami
   async function addAFriend() {
     try {
-      // Récupérer l'ID de l'utilisateur courant
+      // étape 1 : on récupére notre ID
       const userResponse = await fetch(
         `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`
       );
       const userData = await userResponse.json();
 
-      // Récupérer l'ID de l'ami
+      // étape 2 : on récupére l'ID de l'utilisateur visé par la demande
       const friendResponse = await fetch(
         `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${friendName}`
       );
       const friendData = await friendResponse.json();
 
-      // Ajouter un nouvel ami
+      // étape 3 : on crée une demande d'ami "pending" en BDD
       const addFriendResponse = await fetch(
         `${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/addFriend`,
         {
@@ -138,6 +150,7 @@ export default function FriendScreen({ navigation, route }) {
     }
   }
 
+  // variables de gestion du pluriel
   let pluralFriends = "";
   if (numberOfFriends > 1) {
     pluralFriends = "s";
@@ -148,6 +161,7 @@ export default function FriendScreen({ navigation, route }) {
     pluralGames = "s";
   }
 
+  //mapping de la liste de jeu préférés
   const games = gameList.map((data, i) => {
     const stars = [];
     for (let i = 0; i < 5; i++) {
@@ -181,6 +195,7 @@ export default function FriendScreen({ navigation, route }) {
     );
   });
 
+  // mapping des collections du joueur
   const lists = allLists.map((data, i) => {
     let title =
       data.listName.length >= 13

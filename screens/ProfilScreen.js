@@ -45,18 +45,28 @@ export default function ProfilScreen({ navigation }) {
 
   useEffect(() => {
     if (!refreshing) {
+
+      // fetch des informations de l'utilisateur connecté pour les afficher sur la page
       fetch(
         `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${user.username}`
       )
         .then((result) => result.json())
         .then((data) => {
+
+          // on enregistre le nombre d'amis (friendsList.length) dans un useState pour rendre l'info dynamique
           setNumberOfFriends(data.infos.friendsList.length);
+
+          // on enregistre également l'ID qui sera utilisé dans une autre route
           setMyId(data.infos._id);
+
+          //instruction qui permet d'enregistrer dans un useState l'existence ou non d'une photo de profil personnalisée (true/false dans gotPP) pour gérer l'affichage conditionnel et dans un autre useState l'url de la photo de profil (profilePicture)
 
           if (data.infos.profilePicture) {
             setProfilePicture(data.infos.profilePicture);
             setGotPP(true);
           }
+
+          // ici on fetch les demandes d'ami reçues et on les stock dans le useState receivedFriendRequest
 
           fetch(
             `${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/receivedFriendRequests/${data.infos._id}`
@@ -66,6 +76,7 @@ export default function ProfilScreen({ navigation }) {
               setReceivedFriendRequestList(databis.data);
             });
 
+            // même chose pour les demandes envoyées stockées dans le useState sentFriendRequestlList
           fetch(
             `${process.env.EXPO_PUBLIC_BACKEND_URL}/friends/sentFriendRequests/${data.infos._id}`
           )
@@ -77,6 +88,9 @@ export default function ProfilScreen({ navigation }) {
           return data;
         })
         .then((data) => {
+
+           // ici on fa fetcher la liste "all my games" de l'utilisateur connecté, qui regroupe l'ensemble des jeux ajoutés en favoris par celui-ci.
+        // on stocke le nombre (gameList.length dans numberOfGames) et la liste en détail (data.gameList dans le useState gameList)
           fetch(
             `${process.env.EXPO_PUBLIC_BACKEND_URL}/lists/id/${data.infos.lists[0]}`
           )
@@ -88,6 +102,8 @@ export default function ProfilScreen({ navigation }) {
         });
     }
   }, [actionOnFriends, refreshing, isFocused]);
+
+  // on met à jour le useEffect dès qu'on rafraichit la page, dès qu'on ajoute un ami ou lorsqu'on réactive l'écran
 
   function acceptFriendRequest(senderId, senderUsername) {
     //fetch 1 pour changer le statut pending en accepted dans la collection friend
@@ -121,6 +137,9 @@ export default function ProfilScreen({ navigation }) {
       body: JSON.stringify({ username: senderUsername, id: myId }),
     }).then((result) => result.json());
   }
+
+  //on map les infos des demandes d'ami reçues pour les afficher sous forme de liste
+
 
   const myReceivedFriendRequests = receivedFriendRequestList.map((data, i) => {
     return (
@@ -161,6 +180,8 @@ export default function ProfilScreen({ navigation }) {
       </View>
     );
   });
+
+  // même chose pour les demandes envoyées
 
   const mySentFriendRequests = sentFriendRequestList.map((data, i) => {
     console.log(data.receiver.profilePicture);
@@ -227,6 +248,8 @@ export default function ProfilScreen({ navigation }) {
     );
   });
 
+  // les deux fonctions suivantes permettent de changer l'affichage lorqu'on clique sur les demandes reçues ou envoyées pour afficher la liste correspondante et le css qui convient
+
   function sendRequest() {
     setDefaultFriends(false);
   }
@@ -235,6 +258,7 @@ export default function ProfilScreen({ navigation }) {
     setDefaultFriends(true);
   }
 
+  // variable de type tableau qui permet d'afficher le bon nombre d'étoiles brillantes et vides en fonction des notes  const stars = [];
   const stars = [];
   for (let i = 0; i < 5; i++) {
     let style = "star-o";
@@ -244,6 +268,8 @@ export default function ProfilScreen({ navigation }) {
     stars.push(<FontAwesome key={i} name={style} color="yellow" />);
   }
 
+
+  // les deux variables suivantes permettent d'ajuster l'utilisation du pluriel pour le nomlbre d'amis et de jeux affichés sur la page profil
   let pluralFriends = "";
   if (numberOfFriends > 1) {
     pluralFriends = "s";
@@ -361,6 +387,9 @@ export default function ProfilScreen({ navigation }) {
       </LinearGradient>
     </View>
   );
+
+  // ici on prévoit le scénario d'affichage de cette page si l'utilisateur n'est pas connecté (aucun username stocké dans le reducer)
+
 
   if (!user.username) {
     pageContent = (

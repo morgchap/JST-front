@@ -25,6 +25,8 @@ import {
   OpenSans_800ExtraBold_Italic,
 } from "@expo-google-fonts/open-sans";
 
+ // il s'agit de la page qui permet d'afficher la liste d'ami d'un utilisateur
+
 export default function FriendListScreen({ navigation, route }) {
   const { userFriendList } = route.params;
   const [numberOfFriends, setNumberOfFriends] = useState(123);
@@ -34,7 +36,10 @@ export default function FriendListScreen({ navigation, route }) {
   const [friendPP, setFriendPP] = useState(false);
   const [friendProfilePicture, setFriendProfilePicture] = useState(null);
 
+  // le useEffect sera utilisé pour fetcher les data de la liste d'ami au chargement de la page et lorsque la friendlist change
+
   useEffect(() => {
+    // fetch de la liste d'ami de l'utilisateur 
     fetch(
       `${process.env.EXPO_PUBLIC_BACKEND_URL}/users/getOne/${userFriendList}`
     )
@@ -50,8 +55,14 @@ export default function FriendListScreen({ navigation, route }) {
         return data;
       });
   }, [userFriendList]);
+  
+  // mapping des data de liste d'ami 
 
   const friendListContent = friendList.map((data, i) => {
+
+    // fpp (pour friend profil picture) est une variable permettant de réaliser un affichage conditionnel
+      //  en fonction de l'existence d'une photo de profil pour l'ami de la liste visé, sinon utilisation d'une image par défaut
+
     let fpp = (
       <Image
         style={styles.friendsAvatars}

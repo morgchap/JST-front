@@ -13,6 +13,10 @@ import { useIsFocused } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import Button from "../components/Button";
 
+//il s'agit de la page de modificiation de photo de profil dans le cas où l'utilisateur a déjà terminé le process de signup et souhaiterait mettre à jour sa photo, qu'il en ait une ou non
+// Cette page est donc très similaire à la première avec quelques différences pour la faire fonctionner en dehors du parcours de signup
+
+
 export default function SnapScreen2({ navigation }) {
   const isFocused = useIsFocused();
 
@@ -42,6 +46,7 @@ export default function SnapScreen2({ navigation }) {
         })
           .then((response) => response.json())
           .then((data) => {
+            //ici on redirige vers la page profil lorsque la photo a bien été modifée
             navigation.navigate("Profil");
           })
           .catch((err) => console.error("Error:", err));
