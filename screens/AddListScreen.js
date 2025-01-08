@@ -7,7 +7,6 @@ import {
   Switch,
   StyleSheet,
   ImageBackground,
-  Pressable,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { addGame } from "../reducers/user";
